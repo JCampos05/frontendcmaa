@@ -93,9 +93,8 @@ export class LandingComponent implements OnInit {
 
   irAInscripcion(torneoId?: number): void {
     if (torneoId) {
-      console.log('Navegando a inscripción con ID:', torneoId);
+      //console.log('Navegando a inscripción con ID:', torneoId);
       this.router.navigate(['/inscripcion', torneoId]).then(
-        success => console.log('Navegación exitosa:', success),
         error => console.error('Error en navegación:', error)
       );
     } else {

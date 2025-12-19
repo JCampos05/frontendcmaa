@@ -38,10 +38,6 @@ export class ModalEdicionInscripcionComponent implements OnChanges {
   inicializarFormulario(): void {
     if (!this.inscripcion) return;
 
-    console.log('=== INICIALIZANDO FORMULARIO MODAL ===');
-    console.log('Inscripción recibida:', this.inscripcion);
-
-    // ✅ Manejar fecha de nacimiento (puede venir como fechaNacimiento o fecha_nacimiento)
     let fechaNac = '';
     const fechaNacimiento = this.inscripcion.jugador?.fechaNacimiento || this.inscripcion.jugador?.fecha_nacimiento;
     
@@ -141,7 +137,6 @@ export class ModalEdicionInscripcionComponent implements OnChanges {
 
         this.inscripcionService.update(this.jugadorEditando.idInscripcion, datosInscripcion).subscribe({
           next: (response) => {
-            //console.log('✅ Inscripción actualizada:', response);
             this.toast.success('Inscripción hecha','Inscripción actualizada exitosamente');
             //alert('Inscripción actualizada exitosamente');
             this.actualizado.emit();

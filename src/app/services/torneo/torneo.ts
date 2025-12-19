@@ -39,7 +39,6 @@ export class TorneoService {
   getCategoriasByTorneo(torneoId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${torneoId}/categorias`).pipe(
       map(response => {
-        console.log('Respuesta RAW de categorías:', response);
         
         // El backend devuelve { success: true, categorias: [...], total: N }
         // donde categorias viene de categorias_torneo con through attributes
@@ -73,7 +72,6 @@ export class TorneoService {
             };
           });
           
-          console.log('Categorías transformadas:', categoriasTransformadas);
           return { success: true, categorias: categoriasTransformadas };
         }
         

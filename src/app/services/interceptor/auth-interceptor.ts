@@ -16,16 +16,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('🔒 Token agregado a la petición');
+    //console.log('🔒 Token agregado a la petición');
   } else {
-    console.warn('⚠️ No hay token disponible');
+    //console.warn('⚠️ No hay token disponible');
   }
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
         const errorMessage = error.error?.message || '';
-        console.error('❌ Error 401: No autorizado -', errorMessage);
+        //console.error('❌ Error 401: No autorizado -', errorMessage);
         
         // Verificar si es por sesión inválida o expirada
         if (errorMessage.includes('Sesión inválida') || 

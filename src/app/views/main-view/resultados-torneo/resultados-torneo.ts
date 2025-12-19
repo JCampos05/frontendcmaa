@@ -113,7 +113,6 @@ export class ResultadosTorneoComponent implements OnInit {
     this.torneoService.getCategoriasByTorneo(idTorneo).subscribe({
       next: (response) => {
         this.categorias = response.categorias || [];
-        console.log('Categorías cargadas:', this.categorias);
         this.cargando = false;
       },
       error: (err) => {
@@ -137,30 +136,16 @@ export class ResultadosTorneoComponent implements OnInit {
   }
 
   cargarRondas(idTorneo: number, idTorneoCat: number): void {
-    console.log('=== CARGANDO RONDAS ===');
-    console.log('idTorneo:', idTorneo);
-    console.log('idTorneoCat seleccionado:', idTorneoCat);
-
     this.rondaService.getRondasByTorneo(idTorneo).subscribe({
       next: (response) => {
-        console.log('Respuesta COMPLETA de rondas:', response);
 
         const rondasArray = Array.isArray(response) ? response : [];
-        console.log('Total de rondas del torneo:', rondasArray.length);
-
+        
         rondasArray.forEach((r: Ronda, index) => {
-          console.log(`Ronda ${index + 1}:`, {
-            idRonda: r.idRonda,
-            numeroRonda: r.numeroRonda,
-            idTorneoCategoria: r.idTorneoCategoria,
-            estado: r.estado
-          });
+
         });
 
         this.rondasDisponibles = rondasArray.sort((a, b) => a.numeroRonda - b.numeroRonda);
-
-        console.log('Rondas disponibles SIN FILTRAR:', this.rondasDisponibles);
-        console.log('Cantidad de rondas disponibles:', this.rondasDisponibles.length);
 
         this.cdr.detectChanges();
       },

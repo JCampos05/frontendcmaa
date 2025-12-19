@@ -389,16 +389,10 @@ export class GraficasEstadisticasComponent implements OnInit, OnChanges {
     }
 
     // Actualizar gráfica de evolución temporal
-    if (this.evolucionTemporal && this.evolucionTemporal.length > 0) {
-      console.log('Actualizando evolución con datos:', this.evolucionTemporal);
-      
+    if (this.evolucionTemporal && this.evolucionTemporal.length > 0) {      
       const labels = this.evolucionTemporal.map(e => e.periodo);
       const recaudado = this.evolucionTemporal.map(e => Number(e.total_recaudado) || 0);
       const esperado = this.evolucionTemporal.map(e => Number(e.total_esperado) || 0);
-      
-      console.log('Labels:', labels);
-      console.log('Recaudado:', recaudado);
-      console.log('Esperado:', esperado);
       
       this.chartEvolucionData = {
         labels: labels,
@@ -436,7 +430,6 @@ export class GraficasEstadisticasComponent implements OnInit, OnChanges {
       
       this.cdr.detectChanges();
     } else {
-      console.log('No hay datos de evolución temporal');
       this.chartEvolucionData = {
         labels: [],
         datasets: [

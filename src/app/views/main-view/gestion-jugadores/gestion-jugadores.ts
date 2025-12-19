@@ -121,7 +121,6 @@ export class GestionJugadoresComponent implements OnInit {
       this.cargando = true;
       this.jugadorService.getFullById(jugador.idJugador).subscribe({
         next: (jugadorCompleto) => {
-          console.log('Jugador completo cargado:', jugadorCompleto);
           this.jugadorSeleccionado = jugadorCompleto;
           this.cargando = false;
           this.cargarHistorialJugador(jugador.idJugador!);
@@ -142,45 +141,31 @@ export class GestionJugadoresComponent implements OnInit {
     this.cargandoHistorial = true;
     this.historialTorneos = [];
 
-    console.log('=== CARGANDO HISTORIAL DEL JUGADOR ===', idJugador);
 
     this.jugadorService.getPublicStats(idJugador).subscribe({
       next: (data) => {
-        console.log('📥 Datos recibidos de getPublicStats:', data);
 
         // Los datos vienen directamente, no hay doble envoltura
         const historial = data.historial || [];
-        console.log('📋 Historial extraído:', historial.length, 'inscripciones');
 
         if (historial.length === 0) {
-          console.log('⚠️ No hay inscripciones en el historial');
           this.cargandoHistorial = false;
           return;
         }
 
         // Contador para saber cuándo terminamos de cargar todas las partidas
         let torneosPendientes = historial.length;
-        console.log(`🔄 Procesando ${torneosPendientes} torneos...`);
 
         historial.forEach((insc: any, index: number) => {
-          console.log(`\n📌 Inscripción ${index + 1}:`, {
-            idInscripcion: insc.idInscripcion,
-            torneo: insc.torneo?.nombre || insc.torneo?.lugar,
-            idTorneo: insc.torneo?.idTorneo,
-            categoria: insc.categoria?.nombre
-          });
 
           if (insc.torneo && insc.torneo.idTorneo) {
             this.cargarPartidasTorneo(idJugador, insc, () => {
               torneosPendientes--;
-              console.log(`✅ Torneo procesado. Pendientes: ${torneosPendientes}`);
               if (torneosPendientes === 0) {
                 this.cargandoHistorial = false;
-                console.log('🎉 Historial completo cargado:', this.historialTorneos.length, 'torneos');
               }
             });
           } else {
-            console.warn('⚠️ Inscripción sin torneo válido:', insc);
             torneosPendientes--;
             if (torneosPendientes === 0) {
               this.cargandoHistorial = false;
@@ -204,11 +189,9 @@ export class GestionJugadoresComponent implements OnInit {
   cargarPartidasTorneo(idJugador: number, inscripcion: any, callback?: () => void): void {
     const idTorneo = inscripcion.torneo.idTorneo;
 
-    console.log('Cargando partidas para torneo:', idTorneo);
 
     this.partidaService.getPartidasByJugadorTorneo(idJugador, idTorneo).subscribe({
       next: (partidas) => {
-        console.log('Partidas recibidas:', partidas);
 
         const partidasDetalle = this.procesarPartidas(partidas, idJugador);
 
@@ -219,7 +202,6 @@ export class GestionJugadoresComponent implements OnInit {
           puntos: partidasDetalle.reduce((sum, p) => sum + p.puntosObtenidos, 0)
         };
 
-        console.log('Estadísticas calculadas:', stats);
 
         const historialTorneo: HistorialTorneo = {
           torneo: inscripcion.torneo,
@@ -234,8 +216,6 @@ export class GestionJugadoresComponent implements OnInit {
         this.historialTorneos.sort((a, b) => {
           return new Date(b.torneo.fecha).getTime() - new Date(a.torneo.fecha).getTime();
         });
-
-        console.log('Historial actualizado:', this.historialTorneos);
 
         if (callback) {
           callback();
@@ -320,7 +300,6 @@ export class GestionJugadoresComponent implements OnInit {
         // Recargar el jugador completo desde el servidor con el nuevo endpoint
         this.jugadorService.getFullById(idJugador).subscribe({
           next: (jugadorCompleto) => {
-            console.log('Jugador completo recibido:', jugadorCompleto);
             this.jugadorSeleccionado = jugadorCompleto;
             this.modoEdicion = false;
             this.jugadorEditado = {};

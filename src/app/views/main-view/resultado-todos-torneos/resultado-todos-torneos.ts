@@ -108,7 +108,6 @@ export class ResultadosTodoTorneosComponent implements OnInit {
     this.torneoService.getCategoriasByTorneo(idTorneo).subscribe({
       next: (response) => {
         this.categorias = response.categorias || [];
-        console.log('Categorías cargadas:', this.categorias);
       },
       error: (err) => {
         this.error = 'Error al cargar categorías';
@@ -130,10 +129,6 @@ export class ResultadosTodoTorneosComponent implements OnInit {
   }
 
   cargarRondas(idTorneo: number, idTorneoCat: number): void {
-    console.log('=== CARGANDO RONDAS ===');
-    console.log('idTorneo:', idTorneo);
-    console.log('idTorneoCat seleccionado:', idTorneoCat);
-
     this.rondaService.getRondasByTorneo(idTorneo).subscribe({
       next: (response) => {
         const rondasArray = Array.isArray(response) ? response : [];

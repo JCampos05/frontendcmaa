@@ -52,12 +52,6 @@ export class TorneoActualComponent implements OnInit {
           });
 
           this.torneoActual = torneoEnRango || torneosOrdenados[0];
-          console.log('Torneo actual cargado:', this.torneoActual);
-          console.log('Todas las propiedades del torneo:', Object.keys(this.torneoActual));
-          console.log('TorneoCategoria:', this.torneoActual?.torneoCategoria);
-          console.log('TorneoCategorias (mayúscula):', (this.torneoActual as any)?.TorneoCategorias);
-          console.log('torneoCategorias (minúscula):', (this.torneoActual as any)?.torneoCategorias);
-          console.log('Categorías detalladas:', this.getCategoriasDetalladas());
         } else {
           this.torneoActual = null;
         }
@@ -136,16 +130,11 @@ export class TorneoActualComponent implements OnInit {
       || [];
     
     if (!torneoCategoria || torneoCategoria.length === 0) {
-      console.log('No hay torneoCategoria en el torneo');
       return [];
     }
     
-    console.log('Mapeando categorías desde torneoCategoria:', torneoCategoria);
     
     const categorias = torneoCategoria.map((tc: any) => {
-      console.log('Procesando torneoCategoria:', tc);
-      console.log('Categoria dentro de tc:', tc.categoria);
-      
       return {
         nombre: tc.categoria?.nombre || 'Sin categoría',
         ritmoJuego: tc.ritmoJuego || tc.ritmo_juego || 'No especificado',
@@ -154,7 +143,6 @@ export class TorneoActualComponent implements OnInit {
       };
     });
     
-    console.log('Categorías procesadas:', categorias);
     return categorias;
   }
 

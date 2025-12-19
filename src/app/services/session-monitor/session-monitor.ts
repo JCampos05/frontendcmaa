@@ -32,17 +32,17 @@ export class SessionMonitorService implements OnDestroy {
   startMonitoring(): void {
     // Solo monitorear si hay una sesión activa
     if (!this.authService.isAuthenticated()) {
-      console.log('🔍 SessionMonitor: No hay sesión activa, no se inicia monitoreo');
+      //console.log('🔍 SessionMonitor: No hay sesión activa, no se inicia monitoreo');
       return;
     }
 
     // Si ya está monitoreando, no iniciar de nuevo
     if (this.monitorSubscription) {
-      console.log('🔍 SessionMonitor: Ya está monitoreando');
+      //console.log('🔍 SessionMonitor: Ya está monitoreando');
       return;
     }
 
-    console.log('🔍 SessionMonitor: Iniciando monitoreo de sesión...');
+    //console.log('🔍 SessionMonitor: Iniciando monitoreo de sesión...');
 
     // IMPORTANTE: Verificar inmediatamente al iniciar
     this.verificarSesionInmediata();
@@ -53,19 +53,19 @@ export class SessionMonitorService implements OnDestroy {
         switchMap(() => {
           // Verificar primero si hay token
           if (!this.authService.isAuthenticated()) {
-            console.log('🔍 SessionMonitor: No hay token, deteniendo monitoreo');
+            //console.log('🔍 SessionMonitor: No hay token, deteniendo monitoreo');
             this.stopMonitoring();
             return of(null);
           }
 
           // Si ya hay una verificación en curso, saltar esta
           if (this.isChecking) {
-            console.log('🔍 SessionMonitor: Verificación ya en curso, saltando...');
+           // console.log('🔍 SessionMonitor: Verificación ya en curso, saltando...');
             return of(null);
           }
 
           // Hacer una petición ligera al servidor para verificar la sesión
-          console.log('🔍 SessionMonitor: Verificando sesión...');
+          //console.log('🔍 SessionMonitor: Verificando sesión...');
           return this.authService.getProfile().pipe(
             catchError((error) => {
               if (error.status === 401) {
@@ -80,11 +80,11 @@ export class SessionMonitorService implements OnDestroy {
       .subscribe({
         next: (profile) => {
           if (profile) {
-            console.log('🔍 SessionMonitor: Sesión válida ✅');
+            //console.log('🔍 SessionMonitor: Sesión válida ✅');
           }
         },
         error: (error) => {
-          console.error('🔍 SessionMonitor: Error en monitoreo', error);
+          //console.error('🔍 SessionMonitor: Error en monitoreo', error);
         }
       });
   }
@@ -95,31 +95,31 @@ export class SessionMonitorService implements OnDestroy {
    */
   verificarSesionInmediata(): void {
     if (this.isChecking) {
-      console.log('🔍 SessionMonitor: Ya hay una verificación en curso');
+      //console.log('🔍 SessionMonitor: Ya hay una verificación en curso');
       return;
     }
 
     if (!this.authService.isAuthenticated()) {
-      console.log('🔍 SessionMonitor: No hay token para verificar');
+      //console.log('🔍 SessionMonitor: No hay token para verificar');
       return;
     }
 
     this.isChecking = true;
-    console.log('🔍 SessionMonitor: Verificando sesión inmediatamente...');
+    //console.log('🔍 SessionMonitor: Verificando sesión inmediatamente...');
 
     this.authService.getProfile().subscribe({
       next: (profile) => {
-        console.log('🔍 SessionMonitor: Sesión válida ✅', profile);
+        //console.log('🔍 SessionMonitor: Sesión válida ', profile);
         this.isChecking = false;
       },
       error: (error) => {
         this.isChecking = false;
         
         if (error.status === 401) {
-          console.error('🔍 SessionMonitor: Sesión inválida o cerrada remotamente');
+          //console.error('🔍 SessionMonitor: Sesión inválida o cerrada remotamente');
           this.handleInvalidSession();
         } else {
-          console.error('🔍 SessionMonitor: Error al verificar sesión', error);
+          //console.error('🔍 SessionMonitor: Error al verificar sesión', error);
         }
       }
     });
@@ -130,7 +130,7 @@ export class SessionMonitorService implements OnDestroy {
    */
   stopMonitoring(): void {
     if (this.monitorSubscription) {
-      console.log('🔍 SessionMonitor: Deteniendo monitoreo');
+      //console.log('🔍 SessionMonitor: Deteniendo monitoreo');
       this.monitorSubscription.unsubscribe();
       this.monitorSubscription = null;
     }
@@ -141,7 +141,7 @@ export class SessionMonitorService implements OnDestroy {
    * Maneja una sesión inválida
    */
   private handleInvalidSession(): void {
-    console.warn('⚠️ SessionMonitor: Sesión cerrada remotamente o expirada');
+    //console.warn('⚠️ SessionMonitor: Sesión cerrada remotamente o expirada');
     
     // Limpiar sesión local
     this.authService.logoutLocal();

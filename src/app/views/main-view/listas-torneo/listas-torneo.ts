@@ -306,7 +306,6 @@ export class ListasTorneoComponent implements OnInit {
         `Actualizados: ${actualizados} | No encontrados: ${noEncontrados} | Errores: ${errores}`
       );
 
-      console.log('Actualización completada:', { actualizados, noEncontrados, errores });
     });
   }
 

@@ -13,12 +13,11 @@ export class InscripcionService {
   constructor(private http: HttpClient) {}
 
   /**
-   * ✅ FUNCIÓN AUXILIAR: Transformar datos de snake_case a camelCase
+   * FUNCIÓN AUXILIAR: Transformar datos de snake_case a camelCase
    */
   private transformInscripcion(data: any): any {
     if (!data) return data;
 
-    console.log('🔄 Transformando inscripción desde backend:', data);
 
     const transformed = {
       idInscripcion: data.idInscripcion,
@@ -26,7 +25,7 @@ export class InscripcionService {
       idTorneo: data.idTorneo,
       idCategoria: data.idCategoria,
       
-      // ✅ CRÍTICO: Transformar snake_case → camelCase
+      // CRÍTICO: Transformar snake_case → camelCase
       fechaInscripcion: data.fecha_inscripcion,
       pagoConfirmado: Boolean(data.pago_confirmado === true || data.pago_confirmado === 1),
       montoPagado: Number(data.monto_pagado) || 0,
@@ -106,23 +105,23 @@ export class InscripcionService {
   }
 
   /**
-   * ✅ CRÍTICO: Transformar datos al obtener inscripciones por torneo
+   * CRÍTICO: Transformar datos al obtener inscripciones por torneo
    */
   getByTorneo(idTorneo: number): Observable<any[]> {
-    console.log('📡 Obteniendo inscripciones del torneo:', idTorneo);
+    //console.log('📡 Obteniendo inscripciones del torneo:', idTorneo);
     
     return this.http.get<any>(`${this.apiUrl}/torneo/${idTorneo}`).pipe(
       map(response => {
-        console.log('📥 Respuesta cruda del backend:', response);
+        //console.log('📥 Respuesta cruda del backend:', response);
         
         const data = response.data || response || [];
-        console.log(`📦 Total de inscripciones recibidas: ${data.length}`);
+        //console.log(`📦 Total de inscripciones recibidas: ${data.length}`);
         
-        // ✅ Transformar cada inscripción
+        // Transformar cada inscripción
         const transformed = data.map((item: any) => this.transformInscripcion(item));
         
-        console.log('✅ Inscripciones transformadas:', transformed.length);
-        console.log('Muestra de la primera inscripción:', transformed[0]);
+        //console.log('Inscripciones transformadas:', transformed.length);
+        //console.log('Muestra de la primera inscripción:', transformed[0]);
         
         return transformed;
       }),
@@ -154,11 +153,11 @@ export class InscripcionService {
    * ✅ UPDATE - Transformar respuesta
    */
   update(id: number, datos: any): Observable<any> {
-    console.log('📤 UPDATE - Datos enviados al backend:', datos);
+    //console.log(' UPDATE - Datos enviados al backend:', datos);
 
     return this.http.put<any>(`${this.apiUrl}/${id}`, datos).pipe(
       map(response => {
-        console.log('📥 UPDATE - Respuesta del backend:', response);
+        //console.log(' UPDATE - Respuesta del backend:', response);
         const data = response.data || response;
         return this.transformInscripcion(data);
       }),
@@ -167,16 +166,16 @@ export class InscripcionService {
   }
 
   /**
-   * ✅ CONFIRMAR PAGO - Transformar respuesta
+   * CONFIRMAR PAGO - Transformar respuesta
    */
   confirmarPago(id: number, montoPagado: number): Observable<any> {
-    console.log('📤 CONFIRMAR PAGO - ID:', id, 'Monto:', montoPagado);
+    //console.log(' CONFIRMAR PAGO - ID:', id, 'Monto:', montoPagado);
     
     return this.http.patch<any>(`${this.apiUrl}/${id}/confirmar-pago`, {
       monto_pagado: montoPagado
     }).pipe(
       map(response => {
-        console.log('📥 CONFIRMAR PAGO - Respuesta:', response);
+        //console.log(' CONFIRMAR PAGO - Respuesta:', response);
         return response;
       }),
       catchError(this.handleError)

@@ -123,7 +123,7 @@ export class ModalCargaEmparejamientoComponent {
 
     // Construir el texto de búsqueda según el número de ronda
     const textoBusqueda = this.numeroRonda ? `Round ${this.numeroRonda}` : 'Round 1';
-    console.log('Buscando en el archivo:', textoBusqueda);
+    //console.log('Buscando en el archivo:', textoBusqueda);
 
     for (let i = 0; i < jsonData.length; i++) {
       const fila = jsonData[i];
@@ -170,7 +170,7 @@ export class ModalCargaEmparejamientoComponent {
             .map(i => i.jugador)
             .filter(j => j);
 
-          console.log('Jugadores inscritos:', this.jugadoresInscritos);
+          //console.log('Jugadores inscritos:', this.jugadoresInscritos);
 
           this.jugadorService.getAll({ estado: 'activo' }).subscribe({
             next: (jugadores) => {

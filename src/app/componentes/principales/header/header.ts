@@ -43,34 +43,31 @@ export class HeaderComponent {
 
   logout(): void {
     if (this.cerrando) {
-      console.log('Ya hay un logout en progreso');
       return;
     }
     
     this.cerrando = true;
     this.closeProfileMenu();
     
-    console.log('🔴 Iniciando logout desde header...');
-    console.log('Token antes de logout:', this.authService.getToken() ? 'Existe' : 'No existe');
+    //console.log('Token antes de logout:', this.authService.getToken() ? 'Existe' : 'No existe');
 
     this.authService.logout().subscribe({
       next: (response) => {
-        console.log('✅ Logout exitoso:', response);
         
         // Verificar que el token fue eliminado
         const tokenDespues = this.authService.getToken();
-        console.log('Token después de logout:', tokenDespues ? 'AÚN EXISTE ❌' : 'Eliminado ✅');
+        //console.log('Token después de logout:', tokenDespues ? 'AÚN EXISTE ❌' : 'Eliminado ✅');
         
         if (tokenDespues) {
-          console.error('⚠️ PROBLEMA: El token no se eliminó correctamente');
+          //console.error('⚠️ PROBLEMA: El token no se eliminó correctamente');
           // Forzar limpieza
           this.authService.logoutLocal();
         }
         
         // Navegar al login
-        console.log('🏠 Navegando a /login...');
+        //console.log('🏠 Navegando a /login...');
         this.router.navigate(['/login']).then(() => {
-          console.log('✅ Navegación completada');
+          //console.log('✅ Navegación completada');
           this.cerrando = false;
         });
       },
@@ -79,7 +76,7 @@ export class HeaderComponent {
         
         // Verificar token de todos modos
         const tokenDespues = this.authService.getToken();
-        console.log('Token después del error:', tokenDespues ? 'Existe' : 'Eliminado');
+        //console.log('Token después del error:', tokenDespues ? 'Existe' : 'Eliminado');
         
         // Navegar de todos modos
         this.router.navigate(['/login']).then(() => {

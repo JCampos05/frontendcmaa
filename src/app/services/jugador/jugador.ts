@@ -105,7 +105,7 @@ export class JugadorService {
     return this.http.get<any>(`${this.apiUrl}/${id}/full`).pipe(
       map(response => {
         const data = response.data || response;
-        console.log('Datos recibidos en getFullById:', data);
+        //console.log('Datos recibidos en getFullById:', data);
         return data;
       })
     );

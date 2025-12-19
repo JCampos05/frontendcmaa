@@ -346,7 +346,6 @@ export class NuevoTorneoComponent implements OnInit {
           activo: true
         };
 
-        console.log('Enviando categoriaData:', categoriaData);
         await this.torneoCategoriaService.upsert(categoriaData).toPromise();
       }
 

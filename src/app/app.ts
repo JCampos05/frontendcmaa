@@ -28,26 +28,21 @@ export class AppComponent implements OnInit, OnDestroy {
     
     // Si ya hay una sesión activa al cargar la app, verificar e iniciar monitoreo
     if (this.authService.isAuthenticated()) {
-      console.log('🚀 App inicializada con sesión activa');
       
       // IMPORTANTE: Verificar inmediatamente si la sesión es válida
       this.sessionMonitor.verificarSesionInmediata();
       
       // Luego iniciar monitoreo continuo
       this.sessionMonitor.startMonitoring();
-    } else {
-      console.log('🚀 App inicializada sin sesión activa');
-    }
+    } 
 
     // Escuchar eventos de inicio de sesión
     window.addEventListener('session-started', () => {
-      console.log('📡 Evento session-started recibido');
       this.sessionMonitor.startMonitoring();
     });
 
     // Escuchar eventos de cierre de sesión
     window.addEventListener('session-ended', () => {
-      console.log('📡 Evento session-ended recibido');
       this.sessionMonitor.stopMonitoring();
     });
   }
@@ -58,7 +53,6 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   @HostListener('window:focus')
   onWindowFocus(): void {
-    console.log('👁️ Ventana enfocada - verificando sesión...');
     
     if (this.authService.isAuthenticated()) {
       // Verificar la sesión cuando el usuario vuelve a la pestaña
@@ -73,7 +67,6 @@ export class AppComponent implements OnInit, OnDestroy {
   @HostListener('document:visibilitychange')
   onVisibilityChange(): void {
     if (!document.hidden) {
-      console.log('👁️ Página visible - verificando sesión...');
       
       if (this.authService.isAuthenticated()) {
         this.sessionMonitor.verificarSesionInmediata();

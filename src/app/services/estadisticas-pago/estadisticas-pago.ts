@@ -1,4 +1,3 @@
-// services/estadisticas-pago/estadisticas-pago.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -103,6 +102,6 @@ export class EstadisticasPagoService {
    */
   exportarReporte(formato: 'pdf' | 'excel', datos: any): void {
     // Este método se implementará en el componente para generar los reportes
-    console.log(`Exportando reporte en formato ${formato}`, datos);
+    //console.log(`Exportando reporte en formato ${formato}`, datos);
   }
 }

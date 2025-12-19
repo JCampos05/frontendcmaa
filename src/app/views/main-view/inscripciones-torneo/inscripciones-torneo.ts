@@ -120,11 +120,8 @@ export class InscripcionesAdminComponent implements OnInit {
   }
 
   cargarInscripciones(idTorneo: number): void {
-    console.log('=== CARGANDO INSCRIPCIONES DEL TORNEO:', idTorneo);
     this.inscripcionService.getByTorneo(idTorneo).subscribe({
       next: (inscripciones) => {
-        console.log('=== INSCRIPCIONES RECIBIDAS:', inscripciones.length);
-        console.log('Datos completos:', inscripciones);
         this.procesarEstadisticas(inscripciones);
         this.cargando = false;
       },
@@ -137,8 +134,6 @@ export class InscripcionesAdminComponent implements OnInit {
   }
 
   procesarEstadisticas(inscripciones: Inscripcion[]): void {
-    console.log('=== PROCESANDO ESTADÍSTICAS ===');
-    console.log('Total inscripciones recibidas:', inscripciones.length);
 
     const categorias = new Map<number, EstadisticasCategoria>();
 
@@ -146,17 +141,8 @@ export class InscripcionesAdminComponent implements OnInit {
       const montoPagadoNum = Number(insc.montoPagado) || 0;
       const costoCategoria = Number(insc.categoria?.costo) || 0;
 
-      // ✅ CORRECCIÓN: Validar que el pago esté 100% completo
+      //  CORRECCIÓN: Validar que el pago esté 100% completo
       const pagoCompleto = montoPagadoNum >= costoCategoria && costoCategoria > 0;
-
-      console.log('Procesando inscripción:', {
-        id: insc.idInscripcion,
-        jugador: `${insc.jugador?.nombre} ${insc.jugador?.apellido1}`,
-        montoPagado: montoPagadoNum,
-        costoCategoria: costoCategoria,
-        pagoCompleto: pagoCompleto,
-        estado: insc.estado
-      });
 
       const idCat = insc.idCategoria || 0;
 
@@ -179,16 +165,14 @@ export class InscripcionesAdminComponent implements OnInit {
       cat.totalInscritos++;
       cat.inscripciones.push(insc);
 
-      // ✅ CORRECCIÓN: Solo contar como confirmado si pagó el 100%
+      // CORRECCIÓN: Solo contar como confirmado si pagó el 100%
       if (pagoCompleto) {
         cat.pagosConfirmados++;
-        console.log(`✅ Pago completo - Monto: ${montoPagadoNum}`);
       } else {
         cat.pagosPendientes++;
-        console.log(`⏳ Pago pendiente/parcial - Pagado: ${montoPagadoNum} de ${costoCategoria}`);
       }
 
-      // ✅ SIEMPRE sumar al total recaudado, sin importar si es pago completo o parcial
+      // SIEMPRE sumar al total recaudado, sin importar si es pago completo o parcial
       cat.totalRecaudado += montoPagadoNum;
 
       const rating = insc.jugador?.rating || 0;
@@ -208,13 +192,6 @@ export class InscripcionesAdminComponent implements OnInit {
         : 0;
 
       if (cat.ratingMasBajo === 9999) cat.ratingMasBajo = 0;
-
-      console.log(`📊 Categoría ${cat.nombreCategoria}:`, {
-        totalInscritos: cat.totalInscritos,
-        pagosConfirmados: cat.pagosConfirmados,
-        pagosPendientes: cat.pagosPendientes,
-        totalRecaudado: cat.totalRecaudado
-      });
     });
 
     this.estadisticasPorCategoria = Array.from(categorias.values());
@@ -251,12 +228,6 @@ export class InscripcionesAdminComponent implements OnInit {
       promedioEdad: edades.length > 0 ? edades.reduce((a, b) => a + b, 0) / edades.length : 0,
       promedioRating: ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
     };
-
-    console.log('=== ESTADÍSTICAS FINALES ===');
-    console.log('Total inscritos:', totalInscritos);
-    console.log('Pagos confirmados (100%):', pagosConfirmados);
-    console.log('Pagos pendientes/parciales:', totalInscritos - pagosConfirmados);
-    console.log('Total recaudado: $', totalRecaudado.toFixed(2));
   }
 
   cargarCategorias(): void {
@@ -373,10 +344,6 @@ export class InscripcionesAdminComponent implements OnInit {
 
     if (!confirm(mensaje)) return;
 
-    console.log('=== CONFIRMANDO PAGO E INSCRIPCIÓN ===');
-    console.log('ID Inscripción:', inscripcion.idInscripcion);
-    console.log('Monto:', monto);
-
     const datosActualizacion = {
       pago_confirmado: true,
       monto_pagado: Number(monto), 
@@ -385,15 +352,6 @@ export class InscripcionesAdminComponent implements OnInit {
 
     this.inscripcionService.update(inscripcion.idInscripcion, datosActualizacion).subscribe({
       next: (response) => {
-
-        // Verificar que los datos se actualizaron
-        if (response.data) {
-          console.log('Datos actualizados:', {
-            pagoConfirmado: response.data.pagoConfirmado,
-            montoPagado: response.data.montoPagado,
-            estado: response.data.estado
-          });
-        }
 
         this.toast.success('Jugador confirmado','Pago e inscripción confirmados exitosamente');
         //alert('Pago e inscripción confirmados exitosamente');
@@ -428,14 +386,6 @@ export class InscripcionesAdminComponent implements OnInit {
   getMontoPagado(inscripcion: Inscripcion): number {
     const montoPagado = Number(inscripcion.montoPagado) || 0;
 
-    console.log('getMontoPagado para inscripción:', {
-      id: inscripcion.idInscripcion,
-      montoPagado: montoPagado,
-      montoPagadoOriginal: inscripcion.montoPagado,
-      pagoConfirmado: inscripcion.pagoConfirmado,
-      costoCategoría: inscripcion.categoria?.costo
-    });
-
     return montoPagado;
   }
 
@@ -447,18 +397,10 @@ export class InscripcionesAdminComponent implements OnInit {
     // Mostrar botón si: el pago no está completo Y la categoría tiene costo
     const puedePagar = estadoPago !== 'confirmado' && costoCategoría > 0;
 
-    console.log('puedePagarInscripcion:', {
-      id: inscripcion.idInscripcion,
-      estadoPago: estadoPago,
-      costoCategoría: costoCategoría,
-      resultado: puedePagar
-    });
-
     return puedePagar;
   }
 
   actualizarEstadisticas(): void {
-    console.log('=== ACTUALIZANDO ESTADÍSTICAS ===');
     if (this.torneoSeleccionado?.idTorneo) {
       this.cargarInscripciones(this.torneoSeleccionado.idTorneo);
     }
@@ -630,8 +572,6 @@ export class InscripcionesAdminComponent implements OnInit {
   }
 
   editarInscripcion(inscripcion: Inscripcion): void {
-    console.log('=== ABRIENDO MODAL DE EDICIÓN ===');
-    console.log('Inscripción seleccionada:', inscripcion);
     this.inscripcionSeleccionada = inscripcion;
     this.modalEdicionVisible = true;
   }
@@ -644,13 +584,11 @@ export class InscripcionesAdminComponent implements OnInit {
   }
 
   cerrarModalEdicion(): void {
-    console.log('=== CERRANDO MODAL DE EDICIÓN ===');
     this.modalEdicionVisible = false;
     this.inscripcionSeleccionada = null;
   }
 
   onModalEdicionActualizado(): void {
-    console.log('=== EVENTO: Modal de edición actualizado ===');
     this.cerrarModalEdicion();
     this.actualizarEstadisticas();
   }

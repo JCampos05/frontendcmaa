@@ -63,7 +63,6 @@ export class AuthService {
             // Actualizar el subject
             this.currentUserSubject.next(usuario);
             
-            console.log('✅ Login exitoso - Token guardado');
             
             // IMPORTANTE: Emitir evento para iniciar monitoreo de sesión
             window.dispatchEvent(new CustomEvent('session-started'));
@@ -101,36 +100,30 @@ export class AuthService {
     }
 
     this.isLoggingOut = true;
-    console.log('🚪 Iniciando logout...');
 
     // Si no hay token, solo limpiar localmente
     const token = this.getToken();
     if (!token) {
-      console.log('⚠️ No hay token, limpiando localmente');
       this.logoutLocal();
       this.isLoggingOut = false;
       return of({ success: true, message: 'Sesión cerrada localmente' });
     }
 
-    console.log('📡 Enviando petición de logout al servidor...');
     
     return this.http.post<LogoutResponse>(`${this.apiUrl}/logout`, {}).pipe(
       tap(response => {
-        console.log('✅ Respuesta del servidor recibida:', response);
         // SIEMPRE limpiar localStorage después de la respuesta
         this.logoutLocal();
       }),
       catchError(error => {
         // Aunque falle el backend, limpiar localmente
-        console.error('❌ Error al cerrar sesión en el backend:', error);
-        console.log('🧹 Limpiando sesión localmente de todos modos...');
+        //console.error('❌ Error al cerrar sesión en el backend:', error);
         this.logoutLocal();
         // Retornar éxito de todos modos para que no se bloquee la UI
         return of({ success: true, message: 'Sesión cerrada localmente' });
       }),
       tap(() => {
         this.isLoggingOut = false;
-        console.log('✅ Logout completado');
       })
     );
   }
@@ -140,19 +133,19 @@ export class AuthService {
    * Usar solo en casos de emergencia o cuando el backend no responde
    */
   logoutLocal(): void {
-    console.log('🧹 Limpiando localStorage...');
-    console.log('Token antes:', localStorage.getItem('token') ? 'Existe' : 'No existe');
+    //console.log('🧹 Limpiando localStorage...');
+    //console.log('Token antes:', localStorage.getItem('token') ? 'Existe' : 'No existe');
     
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
     
-    console.log('Token después:', localStorage.getItem('token') ? 'Existe' : 'No existe');
+    //console.log('Token después:', localStorage.getItem('token') ? 'Existe' : 'No existe');
     
     this.currentUserSubject.next(null);
     this.isLoggingOut = false;
     
-    console.log('✅ Sesión cerrada localmente');
-    console.log('Usuario actual:', this.currentUserValue);
+    //console.log('✅ Sesión cerrada localmente');
+    //console.log('Usuario actual:', this.currentUserValue);
     
     // Emitir evento para detener monitoreo de sesión
     window.dispatchEvent(new CustomEvent('session-ended'));

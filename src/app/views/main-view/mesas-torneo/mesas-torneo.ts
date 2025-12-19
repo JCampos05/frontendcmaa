@@ -172,7 +172,6 @@ export class MesasTorneoComponent implements OnInit {
     this.torneoService.getCategoriasByTorneo(idTorneo).subscribe({
       next: (response) => {
         this.categorias = response.categorias || [];
-        console.log('Categorías cargadas:', this.categorias);
         this.cargando = false;
       },
       error: (err) => {
@@ -183,7 +182,6 @@ export class MesasTorneoComponent implements OnInit {
     });
   }
   onCategoriaChange(): void {
-    console.log('Categoría seleccionada:', this.categoriaSeleccionada);
     this.rondaSeleccionada = null;
     this.rondaActualData = null;
     this.mesasRonda = [];
@@ -191,9 +189,6 @@ export class MesasTorneoComponent implements OnInit {
 
     if (this.categoriaSeleccionada && this.torneoActual?.idTorneo) {
       const idCategoria = this.categoriaSeleccionada.idCategoria;
-
-      console.log('ID Categoria:', idCategoria);
-      console.log('ID TorneoCat:', this.categoriaSeleccionada.idTorneoCat);
 
       if (idCategoria) {
         this.cargarRondas(this.torneoActual.idTorneo, idCategoria);
@@ -205,19 +200,16 @@ export class MesasTorneoComponent implements OnInit {
   }
 
   cargarRondas(idTorneo: number, idCategoria: number): void {
-    console.log('Cargando rondas - idTorneo:', idTorneo, 'idCategoria:', idCategoria);
     this.cargando = true;
 
     this.rondaService.getRondasByTorneo(idTorneo).subscribe({
       next: (rondas) => {
-        console.log('Rondas recibidas:', rondas);
 
         const idTorneoCat = this.categoriaSeleccionada?.idTorneoCat;
-        console.log('Filtrando por idTorneoCat:', idTorneoCat);
 
         if (!idTorneoCat) {
           console.error('No se encontró idTorneoCat en la categoría seleccionada');
-          console.error('Categoría completa:', JSON.stringify(this.categoriaSeleccionada, null, 2));
+          //console.error('Categoría completa:', JSON.stringify(this.categoriaSeleccionada, null, 2));
           this.mostrarToast('error', 'Error', 'La categoría no tiene un identificador válido. Contacta al administrador.');
           this.cargando = false;
           return;
@@ -225,12 +217,12 @@ export class MesasTorneoComponent implements OnInit {
 
         this.rondasDisponibles = Array.isArray(rondas)
           ? rondas.filter((r: Ronda) => {
-            console.log(`Ronda ${r.numeroRonda}: idTorneoCategoria=${r.idTorneoCategoria} === idTorneoCat=${idTorneoCat}?`, r.idTorneoCategoria === idTorneoCat);
+            //console.log(`Ronda ${r.numeroRonda}: idTorneoCategoria=${r.idTorneoCategoria} === idTorneoCat=${idTorneoCat}?`, r.idTorneoCategoria === idTorneoCat);
             return r.idTorneoCategoria === idTorneoCat;
           }).sort((a, b) => a.numeroRonda - b.numeroRonda)
           : [];
 
-        console.log('Rondas filtradas:', this.rondasDisponibles);
+        //console.log('Rondas filtradas:', this.rondasDisponibles);
 
         if (this.rondasDisponibles.length > 0) {
           // Si había una ronda seleccionada, mantenerla si sigue existiendo
@@ -252,7 +244,6 @@ export class MesasTorneoComponent implements OnInit {
           this.rondaActualData = ultimaRonda;
           this.cargarMesasRonda(ultimaRonda.idRonda);
         } else {
-          console.log('No hay rondas disponibles para esta categoría');
           this.cargando = false;
         }
       },
@@ -285,7 +276,6 @@ export class MesasTorneoComponent implements OnInit {
       next: (mesas) => {
         this.mesasRonda = Array.isArray(mesas) ? mesas : [];
         this.cargando = false;
-        console.log('Mesas de la ronda:', this.mesasRonda);
       },
       error: (err) => {
         console.error('Error al cargar mesas:', err);

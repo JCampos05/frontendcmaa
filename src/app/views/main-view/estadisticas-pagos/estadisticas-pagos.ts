@@ -264,7 +264,6 @@ export class EstadisticasPagosComponent implements OnInit {
       this.estadisticasService.getEvolucionTemporal(fechaInicio, fechaFin, agrupacionAUsar, this.torneoSeleccionado).toPromise(),
       this.estadisticasService.getComparativaAnual(this.torneoSeleccionado).toPromise()
     ]).then(([generales, categorias, torneos, evolucion, comparativa]) => {
-      console.log('Evolución temporal recibida:', evolucion);
       this.estadisticasGenerales = generales;
       this.estadisticasPorCategoria = categorias || [];
       this.estadisticasPorTorneo = torneos || [];

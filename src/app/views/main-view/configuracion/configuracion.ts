@@ -330,7 +330,6 @@ export class Configuracion implements OnInit {
     this.cargando = true;
     this.error = null;
 
-    console.log('🔍 Filtros antes de construir:', this.filtrosLogs);
 
     const filtros = {
       nivel: this.filtrosLogs.nivel || undefined,
@@ -338,11 +337,9 @@ export class Configuracion implements OnInit {
       accion: this.filtrosLogs.accion || undefined
     };
 
-    console.log('🔍 Filtros después de construir:', filtros);
 
     this.logsService.getAll(this.limitePorPaginaLogs, this.paginaLogs, filtros).subscribe({
       next: (response) => {
-        console.log('✅ Respuesta del servidor:', response);
         this.logs = response.data;
         this.totalPaginasLogs = response.totalPaginas;
         this.totalLogs = response.total;
@@ -350,7 +347,7 @@ export class Configuracion implements OnInit {
       },
       error: (err) => {
         this.error = 'Error al cargar logs del sistema';
-        console.error('Error:', err);
+        //console.error('Error:', err);
         this.cargando = false;
       }
     });

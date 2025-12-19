@@ -25,13 +25,13 @@ export class EstadisticaTorneoService {
   getAllEstadisticas(): Observable<EstadisticaTorneo[]> {
     return this.http.get<any>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       map(response => {
-        console.log('getAllEstadisticas response:', response);
+        //console.log('getAllEstadisticas response:', response);
         if (response.data) return response.data;
         if (Array.isArray(response)) return response;
         return [];
       }),
       catchError(error => {
-        console.error('Error en getAllEstadisticas:', error);
+        //console.error('Error en getAllEstadisticas:', error);
         return of([]);
       })
     );
@@ -42,14 +42,14 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        console.log('getEstadisticasByTorneo response:', response);
+        //console.log('getEstadisticasByTorneo response:', response);
         if (response.data) return response.data;
         if (response.estadisticas) return response.estadisticas;
         if (Array.isArray(response)) return response;
         return [];
       }),
       catchError(error => {
-        console.error('Error en getEstadisticasByTorneo:', error);
+        //console.error('Error en getEstadisticasByTorneo:', error);
         return of([]);
       })
     );
@@ -57,11 +57,11 @@ export class EstadisticaTorneoService {
 
   getEstadisticasByTorneoCategoria(idTorneo: number, idTorneoCategoria: number): Observable<EstadisticaTorneo[]> {
     const url = `${this.apiUrl}/torneo/${idTorneo}/categoria/${idTorneoCategoria}`;
-    console.log('Llamando a URL:', url);
+    //console.log('Llamando a URL:', url);
 
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       map(response => {
-        console.log('getEstadisticasByTorneoCategoria response:', response);
+        //console.log('getEstadisticasByTorneoCategoria response:', response);
 
         // El backend retorna { success: true, data: [...] }
         if (response.success && response.data) {
@@ -88,11 +88,11 @@ export class EstadisticaTorneoService {
     numeroRonda: number
   ): Observable<EstadisticaTorneo[]> {
     const url = `${this.apiUrl}/torneo/${idTorneo}/categoria/${idTorneoCategoria}/ronda/${numeroRonda}`;
-    console.log('Llamando a URL (hasta ronda):', url);
+    //console.log('Llamando a URL (hasta ronda):', url);
 
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       map(response => {
-        console.log('getEstadisticasByTorneoCategoriaHastaRonda response:', response);
+        //console.log('getEstadisticasByTorneoCategoriaHastaRonda response:', response);
 
         if (response.success && response.data) {
           return response.data;
@@ -115,13 +115,13 @@ export class EstadisticaTorneoService {
       { headers: this.getHeaders() }
     ).pipe(
       map(response => {
-        console.log('getEstadisticaByJugador response:', response);
+        //console.log('getEstadisticaByJugador response:', response);
         if (response.data) return response.data;
         if (response.success && response.estadistica) return response.estadistica;
         return response;
       }),
       catchError(error => {
-        console.error('Error en getEstadisticaByJugador:', error);
+        //console.error('Error en getEstadisticaByJugador:', error);
         return of(null);
       })
     );
@@ -132,7 +132,7 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        console.log('createEstadistica response:', response);
+        //console.log('createEstadistica response:', response);
         if (response.data) return response.data;
         if (response.success && response.estadistica) return response.estadistica;
         return response;
@@ -149,13 +149,13 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        console.log('updateEstadistica response:', response);
+        //console.log('updateEstadistica response:', response);
         if (response.data) return response.data;
         if (response.success && response.estadistica) return response.estadistica;
         return response;
       }),
       catchError(error => {
-        console.error('Error en updateEstadistica:', error);
+        //console.error('Error en updateEstadistica:', error);
         return of(null);
       })
     );
@@ -166,11 +166,11 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        console.log('deleteEstadistica response:', response);
+        //console.log('deleteEstadistica response:', response);
         return response.success || true;
       }),
       catchError(error => {
-        console.error('Error en deleteEstadistica:', error);
+        //console.error('Error en deleteEstadistica:', error);
         return of(false);
       })
     );
@@ -183,14 +183,14 @@ export class EstadisticaTorneoService {
       { headers: this.getHeaders() }
     ).pipe(
       map(response => {
-        console.log('recalcularPosiciones response:', response);
+        //console.log('recalcularPosiciones response:', response);
         if (response.data) return response.data;
         if (response.estadisticas) return response.estadisticas;
         if (Array.isArray(response)) return response;
         return [];
       }),
       catchError(error => {
-        console.error('Error en recalcularPosiciones:', error);
+        //console.error('Error en recalcularPosiciones:', error);
         return of([]);
       })
     );

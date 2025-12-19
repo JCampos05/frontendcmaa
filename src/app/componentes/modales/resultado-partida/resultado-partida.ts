@@ -133,7 +133,6 @@ export class ModalResultadoPartidaComponent implements OnInit, OnDestroy, OnChan
 
     this.mesaService.liberarMesa(this.mesa.idMesa).subscribe({
       next: () => {
-        console.log('Mesa liberada exitosamente');
       },
       error: (err) => {
         console.error('Error al liberar mesa:', err);
