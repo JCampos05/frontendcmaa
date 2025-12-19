@@ -14,6 +14,16 @@ import { SidebarComponent } from '../../componentes/principales/sidebar/sidebar'
 export class MainView {
   sidebarCollapsed = false;
 
+  get esMobile(): boolean {
+    return window.innerWidth <= 768;
+  }
+
+  cerrarSidebar(): void {
+    if (this.esMobile) {
+      this.sidebarCollapsed = true;
+    }
+  }
+  
   toggleSidebar(): void {
     this.sidebarCollapsed = !this.sidebarCollapsed;
   }

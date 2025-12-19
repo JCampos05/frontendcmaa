@@ -1,9 +1,9 @@
-// inscripcion.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { InscripcionService } from '../../../services/inscripcion/inscripcion';
 import { TorneoService } from '../../../services/torneo/torneo';
+import { TorneoCategoriaService } from '../../../services/torneo-categoria/torneo-categoria';
 
 @Component({
   selector: 'app-inscripcion',
@@ -52,7 +52,8 @@ export class InscripcionComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private inscripcionService: InscripcionService,
-    private torneoService: TorneoService
+    private torneoService: TorneoService,
+    private torneoCategoriaService: TorneoCategoriaService
   ) {
     // Generar años (desde hace 100 años hasta el año actual)
     const anioActual = new Date().getFullYear();
@@ -142,13 +143,23 @@ export class InscripcionComponent implements OnInit {
       }
 
       this.loading = true;
-      this.errores = []; // Limpiar errores previos
+      this.errores = [];
 
-
-      this.torneoService.getCategoriasByTorneo(torneoIdNumero).subscribe({
-        next: (response) => {
+      this.torneoCategoriaService.getByTorneo(torneoIdNumero).subscribe({
+        next: (torneosCategorias) => {
           this.loading = false;
-          this.categorias = response.categorias || [];
+
+          // Mapear para extraer las categorías con su información completa
+          this.categorias = torneosCategorias
+            .filter(tc => tc.activo !== false && tc.categoria)
+            .map(tc => ({
+              idCategoria: tc.idCategoria,
+              nombre: tc.categoria!.nombre,
+              costo: tc.categoria!.costo,
+              nota: tc.categoria!.nota
+            }));
+
+          console.log('Categorías cargadas:', this.categorias);
 
           if (this.categorias.length === 0) {
             this.errores = ['Este torneo no tiene categorías disponibles'];

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -11,16 +11,24 @@ import { Subscription } from 'rxjs';
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.css']
 })
-export class SidebarComponent implements OnInit, OnDestroy {
+export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isCollapsed = false;
   @Output() sidebarClosed = new EventEmitter<void>();
+
+  isMobileOpen = false;
 
   rutaActual = '';
   submenuTorneosExpandido = false;
   submenuTorneoActualExpandido = false;
   submenuInscripcionesExpandido = false;
   private routerSubscription?: Subscription;
-  
+
+  ngOnChanges(): void {
+    if (this.esMobile) {
+      this.isMobileOpen = !this.isCollapsed;
+    }
+  }
+
   // Detectar si es móvil
   get esMobile(): boolean {
     return window.innerWidth <= 768;
@@ -49,22 +57,22 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private actualizarSubmenusSegunRuta(): void {
     // Expandir submenu Torneos
     if (this.rutaActual.includes('/detalle-torneo') ||
-        this.rutaActual.includes('/editar-torneo')) {
+      this.rutaActual.includes('/editar-torneo')) {
       this.submenuTorneosExpandido = true;
     }
 
     // Expandir submenu Torneo Actual
     if (this.rutaActual.includes('/torneo-actual') ||
-        this.rutaActual.includes('/inscripciones-torneo') ||
-        this.rutaActual.includes('/listas') ||
-        this.rutaActual.includes('/mesas-torneo') ||
-        this.rutaActual.includes('/resultados-torneo')) {
+      this.rutaActual.includes('/inscripciones-torneo') ||
+      this.rutaActual.includes('/listas') ||
+      this.rutaActual.includes('/mesas-torneo') ||
+      this.rutaActual.includes('/resultados-torneo')) {
       this.submenuTorneoActualExpandido = true;
     }
 
     // Expandir submenu Inscripciones
     if (this.rutaActual.includes('/jugadores-torneo') ||
-        this.rutaActual.includes('/estadisticas-pago')) {
+      this.rutaActual.includes('/estadisticas-pago')) {
       this.submenuInscripcionesExpandido = true;
     }
   }
@@ -172,6 +180,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   // === CERRAR SIDEBAR EN MÓVIL ===
   cerrarSidebarMovil(): void {
     if (this.esMobile) {
+      this.isMobileOpen = false;
       this.sidebarClosed.emit();
     }
   }
@@ -231,7 +240,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     // Gestión Torneos
     if (ruta === '/main-view/torneos') {
       return this.rutaActual === ruta ||
-             this.rutaActual.startsWith('/main-view/torneos/');
+        this.rutaActual.startsWith('/main-view/torneos/');
     }
 
     if (ruta === '/main-view/detalle-torneo') {

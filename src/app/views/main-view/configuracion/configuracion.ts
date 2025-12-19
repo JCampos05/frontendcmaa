@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService } from '../../../services/usuario/usuario';
@@ -12,6 +12,7 @@ import { SesionActiva } from '../../../models/sesion-activa';
 import { LogSistema, EstadisticasLogs } from '../../../models/log-sistema';
 import { ModalConfirmacionComponent } from '../../../componentes/modales/modal-confirmacion/modal-confirmacion';
 import { Router } from '@angular/router';
+import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 
 interface UsuarioExtendido extends Usuario {
   mostrarPassword?: boolean;
@@ -31,6 +32,8 @@ interface ToastMessage {
   styleUrls: ['./configuracion.css']
 })
 export class Configuracion implements OnInit {
+  @ViewChild(ToastNoti) toast!: ToastNoti;
+
   usuarios: UsuarioExtendido[] = [];
   usuarioActual: Usuario | null = null;
   cargando = false;
@@ -247,6 +250,7 @@ export class Configuracion implements OnInit {
 
       // Mostrar mensaje usando el sistema de toast interno
       this.showToast('warning', 'Tu sesión ha sido cerrada desde otro dispositivo');
+      this.toast.warning('Precaución', '');
 
       // Esperar un momento para que vean el mensaje
       setTimeout(() => {

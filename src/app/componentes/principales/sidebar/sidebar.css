@@ -16,6 +16,28 @@
     width: 70px;
 }
 
+/* Overlay para móvil */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 70px);
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 899;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 /* Toggle Button */
 .sidebar-toggle {
     padding: 0.75rem 1rem;
@@ -204,67 +226,7 @@
     min-width: 16px;
 }
 
-/* Footer */
-.sidebar-footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid var(--color-light-gray);
-    transition: opacity 0.2s;
-}
-
-.sidebar.collapsed .sidebar-footer {
-    opacity: 0;
-    height: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-.footer-content {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--color-slate);
-    font-size: 0.85rem;
-}
-
-.footer-content i {
-    font-size: 1.2rem;
-    color: var(--color-brown);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .sidebar.collapsed {
-        transform: translateX(0);
-        width: 70px;
-    }
-    
-    .toggle-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
-    }
-}
-
-/* Nav Items */
-.nav-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1.5rem;
-    color: var(--color-dark-navy);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    position: relative;
-    cursor: pointer;
-    margin: 0.25rem 0.5rem;
-    border-radius: 8px;
-}
-
+/* Submenu Toggle Button */
 .btn-submenu-toggle {
     background: transparent;
     border: none;
@@ -307,7 +269,7 @@
 }
 
 .submenu.submenu-visible {
-    max-height: 200px;
+    max-height: 500px;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
@@ -354,61 +316,107 @@
     font-weight: 500;
 }
 
-.submenu-item.active::after {
-    display: none;
+/* Footer */
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--color-light-gray);
+    transition: opacity 0.2s;
 }
 
-.btn-submenu-toggle {
-    background: transparent;
-    border: none;
-    color: var(--color-slate);
-    cursor: pointer;
-    padding: 0.25rem;
+.sidebar.collapsed .sidebar-footer {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.footer-content {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    font-size: 0.8rem;
-}
-
-.btn-submenu-toggle:hover {
-    color: var(--color-brown);
-}
-
-.btn-submenu-toggle.expanded i {
-    transform: rotate(180deg);
-}
-
-.btn-submenu-toggle i {
-    transition: transform 0.2s;
-}
-
-/* Submenu */
-.submenu {
-    margin-left: 0.5rem;
-    margin-top: 0.25rem;
-    margin-bottom: 0.5rem;
-}
-
-.submenu-item {
-    padding: 0.65rem 1.5rem 0.65rem 2.5rem;
-    margin: 0.15rem 0.5rem;
+    gap: 0.75rem;
+    color: var(--color-slate);
     font-size: 0.85rem;
 }
 
-.submenu-item:hover {
-    background: var(--color-light-gray);
-}
-
-.submenu-item.active {
-    background: linear-gradient(90deg, 
-        rgba(133, 77, 46, 0.08) 0%, 
-        rgba(133, 77, 46, 0.03) 100%);
+.footer-content i {
+    font-size: 1.2rem;
     color: var(--color-brown);
-    font-weight: 500;
 }
 
-.submenu-item.active::before {
-    left: 0.5rem;
-    width: 2px;
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+        z-index: 1001;
+        /* Por defecto en móvil, todo centrado cuando NO está abierto */
+    }
+
+    /* Cuando NO está abierto (estado por defecto en móvil), centrar todo */
+    .sidebar:not(.mobile-open) .section-title {
+        text-align: center;
+        padding: 0;
+    }
+
+    .sidebar:not(.mobile-open) .nav-item {
+        justify-content: center;
+        padding: 0.75rem 0;
+        margin: 0.25rem 0.25rem;
+    }
+
+    .sidebar:not(.mobile-open) .nav-item-content {
+        justify-content: center;
+    }
+
+    .sidebar:not(.mobile-open) .nav-icon {
+        font-size: 1.25rem;
+    }
+
+    .sidebar:not(.mobile-open) .nav-label {
+        display: none;
+    }
+
+    .sidebar:not(.mobile-open) .btn-submenu-toggle {
+        display: none;
+    }
+
+    .sidebar:not(.mobile-open) .submenu {
+        display: none;
+    }
+
+    .sidebar:not(.mobile-open) .nav-item.active::before {
+        display: none;
+    }
+
+    .sidebar:not(.mobile-open) .sidebar-footer {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    /* Cuando SÍ está abierto, mostrar todo normal */
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        display: block;
+    }
+
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+
+    /* En móvil, los submenús siempre están visibles cuando están expandidos */
+    .submenu.submenu-visible {
+        max-height: 600px;
+    }
+    
+    .toggle-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
 }
