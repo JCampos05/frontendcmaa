@@ -136,7 +136,7 @@ export class InscripcionComponent implements OnInit {
       const torneoIdNumero = Number(torneoId);
 
       if (isNaN(torneoIdNumero) || torneoIdNumero <= 0) {
-        console.error('El ID del torneo no es válido:', torneoId);
+        //console.error('El ID del torneo no es válido:', torneoId);
         this.errores = ['Error al seleccionar el torneo. Por favor, intente nuevamente.'];
         this.categorias = [];
         return;
@@ -159,7 +159,7 @@ export class InscripcionComponent implements OnInit {
               nota: tc.categoria!.nota
             }));
 
-          console.log('Categorías cargadas:', this.categorias);
+          //console.log('Categorías cargadas:', this.categorias);
 
           if (this.categorias.length === 0) {
             this.errores = ['Este torneo no tiene categorías disponibles'];
@@ -167,7 +167,7 @@ export class InscripcionComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          console.error('Error al cargar categorías:', error);
+          //console.error('Error al cargar categorías:', error);
           this.categorias = [];
 
           if (error.status === 404) {
@@ -403,7 +403,7 @@ export class InscripcionComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        console.error('Error completo:', error);
+        //console.error('Error completo:', error);
 
         if (error.error && error.error.errores && Array.isArray(error.error.errores)) {
           this.errores = error.error.errores;

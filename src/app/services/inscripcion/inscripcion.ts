@@ -40,17 +40,11 @@ export class InscripcionService {
       categoria: data.categoria
     };
 
-    console.log('✅ Inscripción transformada:', {
-      id: transformed.idInscripcion,
-      pagoConfirmado: transformed.pagoConfirmado,
-      montoPagado: transformed.montoPagado
-    });
-
     return transformed;
   }
 
   /**
-   * ✅ FUNCIÓN AUXILIAR: Transformar datos del jugador
+   * FUNCIÓN AUXILIAR: Transformar datos del jugador
    */
   private transformJugador(data: any): any {
     if (!data) return data;
