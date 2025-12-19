@@ -586,4 +586,19 @@
     <app-modal-edicion-inscripcion [visible]="modalEdicionVisible" [inscripcion]="inscripcionSeleccionada"
         [categorias]="categorias" (cerrar)="cerrarModalEdicion()" (actualizado)="onModalEdicionActualizado()">
     </app-modal-edicion-inscripcion>
+
+    <!-- Modal de Confirmación de Pago -->
+    <app-modal-confirmacion 
+        [mostrar]="mostrarModalConfirmacion"
+        [titulo]="'Confirmar Pago'"
+        [mensaje]="getMensajeConfirmacion()"
+        [mensajeSecundario]="getMensajeSecundarioConfirmacion()"
+        [textoConfirmar]="'Confirmar Pago'"
+        [textoCancelar]="'Cancelar'"
+        [tipoBotonPrimario]="'secondary'"
+        [icono]="'fa-circle-dollar-to-slot'"
+        [iconoBotonPrimario]="'fa-check-circle'"
+        (confirmar)="onConfirmarPago()"
+        (cancelar)="onCancelarConfirmacion()">
+    </app-modal-confirmacion>
 </div>

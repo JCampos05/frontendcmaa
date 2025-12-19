@@ -9,6 +9,7 @@ import { Torneo } from '../../../models/torneo';
 import { Inscripcion } from '../../../models/inscripcion';
 import { ModalEdicionInscripcionComponent } from '../../../componentes/modales/edicion-inscripcion/edicion-inscripcion';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
+import { ModalConfirmacionComponent } from '../../../componentes/modales/modal-confirmacion/modal-confirmacion';
 
 
 interface EstadisticasCategoria {
@@ -37,7 +38,7 @@ interface EstadisticasGenerales {
 @Component({
   selector: 'app-inscripciones-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalEdicionInscripcionComponent, ToastNoti],
+  imports: [CommonModule, FormsModule, ModalEdicionInscripcionComponent, ToastNoti, ModalConfirmacionComponent],
   templateUrl: './inscripciones-torneo.html',
   styleUrls: ['./inscripciones-torneo.css']
 })
@@ -65,6 +66,10 @@ export class InscripcionesAdminComponent implements OnInit {
   inscripcionSeleccionada: Inscripcion | null = null;
 
   modalEdicionVisible = false;
+
+  // Modal de confirmación de pago
+  mostrarModalConfirmacion = false;
+  inscripcionParaConfirmar: Inscripcion | null = null;
 
   // Paginación
   paginaActual = 1;
@@ -141,7 +146,6 @@ export class InscripcionesAdminComponent implements OnInit {
       const montoPagadoNum = Number(insc.montoPagado) || 0;
       const costoCategoria = Number(insc.categoria?.costo) || 0;
 
-      //  CORRECCIÓN: Validar que el pago esté 100% completo
       const pagoCompleto = montoPagadoNum >= costoCategoria && costoCategoria > 0;
 
       const idCat = insc.idCategoria || 0;
@@ -165,14 +169,12 @@ export class InscripcionesAdminComponent implements OnInit {
       cat.totalInscritos++;
       cat.inscripciones.push(insc);
 
-      // CORRECCIÓN: Solo contar como confirmado si pagó el 100%
       if (pagoCompleto) {
         cat.pagosConfirmados++;
       } else {
         cat.pagosPendientes++;
       }
 
-      // SIEMPRE sumar al total recaudado, sin importar si es pago completo o parcial
       cat.totalRecaudado += montoPagadoNum;
 
       const rating = insc.jugador?.rating || 0;
@@ -199,14 +201,12 @@ export class InscripcionesAdminComponent implements OnInit {
 
     const totalInscritos = inscripciones.length;
 
-    // ✅ CORRECCIÓN: Contar solo pagos 100% completos
     const pagosConfirmados = inscripciones.filter(i => {
       const montoPagado = Number(i.montoPagado) || 0;
       const costo = Number(i.categoria?.costo) || 0;
       return montoPagado >= costo && costo > 0;
     }).length;
 
-    // ✅ CORRECCIÓN: Sumar TODO el dinero registrado, completo o parcial
     const totalRecaudado = inscripciones.reduce((sum, i) => {
       return sum + (Number(i.montoPagado) || 0);
     }, 0);
@@ -239,7 +239,7 @@ export class InscripcionesAdminComponent implements OnInit {
 
   seleccionarCategoria(idCategoria: number | null): void {
     this.categoriaSeleccionada = idCategoria;
-    this.paginaActual = 1; // Resetear a página 1 al cambiar categoría
+    this.paginaActual = 1;
   }
 
   getInscripcionesFiltradas(): Inscripcion[] {
@@ -331,18 +331,22 @@ export class InscripcionesAdminComponent implements OnInit {
   confirmarPago(inscripcion: Inscripcion): void {
     if (!inscripcion.idInscripcion) return;
 
-    // Obtener el monto de la categoría
     const monto = inscripcion.categoria?.costo || 0;
 
     if (monto <= 0) {
       this.toast.error('Error','La categoria no tiene un costo definido');
-      //alert('Error: La categoría no tiene un costo definido');
       return;
     }
 
-    const mensaje = `¿Confirmar pago de $${monto.toFixed(2)} para ${inscripcion.jugador?.nombre} ${inscripcion.jugador?.apellido1}?`;
+    // Guardar la inscripción y mostrar el modal
+    this.inscripcionParaConfirmar = inscripcion;
+    this.mostrarModalConfirmacion = true;
+  }
 
-    if (!confirm(mensaje)) return;
+  onConfirmarPago(): void {
+    if (!this.inscripcionParaConfirmar?.idInscripcion) return;
+
+    const monto = this.inscripcionParaConfirmar.categoria?.costo || 0;
 
     const datosActualizacion = {
       pago_confirmado: true,
@@ -350,31 +354,47 @@ export class InscripcionesAdminComponent implements OnInit {
       estado: 'confirmado'
     };
 
-    this.inscripcionService.update(inscripcion.idInscripcion, datosActualizacion).subscribe({
+    this.inscripcionService.update(this.inscripcionParaConfirmar.idInscripcion, datosActualizacion).subscribe({
       next: (response) => {
-
         this.toast.success('Jugador confirmado','Pago e inscripción confirmados exitosamente');
-        //alert('Pago e inscripción confirmados exitosamente');
-
-        // Recargar estadísticas para reflejar cambios
+        this.mostrarModalConfirmacion = false;
+        this.inscripcionParaConfirmar = null;
         this.actualizarEstadisticas();
       },
       error: (err) => {
-        console.error('❌ Error al confirmar el pago:', err);
-        console.error('Detalles del error:', {
-          status: err.status,
-          statusText: err.statusText,
-          message: err?.error?.message,
-          error: err?.error,
-          fullError: err
-        });
+        console.error('Error al confirmar el pago:', err);
         const mensaje = err?.error?.message || err?.error?.mensaje || 'Error al confirmar el pago';
         this.toast.error('Error', mensaje);
-        //alert(`Error: ${mensaje}`);
+        this.mostrarModalConfirmacion = false;
+        this.inscripcionParaConfirmar = null;
       }
     });
   }
 
+  onCancelarConfirmacion(): void {
+    this.mostrarModalConfirmacion = false;
+    this.inscripcionParaConfirmar = null;
+  }
+
+  getMensajeConfirmacion(): string {
+    if (!this.inscripcionParaConfirmar) return '';
+    
+    const nombreCompleto = `${this.inscripcionParaConfirmar.jugador?.nombre} ${this.inscripcionParaConfirmar.jugador?.apellido1}`;
+    const monto = this.inscripcionParaConfirmar.categoria?.costo || 0;
+    
+    return `Se confirmará el pago de <strong>$${monto.toFixed(2)}</strong> para el jugador <strong>${nombreCompleto}</strong>`;
+  }
+
+  getMensajeSecundarioConfirmacion(): string {
+    const montoPagado = Number(this.inscripcionParaConfirmar?.montoPagado) || 0;
+    const costoCategoria = Number(this.inscripcionParaConfirmar?.categoria?.costo) || 0;
+    
+    if (montoPagado > 0 && montoPagado < costoCategoria) {
+      return `El jugador ya tiene un pago parcial de $${montoPagado.toFixed(2)}. Esta acción completará el pago total.`;
+    }
+    
+    return 'Esta acción actualizará el estado de la inscripción a confirmado.';
+  }
 
   confirmarPagoModal(): void {
     if (this.inscripcionSeleccionada && !this.inscripcionSeleccionada.pagoConfirmado) {
@@ -385,18 +405,13 @@ export class InscripcionesAdminComponent implements OnInit {
 
   getMontoPagado(inscripcion: Inscripcion): number {
     const montoPagado = Number(inscripcion.montoPagado) || 0;
-
     return montoPagado;
   }
 
-
   puedePagarInscripcion(inscripcion: Inscripcion): boolean {
     const estadoPago = this.getEstadoPago(inscripcion);
-    const costoCategoría = inscripcion.categoria?.costo || 0;
-
-    // Mostrar botón si: el pago no está completo Y la categoría tiene costo
-    const puedePagar = estadoPago !== 'confirmado' && costoCategoría > 0;
-
+    const costoCategoria = inscripcion.categoria?.costo || 0;
+    const puedePagar = estadoPago !== 'confirmado' && costoCategoria > 0;
     return puedePagar;
   }
 
@@ -411,17 +426,14 @@ export class InscripcionesAdminComponent implements OnInit {
     const costoCategoria = inscripcion.categoria?.costo || 0;
     const pagoConfirmado = Boolean(inscripcion.pagoConfirmado);
 
-    // Si el pago está confirmado Y el monto es igual o mayor al costo
     if (pagoConfirmado && montoPagado >= costoCategoria) {
       return 'confirmado';
     }
 
-    // Si hay un monto pagado pero es menor al costo (pago parcial)
     if (montoPagado > 0 && montoPagado < costoCategoria) {
       return 'parcial';
     }
 
-    // Si no hay monto pagado o es 0
     return 'pendiente';
   }
 
@@ -452,6 +464,7 @@ export class InscripcionesAdminComponent implements OnInit {
         return 'Pendiente';
     }
   }
+
   getEstadoPagoIcono(inscripcion: Inscripcion): string {
     const estadoPago = this.getEstadoPago(inscripcion);
 
@@ -465,6 +478,7 @@ export class InscripcionesAdminComponent implements OnInit {
         return 'fa-clock';
     }
   }
+
   formatearFecha(fecha: Date | string | undefined): string {
     if (!fecha) return '-';
 
@@ -601,15 +615,11 @@ export class InscripcionesAdminComponent implements OnInit {
     if (confirmar) {
       this.inscripcionService.delete(inscripcion.idInscripcion).subscribe({
         next: () => {
-          //console.log('Inscripción eliminada exitosamente');
           this.toast.success('Inscripcion elimnada','Inscripción eliminada exitosamente');
-          //alert('Inscripción eliminada exitosamente');
           this.actualizarEstadisticas();
         },
         error: (err) => {
-          //onsole.error('Error al eliminar inscripción:', err);
           this.toast.error('Error','Error al eliminar la inscripción');
-          //alert('Error al eliminar la inscripción');
         }
       });
     }
@@ -657,7 +667,7 @@ export class InscripcionesAdminComponent implements OnInit {
     paginas.push(1);
 
     if (paginaActual > 3) {
-      paginas.push(-1); // Indicador de puntos suspensivos
+      paginas.push(-1);
     }
 
     const inicio = Math.max(2, paginaActual - 1);
@@ -668,7 +678,7 @@ export class InscripcionesAdminComponent implements OnInit {
     }
 
     if (paginaActual < totalPaginas - 2) {
-      paginas.push(-1); // Indicador de puntos suspensivos
+      paginas.push(-1);
     }
 
     paginas.push(totalPaginas);
