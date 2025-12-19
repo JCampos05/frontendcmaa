@@ -1,0 +1,122 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onOverlayClick($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>
+                <i class="fa-solid fa-file-export"></i>
+                Exportar Reporte
+            </h3>
+            <button class="btn-close" (click)="close()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-description">Selecciona el formato y contenido de exportación:</p>
+
+            <!-- Selector de Formato -->
+            <div class="formato-section">
+                <h4 class="section-title">
+                    <i class="fa-solid fa-file"></i>
+                    Formato
+                </h4>
+                <div class="formato-opciones">
+                    <button 
+                        class="formato-btn" 
+                        [class.selected]="formatoSeleccionado === 'pdf'"
+                        (click)="seleccionarFormato('pdf')">
+                        <div class="formato-icon pdf">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div class="formato-info">
+                            <h4>PDF</h4>
+                            <p>Documento profesional</p>
+                        </div>
+                        <i class="fa-solid fa-circle-check check-icon"></i>
+                    </button>
+
+                    <button 
+                        class="formato-btn" 
+                        [class.selected]="formatoSeleccionado === 'excel'"
+                        (click)="seleccionarFormato('excel')">
+                        <div class="formato-icon excel">
+                            <i class="fa-solid fa-file-excel"></i>
+                        </div>
+                        <div class="formato-info">
+                            <h4>Excel</h4>
+                            <p>Hoja de cálculo</p>
+                        </div>
+                        <i class="fa-solid fa-circle-check check-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de Contenido (solo para PDF) -->
+            <div class="contenido-section" *ngIf="formatoSeleccionado === 'pdf'">
+                <h4 class="section-title">
+                    <i class="fa-solid fa-list-check"></i>
+                    Contenido del PDF
+                </h4>
+                <div class="contenido-opciones">
+                    <label class="contenido-option" [class.selected]="tipoContenido === 'datos'">
+                        <input 
+                            type="radio" 
+                            name="contenido" 
+                            value="datos"
+                            [(ngModel)]="tipoContenido">
+                        <div class="option-content">
+                            <i class="fa-solid fa-table"></i>
+                            <div class="option-text">
+                                <strong>Solo Datos</strong>
+                                <small>Tablas y estadísticas</small>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="contenido-option" [class.selected]="tipoContenido === 'graficas'">
+                        <input 
+                            type="radio" 
+                            name="contenido" 
+                            value="graficas"
+                            [(ngModel)]="tipoContenido">
+                        <div class="option-content">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            <div class="option-text">
+                                <strong>Solo Gráficas</strong>
+                                <small>Visualizaciones</small>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="contenido-option" [class.selected]="tipoContenido === 'completo'">
+                        <input 
+                            type="radio" 
+                            name="contenido" 
+                            value="completo"
+                            [(ngModel)]="tipoContenido">
+                        <div class="option-content">
+                            <i class="fa-solid fa-file-circle-check"></i>
+                            <div class="option-text">
+                                <strong>Reporte Completo</strong>
+                                <small>Datos + Gráficas</small>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="close()">
+                <i class="fa-solid fa-xmark"></i>
+                Cancelar
+            </button>
+            <button 
+                class="btn-primary" 
+                [disabled]="!formatoSeleccionado"
+                (click)="confirmar()">
+                <i class="fa-solid fa-download"></i>
+                Exportar
+            </button>
+        </div>
+    </div>
+</div>

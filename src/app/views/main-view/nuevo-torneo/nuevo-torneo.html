@@ -1,0 +1,353 @@
+<div class="container">
+    <div class="header">
+        <button class="btn-back" type="button" (click)="cancelar()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1>Nuevo Torneo</h1>
+            <p>Complete la información para crear un nuevo torneo</p>
+        </div>
+    </div>
+
+    <form [formGroup]="torneoForm" (ngSubmit)="guardarTorneo()">
+        <!-- Información General -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('informacionGeneral')">
+                <i class="fas fa-info-circle"></i>
+                <h2>Información General</h2>
+                <i class="fas" [ngClass]="{
+            'fa-chevron-up': seccionesAbiertas.informacionGeneral,
+            'fa-chevron-down': !seccionesAbiertas.informacionGeneral
+          }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.informacionGeneral">
+                <div class="form-group full-width">
+                    <label>
+                        <i class="fas fa-trophy"></i>
+                        Nombre del Torneo
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" formControlName="nombre" placeholder="Ej: Torneo de Ajedrez Primavera 2025"
+                        class="form-control" />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-map-marker-alt"></i>
+                            Lugar
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" formControlName="lugar" placeholder="Ej: Centro Cultural Municipal"
+                            class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-building"></i>
+                            Dirección Completa
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" formControlName="direccion"
+                            placeholder="Ej: Calle Principal #123, Col. Centro" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-calendar"></i>
+                            Fecha del Torneo
+                            <span class="required">*</span>
+                        </label>
+                        <input type="date" formControlName="fecha" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-clock"></i>
+                            Hora de Inicio
+                            <span class="required">*</span>
+                        </label>
+                        <input type="time" formControlName="hora" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-user-clock"></i>
+                            Cierre de Inscripciones
+                            <span class="required">*</span>
+                        </label>
+                        <input type="datetime-local" formControlName="cierreInscripciones" class="form-control" />
+                        <small class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Fecha y hora límite para inscribirse
+                        </small>
+                        <!-- Mensaje de error de validación -->
+                        <div class="validation-error" *ngIf="errorCierreInscripciones">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            {{ errorCierreInscripciones }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categorías del Torneo -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('categorias')">
+                <i class="fas fa-layer-group"></i>
+                <h2>Categorías del Torneo</h2>
+                <i class="fas" [ngClass]="{
+            'fa-chevron-up': seccionesAbiertas.categorias,
+            'fa-chevron-down': !seccionesAbiertas.categorias
+          }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.categorias">
+                <div class="categorias-grid">
+                    <div *ngFor="let categoria of categorias" class="categoria-card"
+                        [ngClass]="{ selected: isCategoriaSeleccionada(categoria.idCategoria!) }"
+                        (click)="toggleCategoria(categoria.idCategoria!)">
+                        <i class="fas fa-check-circle check-icon"></i>
+                        <div class="categoria-info">
+                            <h3>{{ categoria.nombre }}</h3>
+                            <p class="precio">${{ categoria.costo }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración por Categoría -->
+        <div formArrayName="configuracionCategorias">
+            <ng-container *ngFor="let config of configuracionCategorias.controls; let i = index">
+                <div class="section" [ngClass]="{
+            collapsed: !isCategoriaExpandida(
+              configuracionCategorias.at(i).get('idCategoria')?.value
+            )
+          }">
+                    <div class="section-header categoria-header" (click)="
+              toggleCategoriaExpandida(configuracionCategorias.at(i).get('idCategoria')?.value)
+            ">
+                        <i class="fas fa-cog"></i>
+                        <h2>
+                            {{ getNombreCategoria(configuracionCategorias.at(i).get('idCategoria')?.value) }}
+                        </h2>
+                        <i class="fas" [ngClass]="{
+                'fa-chevron-up': isCategoriaExpandida(
+                  configuracionCategorias.at(i).get('idCategoria')?.value
+                ),
+                'fa-chevron-down': !isCategoriaExpandida(
+                  configuracionCategorias.at(i).get('idCategoria')?.value
+                )
+              }"></i>
+                    </div>
+
+                    <div class="section-content"
+                        *ngIf="isCategoriaExpandida(configuracionCategorias.at(i).get('idCategoria')?.value)"
+                        [formGroupName]="i">
+                        <!-- Configuración Básica -->
+                        <div class="subsection">
+                            <h3>
+                                <i class="fas fa-sliders-h"></i>
+                                Configuración Básica
+                            </h3>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        Número de Rondas
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" formControlName="rondas" min="1" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        Ritmo de Juego
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select formControlName="ritmoJuego" class="form-control">
+                                        <option value="">Seleccione...</option>
+                                        <option *ngFor="let ritmo of ritmosJuego" [value]="ritmo.nombre">
+                                            {{ ritmo.nombre }} - {{ ritmo.descripcion }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        Sistema de Competencia
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select formControlName="sistemaCompetencia" class="form-control">
+                                        <option value="">Seleccione...</option>
+                                        <option *ngFor="let sistema of sistemasCompetencia" [value]="sistema.nombre">
+                                            {{ sistema.nombre }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calendario de Rondas -->
+                        <div class="subsection">
+                            <h3>
+                                <i class="fas fa-calendar-alt"></i>
+                                Calendario de Rondas
+                            </h3>
+
+                            <div formArrayName="calendario">
+                                <ng-container *ngFor="let ronda of getCalendario(i).controls; let j = index">
+                                    <div class="ronda-item" [formGroupName]="j">
+                                        <label>Ronda {{ j + 1 }}</label>
+                                        <input type="datetime-local" formControlName="fecha" class="form-control" />
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                        <!-- Premios -->
+                        <div class="subsection">
+                            <h3>
+                                <i class="fas fa-award"></i>
+                                Premios
+                            </h3>
+
+                            <div formArrayName="premios" class="premios-content">
+                                <ng-container *ngFor="let premio of getPremios(i).controls; let j = index">
+                                    <div class="premio-lugar" [formGroupName]="j">
+                                        <div class="lugar-header">
+                                            <label>
+                                                <i class="fas fa-medal" [ngClass]="{
+                            'medal-gold': j === 0,
+                            'medal-silver': j === 1,
+                            'medal-bronze': j === 2,
+                            'medal-other': j > 2
+                          }"></i>
+                                                {{ premio.get('descripcion')?.value || 'Lugar ' + (j + 1) }}
+                                            </label>
+                                            <button type="button" class="btn-delete-small"
+                                                (click)="eliminarPremio(i, j)" [disabled]="getPremios(i).length === 1"
+                                                *ngIf="getPremios(i).length > 1">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <input type="text" formControlName="monto" placeholder="$1500 o Trofeo"
+                                            class="form-control" />
+                                    </div>
+                                </ng-container>
+                            </div>
+
+                            <button type="button" class="btn-add-lugar" (click)="agregarPremio(i)">
+                                <i class="fas fa-plus"></i>
+                                Agregar Lugar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <!-- Configuración Adicional -->
+        <div class="section" *ngIf="categoriasSeleccionadas.length > 0">
+            <div class="section-header" (click)="toggleSeccion('configuracionAdicional')">
+                <i class="fas fa-cogs"></i>
+                <h2>Configuración Adicional</h2>
+                <i class="fas" [ngClass]="{
+            'fa-chevron-up': seccionesAbiertas.configuracionAdicional,
+            'fa-chevron-down': !seccionesAbiertas.configuracionAdicional
+          }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.configuracionAdicional">
+                <div class="form-group">
+                    <label>Tiempo de Espera (min)</label>
+                    <input type="number" formControlName="tiempoEspera" min="0" class="form-control" />
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" formControlName="permitirByePrimeraRonda" />
+                        <span>Permitir solicitud de bye en primera ronda</span>
+                    </label>
+                </div>
+
+                <!-- Sistemas de Desempate (Configuración Global) -->
+                <div class="subsection desempates-section">
+                    <h3>
+                        <i class="fas fa-balance-scale"></i>
+                        Sistemas de Desempate
+                        <span class="required">*</span>
+                    </h3>
+                    <p class="help-text">
+                        <i class="fas fa-info-circle"></i>
+                        Seleccione al menos dos sistemas en orden de prioridad (el primero será mayor prioridad). Esta
+                        configuración se aplicará a todas las categorías.
+                    </p>
+
+                    <div class="desempates-grid">
+                        <div *ngFor="let sistema of sistemasDesempate" class="desempate-card"
+                            [ngClass]="{'selected': isDesempateSeleccionado(null, sistema.idDesempate!)}"
+                            (click)="toggleDesempate(null, sistema.idDesempate!)">
+
+                            <!-- Número de prioridad en la esquina superior derecha -->
+                            <div class="prioridad-badge" *ngIf="isDesempateSeleccionado(null, sistema.idDesempate!)">
+                                {{ getPrioridadDesempate(null, sistema.idDesempate!) }}
+                            </div>
+
+                            <div class="checkbox-icon">
+                                <i class="fas" [ngClass]="{
+             'fa-square-check': isDesempateSeleccionado(null, sistema.idDesempate!),
+             'fa-square': !isDesempateSeleccionado(null, sistema.idDesempate!)
+           }"></i>
+                            </div>
+                            <div class="desempate-info">
+                                <h4>{{ sistema.nombre }}</h4>
+                                <p>{{ sistema.descripcion }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notas Adicionales -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('notas')">
+                <i class="fas fa-sticky-note"></i>
+                <h2>Notas Adicionales</h2>
+                <i class="fas" [ngClass]="{
+            'fa-chevron-up': seccionesAbiertas.notas,
+            'fa-chevron-down': !seccionesAbiertas.notas
+          }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.notas">
+                <textarea formControlName="notas" rows="4"
+                    placeholder="Ingrese información adicional sobre el torneo, reglas especiales, información de contacto, etc."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelar()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button type="submit" class="btn-submit"
+                [disabled]="loading || torneoForm.invalid || categoriasSeleccionadas.length === 0">
+                <i class="fas" [ngClass]="{ 'fa-check': !loading, 'fa-spinner fa-spin': loading }"></i>
+                {{ loading ? 'Guardando...' : 'Crear Torneo' }}
+            </button>
+        </div>
+
+        <div class="error-message" *ngIf="error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error }}
+        </div>
+    </form>
+</div>

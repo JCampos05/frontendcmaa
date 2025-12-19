@@ -1,0 +1,20 @@
+<div class="toast-container">
+    <div *ngFor="let toast of toasts" class="toast" [class.success]="toast.type === 'success'"
+        [class.error]="toast.type === 'error'" [class.warning]="toast.type === 'warning'"
+        [class.info]="toast.type === 'info'" [@slideIn]>
+        <div class="toast-icon">
+            <i class="fa-solid" [class.fa-circle-check]="toast.type === 'success'"
+                [class.fa-circle-exclamation]="toast.type === 'error'"
+                [class.fa-triangle-exclamation]="toast.type === 'warning'"
+                [class.fa-circle-info]="toast.type === 'info'">
+            </i>
+        </div>
+        <div class="toast-content">
+            <h4 class="toast-title">{{ toast.title }}</h4>
+            <p class="toast-message" *ngIf="toast.message">{{ toast.message }}</p>
+        </div>
+        <button class="toast-close" (click)="removeToast(toast.id)">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+</div>

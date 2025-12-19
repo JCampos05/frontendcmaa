@@ -1,0 +1,593 @@
+.inscripcion-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f5f5f5;
+    position: relative;
+}
+
+.inscripcion-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.inscripcion-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+.inscripcion-header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Barra de progreso */
+.progreso-container {
+    margin-bottom: 2rem;
+}
+
+.progreso-barra {
+    width: 100%;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.progreso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6b4423 0%, #8b5a2b 100%);
+    transition: width 0.3s ease;
+}
+
+.progreso-pasos {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.paso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.paso.activo {
+    opacity: 1;
+}
+
+.paso.completado {
+    opacity: 1;
+}
+
+.paso-numero {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    color: #999;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.paso.activo .paso-numero {
+    background-color: #6b4423;
+    color: white;
+}
+
+.paso.completado .paso-numero {
+    background-color: #4caf50;
+    color: white;
+}
+
+.paso-texto {
+    font-size: 0.85rem;
+    text-align: center;
+    color: #666;
+    font-weight: 500;
+}
+
+.paso.activo .paso-texto {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+/* Mensajes */
+.mensaje-error {
+    background-color: #fee;
+    border-left: 4px solid #d32f2f;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+    display: flex;
+    gap: 1rem;
+}
+
+.mensaje-error i {
+    color: #d32f2f;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.mensaje-error-contenido {
+    flex: 1;
+}
+
+.mensaje-error-contenido strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #d32f2f;
+}
+
+.mensaje-error ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.mensaje-error li {
+    color: #d32f2f;
+    margin-bottom: 0.25rem;
+}
+
+/* Formulario */
+.inscripcion-form {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.paso-contenido h2 {
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+.paso-contenido h2 i {
+    color: #6b4423;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.requerido {
+    color: #d32f2f;
+    font-weight: bold;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #6b4423;
+    box-shadow: 0 0 0 3px rgba(107, 68, 35, 0.1);
+}
+
+.form-control.invalido {
+    border-color: #d32f2f;
+}
+
+.form-control.invalido:focus {
+    box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Botones */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+
+/* Botón de regreso */
+.btn-regresar {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    padding: 0.6rem 1.2rem;
+    background-color: #fff;
+    border: 2px solid #6b4423;
+    border-radius: 4px;
+    color: #6b4423;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.btn-regresar:hover:not(:disabled) {
+    background-color: #6b4423;
+    color: white;
+    transform: translateX(-2px);
+    box-shadow: 0 2px 8px rgba(107, 68, 35, 0.3);
+}
+
+.btn-regresar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: #6b4423;
+    color: white;
+    margin-left: auto;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #8b5a2b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    background-color: #757575;
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #616161;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+    background-color: #4caf50;
+    color: white;
+    margin-left: auto;
+}
+
+.btn-success:hover:not(:disabled) {
+    background-color: #43a047;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-contenido {
+    background-color: white;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.modal-header.exito {
+    background-color: #f1f8f4;
+}
+
+.modal-header i {
+    font-size: 3rem;
+    color: #4caf50;
+    margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-body p {
+    margin-bottom: 1rem;
+    color: #333;
+    line-height: 1.6;
+}
+
+.info-pago {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1rem;
+    border-radius: 4px;
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-pago i {
+    color: #ffc107;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.info-pago p {
+    margin-bottom: 0.5rem;
+}
+
+.info-pago p:last-child {
+    margin-bottom: 0;
+}
+
+.info-pago strong {
+    color: #856404;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .inscripcion-container {
+        padding: 1rem;
+    }
+
+    .inscripcion-form {
+        padding: 1.5rem;
+    }
+
+    .paso-texto {
+        font-size: 0.75rem;
+    }
+
+    .paso-numero {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-success {
+        margin-left: 0;
+    }
+
+    .progreso-pasos {
+        gap: 0.5rem;
+    }
+}
+
+.costo-inscripcion {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #6b4423;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 2px 8px rgba(107, 68, 35, 0.1);
+}
+
+.costo-contenido {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.costo-contenido i {
+    font-size: 2rem;
+    color: #6b4423;
+    background-color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.costo-contenido > div {
+    flex: 1;
+}
+
+.costo-contenido strong {
+    display: block;
+    color: #333;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.costo-monto {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #6b4423;
+    line-height: 1;
+}
+
+.costo-nota {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+}
+
+.costo-nota i {
+    color: #6b4423;
+    font-size: 1rem;
+}
+
+/* Animación para el costo */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.costo-inscripcion {
+    animation: fadeInScale 0.3s ease;
+}
+
+/* Estilos para el costo en el modal */
+.modal-costo {
+    background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%);
+    border: 2px solid #4caf50;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.modal-costo-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: #2e7d32;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.modal-costo-header i {
+    font-size: 1.5rem;
+    color: #4caf50;
+    background-color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-costo-monto {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2e7d32;
+    margin-bottom: 0.75rem;
+    line-height: 1;
+}
+
+.modal-costo-categoria {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    color: #2e7d32;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-costo-categoria i {
+    color: #4caf50;
+}

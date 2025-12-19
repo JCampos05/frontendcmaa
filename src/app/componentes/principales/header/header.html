@@ -1,0 +1,59 @@
+<header class="header">
+  <div class="header-content">
+    <div class="header-left">
+      <!-- Botón Toggle Sidebar -->
+      <button class="sidebar-toggle-btn" (click)="onToggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="logo-section">
+        <i class="fa-solid fa-chess-knight logo-icon"></i>
+        <h1 class="logo-text">Comité de Ajedrez</h1>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Perfil de usuario -->
+      <div class="profile-container">
+        <button class="profile-button" (click)="toggleProfileMenu()" [disabled]="cerrando">
+          <div class="profile-avatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="profile-info">
+            <span class="profile-name">Administrador</span>
+            <span class="profile-role">{{ currentUser?.telefono || 'Usuario' }}</span>
+          </div>
+          <i class="fa-solid fa-chevron-down profile-arrow" 
+             [class.rotated]="showProfileMenu"></i>
+        </button>
+
+        <!-- Menú desplegable -->
+        <div class="profile-menu" *ngIf="showProfileMenu">
+          <div class="menu-header">
+            <div class="menu-avatar">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="menu-user-info">
+              <span class="menu-name">Administrador</span>
+              <span class="menu-phone">{{ currentUser?.telefono }}</span>
+            </div>
+          </div>
+
+          <div class="menu-divider"></div>
+
+          <button class="menu-item" (click)="goToConfig()" [disabled]="cerrando">
+            <i class="fa-solid fa-gear"></i>
+            <span>Configuración</span>
+          </button>
+
+          <div class="menu-divider"></div>
+
+          <button class="menu-item danger" (click)="logout()" [disabled]="cerrando">
+            <i class="fa-solid" [class.fa-right-from-bracket]="!cerrando" [class.fa-spinner]="cerrando" [class.fa-spin]="cerrando"></i>
+            <span>{{ cerrando ? 'Cerrando sesión...' : 'Cerrar Sesión' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

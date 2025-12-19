@@ -1,0 +1,177 @@
+<div class="torneos-container">
+    <app-toast-noti></app-toast-noti>
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fa-solid fa-trophy"></i>
+                <div>
+                    <h1>Torneos</h1>
+                    <p>Consulta y administra todos los torneos del comité</p>
+                </div>
+            </div>
+            <button class="btn-nuevo-torneo" routerLink="/main-view/nuevo-torneo">
+                <i class="fa-solid fa-plus"></i>
+                Nuevo Torneo
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros y Búsqueda -->
+    <div class="filters-section">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input 
+                type="text" 
+                placeholder="Buscar torneos por nombre o lugar..."
+                [(ngModel)]="searchTerm"
+                (input)="filtrarTorneos()">
+        </div>
+        
+        <div class="filter-buttons">
+            <button 
+                class="filter-btn"
+                [class.active]="filtroActivo === 'todos'"
+                (click)="cambiarFiltro('todos')">
+                <i class="fa-solid fa-list"></i>
+                Todos
+            </button>
+            <button 
+                class="filter-btn"
+                [class.active]="filtroActivo === 'activos'"
+                (click)="cambiarFiltro('activos')">
+                <i class="fa-solid fa-circle-check"></i>
+                Activos
+            </button>
+            <button 
+                class="filter-btn"
+                [class.active]="filtroActivo === 'finalizados'"
+                (click)="cambiarFiltro('finalizados')">
+                <i class="fa-solid fa-circle-xmark"></i>
+                Finalizados
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Cargando torneos...</p>
+    </div>
+
+    <!-- Lista de Torneos -->
+    <div class="torneos-lista" *ngIf="!loading && torneosFiltrados.length > 0">
+        <div class="torneo-item" *ngFor="let torneo of torneosFiltrados">
+            <!-- Badge de Estado -->
+            <div class="item-badge" [class.badge-activo]="torneo.activo" [class.badge-finalizado]="!torneo.activo">
+                <i class="fa-solid" [class.fa-circle-check]="torneo.activo" [class.fa-flag-checkered]="!torneo.activo"></i>
+                {{ torneo.activo ? 'Activo' : 'Finalizado' }}
+            </div>
+
+            <!-- Fecha Compacta -->
+            <div class="item-fecha">
+                <span class="fecha-dia">{{ getDia(torneo.fecha) }}</span>
+                <span class="fecha-mes">{{ getMes(torneo.fecha) }}</span>
+            </div>
+
+            <!-- Información Principal -->
+            <div class="item-info">
+                <h3 class="item-titulo">{{ torneo.nombre || torneo.lugar }}</h3>
+                <p class="item-subtitulo" *ngIf="torneo.nombre">{{ torneo.lugar }}</p>
+                
+                <div class="item-detalles">
+                    <span class="detalle-chip">
+                        <i class="fa-solid fa-location-dot"></i>
+                        {{ torneo.lugar }}
+                    </span>
+                    
+                    <span class="detalle-chip">
+                        <i class="fa-solid fa-clock"></i>
+                        {{ torneo.hora }}
+                    </span>
+                    
+                    <span class="detalle-chip">
+                        <i class="fa-solid fa-chess-board"></i>
+                        {{ torneo.rondas }} rondas
+                    </span>
+
+                    <span class="detalle-chip" *ngIf="tieneSistemasCompetencia(torneo)">
+                        <i class="fa-solid fa-diagram-project"></i>
+                        {{ getSistemasCompetencia(torneo) }}
+                    </span>
+
+                    <span class="detalle-chip" *ngIf="tieneRitmosJuego(torneo)">
+                        <i class="fa-solid fa-stopwatch"></i>
+                        {{ getRitmosJuego(torneo) }}
+                    </span>
+                </div>
+
+                <!-- Info Adicional -->
+                <div class="item-extra">
+                    <span class="extra-cierre" *ngIf="torneo.cierreInscripciones">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                        Cierre: {{ formatearFechaCorta(torneo.cierreInscripciones) }}
+                    </span>
+                    
+                    <span class="extra-categorias" *ngIf="torneo.categorias && torneo.categorias.length > 0">
+                        <i class="fa-solid fa-layer-group"></i>
+                        {{ torneo.categorias.length }} {{ torneo.categorias.length === 1 ? 'categoría' : 'categorías' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="item-acciones">
+                <button class="btn-accion btn-ver" (click)="verDetalle(torneo.idTorneo)" title="Ver detalle">
+                    <i class="fa-solid fa-eye"></i>
+                    Ver Detalle
+                </button>
+                <button class="btn-accion btn-editar" (click)="editarTorneo(torneo.idTorneo)" *ngIf="torneo.activo" title="Editar">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-accion btn-eliminar" (click)="confirmarEliminacion(torneo)" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estado Vacío -->
+    <div class="empty-state" *ngIf="!loading && torneosFiltrados.length === 0">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <h3>{{ getEmptyMessage() }}</h3>
+        <p>{{ getEmptyDescription() }}</p>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Edición -->
+<app-modal-confirmacion
+    [mostrar]="mostrarModalEditar"
+    titulo="¿Editar Torneo?"
+    [mensaje]="'¿Deseas editar el torneo ' + (torneoAEditar?.nombre || torneoAEditar?.lugar) + '?'"
+    mensajeSecundario="Se cargará el formulario con los datos actuales del torneo para su modificación."
+    textoConfirmar="Editar Torneo"
+    textoCancelar="Cancelar"
+    tipoBotonPrimario="secondary"
+    icono="fa-pen-to-square"
+    iconoBotonPrimario="fa-pen-to-square"
+    [tipoAdvertencia]="false"
+    (confirmar)="confirmarEdicion()"
+    (cancelar)="cancelarEdicion()">
+</app-modal-confirmacion>
+
+<!-- Modal de Confirmación de Eliminación -->
+<app-modal-confirmacion
+    [mostrar]="mostrarModalEliminar"
+    titulo="¿Eliminar Torneo?"
+    [mensaje]="'¿Estás seguro de que deseas eliminar el torneo ' + (torneoAEliminar?.nombre || torneoAEliminar?.lugar) + '?'"
+    mensajeSecundario="Esta acción no se puede deshacer y se eliminarán todas las inscripciones asociadas."
+    textoConfirmar="Eliminar Torneo"
+    textoCancelar="Cancelar"
+    tipoBotonPrimario="danger"
+    icono="fa-triangle-exclamation"
+    iconoBotonPrimario="fa-trash"
+    [tipoAdvertencia]="true"
+    (confirmar)="eliminarTorneo()"
+    (cancelar)="cancelarEliminacion()">
+</app-modal-confirmacion>

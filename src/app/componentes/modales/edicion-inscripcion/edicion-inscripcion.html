@@ -1,0 +1,117 @@
+<div class="modal-overlay" *ngIf="visible" (click)="cerrarModal()">
+    <app-toast-noti></app-toast-noti>
+    <div class="modal-container modal-edicion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <h2>Editar Inscripción</h2>
+            </div>
+            <button class="btn-close-modal" (click)="cerrarModal()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body" *ngIf="jugadorEditando">
+            <!-- Información del Jugador -->
+            <div class="detalle-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-user"></i>
+                    <h3>Información del Jugador</h3>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" [(ngModel)]="jugadorEditando.nombre" class="form-control"
+                            placeholder="Nombre">
+                    </div>
+                    <div class="form-group">
+                        <label>Primer Apellido *</label>
+                        <input type="text" [(ngModel)]="jugadorEditando.apellido1" class="form-control"
+                            placeholder="Primer apellido">
+                    </div>
+                    <div class="form-group">
+                        <label>Segundo Apellido</label>
+                        <input type="text" [(ngModel)]="jugadorEditando.apellido2" class="form-control"
+                            placeholder="Segundo apellido">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" [(ngModel)]="jugadorEditando.telefono" class="form-control"
+                            placeholder="(123) 456-7890">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento</label>
+                        <input type="date" [(ngModel)]="jugadorEditando.fecha_nacimiento" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <input type="number" [(ngModel)]="jugadorEditando.rating" class="form-control" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado del Jugador</label>
+                        <select [(ngModel)]="jugadorEditando.estado" class="form-control">
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                            <option value="retirado">Retirado</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de la Inscripción -->
+            <div class="detalle-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <h3>Información de la Inscripción</h3>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select [(ngModel)]="jugadorEditando.idCategoria" class="form-control">
+                            <option *ngFor="let cat of categorias" [value]="cat.idCategoria">
+                                {{ cat.nombre }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto Pagado</label>
+                        <input type="number" [(ngModel)]="jugadorEditando.monto_pagado" class="form-control" step="0.01"
+                            min="0" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de Pago</label>
+                        <select [(ngModel)]="jugadorEditando.pago_confirmado" class="form-control">
+                            <option [ngValue]="false">Pendiente</option>
+                            <option [ngValue]="true">Confirmado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado de Inscripción</label>
+                        <select [(ngModel)]="jugadorEditando.estado_inscripcion" class="form-control">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="confirmado">Confirmado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Notas</label>
+                        <textarea [(ngModel)]="jugadorEditando.notas" class="form-control" rows="3"
+                            placeholder="Notas adicionales..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel-modal" (click)="cerrarModal()">
+                    <i class="fa-solid fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="btn-modal btn-save-modal" (click)="guardarEdicion()">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

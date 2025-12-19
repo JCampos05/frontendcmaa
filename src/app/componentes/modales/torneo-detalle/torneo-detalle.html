@@ -1,0 +1,180 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="cerrarModal()">
+    <div class="modal-content" (click)="detenerPropagacion($event)">
+
+        <!-- Header del Modal -->
+        <div class="modal-header">
+            <div class="modal-title-section">
+                <i class="fa-solid fa-circle-info"></i>
+                <h2>Detalles del Torneo</h2>
+            </div>
+            <button class="btn-close" (click)="cerrarModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Contenido del Modal -->
+        <div class="modal-body" *ngIf="torneo">
+
+            <!-- Información General -->
+            <section class="detalle-seccion">
+                <h3 class="seccion-titulo">
+                    <i class="fa-solid fa-trophy"></i>
+                    Información General
+                </h3>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <i class="fa-solid fa-tag"></i>
+                        <div class="info-content">
+                            <span class="info-label">Nombre del Torneo</span>
+                            <span class="info-value">{{ torneo.nombre || torneo.lugar }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div class="info-content">
+                            <span class="info-label">Lugar</span>
+                            <span class="info-value">{{ torneo.lugar }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-building"></i>
+                        <div class="info-content">
+                            <span class="info-label">Dirección</span>
+                            <span class="info-value">{{ torneo.direccion }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <div class="info-content">
+                            <span class="info-label">Fecha del Torneo</span>
+                            <span class="info-value">{{ formatearFecha(torneo.fecha) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-clock"></i>
+                        <div class="info-content">
+                            <span class="info-label">Hora de inicio</span>
+                            <span class="info-value">{{ torneo.hora }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item" *ngIf="getCierreInscripciones()">
+                        <i class="fa-solid fa-door-closed"></i>
+                        <div class="info-content">
+                            <span class="info-label">Cierre de inscripciones</span>
+                            <span class="info-value">{{ formatearFechaCorta(getCierreInscripciones()!) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categorías -->
+            <section class="detalle-seccion" *ngIf="getCategorias().length > 0">
+                <h3 class="seccion-titulo">
+                    <i class="fa-solid fa-layer-group"></i>
+                    Categorías ({{ getCategorias().length }})
+                </h3>
+
+                <div class="categorias-lista">
+                    <div class="categoria-detalle" *ngFor="let categoria of getCategorias()">
+                        
+                        <!-- Header de la categoría -->
+                        <div class="categoria-header-detalle">
+                            <h4>{{ categoria.categoria?.nombre }}</h4>
+                            <span class="categoria-costo" *ngIf="categoria.categoria?.costo">
+                                ${{ categoria.categoria?.costo }}
+                            </span>
+                        </div>
+
+                        <!-- Información básica de la categoría -->
+                        <div class="categoria-info-grid">
+                            <div class="categoria-info-item">
+                                <i class="fa-solid fa-chess-board"></i>
+                                <span>{{ categoria.rondas }} ronda{{ categoria.rondas !== 1 ? 's' : '' }}</span>
+                            </div>
+
+                            <div class="categoria-info-item" *ngIf="getRitmoJuego(categoria) !== 'No especificado'">
+                                <i class="fa-solid fa-stopwatch"></i>
+                                <span>{{ getRitmoJuego(categoria) }}</span>
+                            </div>
+
+                            <div class="categoria-info-item" *ngIf="getSistemaCompetencia(categoria) !== 'No especificado'">
+                                <i class="fa-solid fa-diagram-project"></i>
+                                <span>{{ getSistemaCompetencia(categoria) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor de información adicional -->
+                        <div class="info-adicional-container" *ngIf="hayInformacionAdicional(categoria)">
+
+                            <!-- Premios -->
+                            <div class="premios-section" *ngIf="getPremios(categoria).length > 0">
+                                <h5>
+                                    <i class="fa-solid fa-award"></i>
+                                    Premios
+                                </h5>
+                                <ul class="premios-lista">
+                                    <li *ngFor="let premio of getPremios(categoria)">{{ premio }}</li>
+                                </ul>
+                            </div>
+
+                            <!-- Sistemas de Desempate -->
+                            <div class="desempates-section" *ngIf="getDesempates(categoria).length > 0">
+                                <h5>
+                                    <i class="fa-solid fa-scale-balanced"></i>
+                                    Sistemas de Desempate
+                                </h5>
+                                <div class="desempates-chips">
+                                    <span class="desempate-chip"
+                                        *ngFor="let desempate of getDesempates(categoria); let i = index">
+                                        <span class="prioridad-numero">{{ i + 1 }}</span>
+                                        {{ desempate }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Calendario -->
+                            <div class="calendario-section" *ngIf="getCalendario(categoria).length > 0">
+                                <h5>
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    Calendario de Rondas
+                                </h5>
+                                <div class="calendario-grid">
+                                    <div class="ronda-calendario" *ngFor="let ronda of getCalendario(categoria)">
+                                        <span class="ronda-numero">Ronda {{ ronda.numero }}</span>
+                                        <span class="ronda-fecha">{{ formatearFechaRonda(ronda.fecha) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notas Adicionales -->
+            <section class="detalle-seccion" *ngIf="torneo.notas">
+                <h3 class="seccion-titulo">
+                    <i class="fa-solid fa-note-sticky"></i>
+                    Notas Adicionales
+                </h3>
+                <p class="notas-texto">{{ torneo.notas }}</p>
+            </section>
+
+        </div>
+
+        <!-- Footer del Modal -->
+        <div class="modal-footer">
+            <button class="btn-cerrar" (click)="cerrarModal()">
+                <i class="fa-solid fa-xmark"></i>
+                Cerrar
+            </button>
+        </div>
+
+    </div>
+</div>

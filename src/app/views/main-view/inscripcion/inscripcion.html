@@ -1,0 +1,315 @@
+<div class="inscripcion-container">
+    <!-- Botón de regreso -->
+    <button class="btn-regresar" (click)="intentarSalir()" [disabled]="loading">
+        <i class="fas fa-arrow-left"></i>
+        Regresar
+    </button>
+
+    <div class="inscripcion-header">
+        <h1>Inscripción al Torneo</h1>
+        <p>Complete el formulario para registrarse en el torneo</p>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="progreso-container">
+        <div class="progreso-barra">
+            <div class="progreso-fill" [style.width.%]="progreso"></div>
+        </div>
+        <div class="progreso-pasos">
+            <div class="paso" [class.activo]="pasoActual >= 1" [class.completado]="pasoActual > 1">
+                <div class="paso-numero">
+                    <i class="fas" [class.fa-check]="pasoActual > 1" [class.fa-user]="pasoActual <= 1"></i>
+                </div>
+                <span class="paso-texto">Datos Personales</span>
+            </div>
+            <div class="paso" [class.activo]="pasoActual >= 2" [class.completado]="pasoActual > 2">
+                <div class="paso-numero">
+                    <i class="fas" [class.fa-check]="pasoActual > 2" [class.fa-phone]="pasoActual <= 2"></i>
+                </div>
+                <span class="paso-texto">Contacto</span>
+            </div>
+            <div class="paso" [class.activo]="pasoActual >= 3" [class.completado]="pasoActual > 3">
+                <div class="paso-numero">
+                    <i class="fas" [class.fa-check]="pasoActual > 3" [class.fa-calendar-alt]="pasoActual <= 3"></i>
+                </div>
+                <span class="paso-texto">Fecha Nacimiento</span>
+            </div>
+            <div class="paso" [class.activo]="pasoActual >= 4" [class.completado]="pasoActual > 4">
+                <div class="paso-numero">
+                    <i class="fas" [class.fa-check]="pasoActual > 4" [class.fa-chess]="pasoActual <= 4"></i>
+                </div>
+                <span class="paso-texto">Torneo</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes de error -->
+    <div class="mensaje-error" *ngIf="errores.length > 0">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="mensaje-error-contenido">
+            <strong>Por favor, corrija los siguientes errores:</strong>
+            <ul>
+                <li *ngFor="let error of errores">{{ error }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()" class="inscripcion-form">
+
+        <!-- Paso 1: Datos Personales -->
+        <div class="paso-contenido" *ngIf="pasoActual === 1">
+            <h2>
+                <i class="fas fa-user"></i>
+                Datos Personales
+            </h2>
+
+            <div class="form-group">
+                <label for="nombre">
+                    Nombre <span class="requerido">*</span>
+                </label>
+                <input type="text" id="nombre" formControlName="nombre" class="form-control"
+                    [class.invalido]="inscripcionForm.get('nombre')?.invalid && (inscripcionForm.get('nombre')?.touched || submitted)"
+                    placeholder="Ingrese su nombre">
+            </div>
+
+            <div class="form-group">
+                <label for="apellido1">
+                    Primer Apellido <span class="requerido">*</span>
+                </label>
+                <input type="text" id="apellido1" formControlName="apellido1" class="form-control"
+                    [class.invalido]="inscripcionForm.get('apellido1')?.invalid && (inscripcionForm.get('apellido1')?.touched || submitted)"
+                    placeholder="Ingrese su primer apellido">
+            </div>
+
+            <div class="form-group">
+                <label for="apellido2">
+                    Segundo Apellido
+                </label>
+                <input type="text" id="apellido2" formControlName="apellido2" class="form-control"
+                    [class.invalido]="inscripcionForm.get('apellido2')?.invalid && (inscripcionForm.get('apellido2')?.touched || submitted)"
+                    placeholder="Ingrese su segundo apellido (opcional)">
+            </div>
+        </div>
+
+        <!-- Paso 2: Contacto -->
+        <div class="paso-contenido" *ngIf="pasoActual === 2">
+            <h2>
+                <i class="fas fa-phone"></i>
+                Datos de Contacto
+            </h2>
+
+            <div class="form-group">
+                <label for="telefono">
+                    Teléfono <span class="requerido">*</span>
+                </label>
+                <input type="tel" id="telefono" formControlName="telefono" class="form-control"
+                    [class.invalido]="inscripcionForm.get('telefono')?.invalid && (inscripcionForm.get('telefono')?.touched || submitted)"
+                    placeholder="10 dígitos" maxlength="10">
+                <small class="form-text">Ingrese 10 dígitos sin espacios ni guiones</small>
+            </div>
+        </div>
+
+        <!-- Paso 3: Fecha de Nacimiento -->
+        <div class="paso-contenido" *ngIf="pasoActual === 3">
+            <h2>
+                <i class="fas fa-calendar-alt"></i>
+                Fecha de Nacimiento
+            </h2>
+
+            <div class="form-group">
+                <label>
+                    Fecha de Nacimiento <span class="requerido">*</span>
+                </label>
+                <div class="fecha-nacimiento-grid">
+                    <div class="fecha-campo">
+                        <label for="dia_nacimiento" class="fecha-label">Día</label>
+                        <select id="dia_nacimiento" formControlName="dia_nacimiento" class="form-control"
+                            [class.invalido]="inscripcionForm.get('dia_nacimiento')?.invalid && (inscripcionForm.get('dia_nacimiento')?.touched || submitted)">
+                            <option value="">Día</option>
+                            <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
+                        </select>
+                    </div>
+
+                    <div class="fecha-campo">
+                        <label for="mes_nacimiento" class="fecha-label">Mes</label>
+                        <select id="mes_nacimiento" formControlName="mes_nacimiento" class="form-control"
+                            [class.invalido]="inscripcionForm.get('mes_nacimiento')?.invalid && (inscripcionForm.get('mes_nacimiento')?.touched || submitted)">
+                            <option value="">Mes</option>
+                            <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
+                        </select>
+                    </div>
+
+                    <div class="fecha-campo">
+                        <label for="anio_nacimiento" class="fecha-label">Año</label>
+                        <select id="anio_nacimiento" formControlName="anio_nacimiento" class="form-control"
+                            [class.invalido]="inscripcionForm.get('anio_nacimiento')?.invalid && (inscripcionForm.get('anio_nacimiento')?.touched || submitted)">
+                            <option value="">Año</option>
+                            <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+                        </select>
+                    </div>
+                </div>
+                <small class="form-text">La edad se calculará automáticamente según la fecha del torneo</small>
+            </div>
+        </div>
+
+        <!-- Paso 4: Torneo y Categoría -->
+        <div class="paso-contenido" *ngIf="pasoActual === 4">
+            <h2>
+                <i class="fas fa-chess"></i>
+                Selección de Torneo
+            </h2>
+
+            <div class="form-group">
+                <label for="torneo_id">
+                    Torneo <span class="requerido">*</span>
+                </label>
+                <select id="torneo_id" formControlName="torneo_id" class="form-control"
+                    [class.invalido]="inscripcionForm.get('torneo_id')?.invalid && (inscripcionForm.get('torneo_id')?.touched || submitted)"
+                    (change)="onTorneoChange($event)">
+                    <option value="">Seleccione un torneo</option>
+                    <option *ngFor="let torneo of torneos" [value]="torneo.idTorneo">
+                        {{ torneo.nombre }} - {{ torneo.fecha | date:'dd/MM/yyyy' }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Sección de depuración (eliminar después de resolver) -->
+            <!--div *ngIf="torneos.length > 0"
+                style="background: #f0f0f0; padding: 10px; margin-top: 10px; font-size: 12px; border-radius: 4px;">
+                <strong>Debug - Torneos disponibles:</strong>
+                <pre>{{ torneos | json }}</pre>
+            </!--div-->
+
+            <div class="form-group" *ngIf="categorias.length > 0">
+                <label for="categoria_id">
+                    Categoría <span class="requerido">*</span>
+                </label>
+                <select id="categoria_id" formControlName="categoria_id" class="form-control"
+                    [class.invalido]="inscripcionForm.get('categoria_id')?.invalid && (inscripcionForm.get('categoria_id')?.touched || submitted)"
+                    (change)="onCategoriaChange($event)">
+                    <option value="">Seleccione una categoría</option>
+                    <option *ngFor="let cat of categorias" [value]="cat.idCategoria">
+                        {{ cat.nombre }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Mostrar el costo de inscripción -->
+            <div class="costo-inscripcion" *ngIf="costoInscripcion > 0">
+                <div class="costo-contenido">
+                    <i class="fas fa-dollar-sign"></i>
+                    <div>
+                        <strong>Costo de Inscripción:</strong>
+                        <span class="costo-monto">${{ costoInscripcion | number:'1.2-2' }} MXN</span>
+                    </div>
+                </div>
+                <small class="costo-nota">
+                    <i class="fas fa-info-circle"></i>
+                    El pago se realiza de manera presencial en las oficinas del comité
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="notas">
+                    Notas Adicionales
+                </label>
+                <textarea id="notas" formControlName="notas" class="form-control" rows="4"
+                    placeholder="Información adicional (opcional)" maxlength="1000"></textarea>
+                <small class="form-text">Máximo 1000 caracteres</small>
+            </div>
+        </div>
+
+        <!-- Botones de navegación -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="pasoAnterior()" *ngIf="pasoActual > 1"
+                [disabled]="loading">
+                <i class="fas fa-arrow-left"></i>
+                Anterior
+            </button>
+
+            <button type="button" class="btn btn-primary" (click)="siguientePaso()" *ngIf="pasoActual < totalPasos"
+                [disabled]="loading">
+                Siguiente
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <button type="submit" class="btn btn-success" *ngIf="pasoActual === totalPasos"
+                [disabled]="loading || inscripcionForm.invalid">
+                <i class="fas fa-check" *ngIf="!loading"></i>
+                <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
+                {{ loading ? 'Procesando...' : 'Finalizar Inscripción' }}
+            </button>
+        </div>
+    </form>
+
+    <!-- Mensaje de éxito -->
+    <div class="modal-overlay" *ngIf="mensajeExito" (click)="cerrarMensajeExito()">
+        <div class="modal-contenido" (click)="$event.stopPropagation()">
+            <div class="modal-header exito">
+                <i class="fas fa-check-circle"></i>
+                <h2>Inscripción Completada</h2>
+            </div>
+            <div class="modal-body">
+                <p>Su proceso de inscripción ha finalizado exitosamente.</p>
+
+                <!-- Mostrar el costo de la inscripción -->
+                <div class="modal-costo" *ngIf="costoInscripcion > 0">
+                    <div class="modal-costo-header">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Monto a Pagar</span>
+                    </div>
+                    <div class="modal-costo-monto">
+                        ${{ costoInscripcion | number:'1.2-2' }} MXN
+                    </div>
+                    <div class="modal-costo-categoria" *ngIf="categoriaSeleccionada">
+                        <i class="fas fa-tag"></i>
+                        {{ categoriaSeleccionada.nombre }}
+                    </div>
+                </div>
+
+                <div class="info-pago">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <p><strong>Importante:</strong></p>
+                        <p>Su inscripción quedará en estado <strong>PENDIENTE</strong> hasta que se confirme el pago.
+                        </p>
+                        <p>Una vez realizado el pago, su estado cambiará a <strong>ACTIVO</strong> en el torneo
+                            seleccionado.</p>
+                        <p>El pago debe realizarse de manera presencial en las oficinas del comité.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" (click)="cerrarMensajeExito()">
+                    <i class="fas fa-times"></i>
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de salida -->
+    <div class="modal-overlay" *ngIf="mostrarConfirmacionSalida" (click)="cancelarSalida()">
+        <div class="modal-contenido modal-advertencia" (click)="$event.stopPropagation()">
+            <div class="modal-header advertencia">
+                <i class="fas fa-exclamation-circle"></i>
+                <h2>¿Desea salir?</h2>
+            </div>
+            <div class="modal-body">
+                <p>Si sale ahora, se perderán todos los datos que ha ingresado en el formulario.</p>
+                <p><strong>¿Está seguro de que desea continuar?</strong></p>
+            </div>
+            <div class="modal-footer modal-footer-doble">
+                <button class="btn btn-secondary" (click)="cancelarSalida()">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="btn btn-danger" (click)="confirmarSalida()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sí, salir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

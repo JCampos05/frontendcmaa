@@ -1,0 +1,290 @@
+<div class="torneo-detalle-container">
+    <app-toast-noti></app-toast-noti>
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Cargando detalles del torneo...</p>
+    </div>
+
+    <!-- Contenido del torneo -->
+    <div *ngIf="!loading && torneo">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-content">
+                <button class="btn-back" (click)="volver()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="header-title">
+                    <h1>{{ torneo.nombre || torneo.lugar }}</h1>
+                    <p>Detalles completos del torneo</p>
+                </div>
+                <button class="btn-editar-header" (click)="editarTorneo()" *ngIf="torneo.activo">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Editar Torneo
+                </button>
+            </div>
+        </div>
+
+        <div class="torneo-content">
+            <!-- Informacion General -->
+            <div class="detalle-section" [class.collapsed]="!seccionesExpandidas.informacionGeneral">
+                <div class="section-header clickable" (click)="toggleSeccion('informacionGeneral')">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <h2>Informacion General</h2>
+                    <button type="button" class="btn-toggle">
+                        <i class="fa-solid" [class.fa-chevron-up]="seccionesExpandidas.informacionGeneral"
+                            [class.fa-chevron-down]="!seccionesExpandidas.informacionGeneral"></i>
+                    </button>
+                </div>
+
+                <div class="section-content" *ngIf="seccionesExpandidas.informacionGeneral">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-trophy"></i>
+                                Nombre del Torneo
+                            </span>
+                            <span class="info-value">{{ torneo.nombre || 'Sin nombre' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Lugar
+                            </span>
+                            <span class="info-value">{{ torneo.lugar }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="obtenerDireccion()">
+                            <span class="info-label">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                Direccion Completa
+                            </span>
+                            <span class="info-value">{{ obtenerDireccion() }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                Fecha del Torneo
+                            </span>
+                            <span class="info-value">{{ formatearFecha(torneo.fecha) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-clock"></i>
+                                Hora de Inicio
+                            </span>
+                            <span class="info-value">{{ formatearHora(torneo.hora) }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="torneo.cierreInscripciones">
+                            <span class="info-label">
+                                <i class="fa-solid fa-door-closed"></i>
+                                Cierre de Inscripciones
+                            </span>
+                            <span class="info-value">{{ formatearFechaHora(torneo.cierreInscripciones) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Estado
+                            </span>
+                            <span class="info-value">
+                                <span class="badge" [class.badge-activo]="torneo.activo"
+                                    [class.badge-finalizado]="!torneo.activo">
+                                    {{ torneo.activo ? 'Activo' : 'Finalizado' }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categorias del Torneo -->
+            <div class="detalle-section" [class.collapsed]="!seccionesExpandidas.categoriasTorneo"
+                *ngIf="torneoCategorias.length > 0">
+                <div class="section-header clickable" (click)="toggleSeccion('categoriasTorneo')">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <h2>Categorias del Torneo</h2>
+                    <button type="button" class="btn-toggle">
+                        <i class="fa-solid" [class.fa-chevron-up]="seccionesExpandidas.categoriasTorneo"
+                            [class.fa-chevron-down]="!seccionesExpandidas.categoriasTorneo"></i>
+                    </button>
+                </div>
+
+                <div class="section-content" *ngIf="seccionesExpandidas.categoriasTorneo">
+                    <div class="categorias-lista">
+                        <div class="categoria-badge" *ngFor="let tc of torneoCategorias">
+                            <i class="fa-solid fa-chess"></i>
+                            <span>{{ tc.categoria?.nombre || 'Categoria' }}</span>
+                            <span class="categoria-costo" *ngIf="tc.categoria?.costo">
+                                ${{ tc.categoria?.costo }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuracion por Categoria -->
+            <div class="detalle-section" [class.collapsed]="!seccionesExpandidas.configuracionPorCategoria"
+                *ngIf="torneoCategorias.length > 0">
+                <div class="section-header clickable" (click)="toggleSeccion('configuracionPorCategoria')">
+                    <i class="fa-solid fa-gears"></i>
+                    <h2>Configuracion por Categoria</h2>
+                    <button type="button" class="btn-toggle">
+                        <i class="fa-solid" [class.fa-chevron-up]="seccionesExpandidas.configuracionPorCategoria"
+                            [class.fa-chevron-down]="!seccionesExpandidas.configuracionPorCategoria"></i>
+                    </button>
+                </div>
+
+                <div class="section-content" *ngIf="seccionesExpandidas.configuracionPorCategoria">
+                    <div class="categorias-config-container">
+                        <div *ngFor="let tc of torneoCategorias; let i = index" class="categoria-detalle-card"
+                            [class.collapsed]="!categoriasExpandidas[i]">
+
+                            <div class="config-header clickable" (click)="toggleCategoria(i)">
+                                <div class="config-title">
+                                    <i class="fa-solid fa-chess"></i>
+                                    <h3>{{ tc.categoria?.nombre || 'Categoria' }}</h3>
+                                </div>
+                                <button type="button" class="btn-toggle-cat">
+                                    <i class="fa-solid" [class.fa-chevron-up]="categoriasExpandidas[i]"
+                                        [class.fa-chevron-down]="!categoriasExpandidas[i]"></i>
+                                </button>
+                            </div>
+
+                            <div class="config-content" *ngIf="categoriasExpandidas[i]">
+                                <!-- Configuracion Basica -->
+                                <div class="config-subsection">
+                                    <h4><i class="fa-solid fa-sliders"></i> Configuracion Basica</h4>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <span class="info-label">Numero de Rondas</span>
+                                            <span class="info-value">{{ tc.rondas || 'No especificado' }}</span>
+                                        </div>
+
+                                        <div class="info-item">
+                                            <span class="info-label">Ritmo de Juego</span>
+                                            <span class="info-value">{{ tc.ritmoJuego || 'No especificado' }}</span>
+                                        </div>
+
+                                        <div class="info-item full-width">
+                                            <span class="info-label">Sistema de Competencia</span>
+                                            <span class="info-value">{{ tc.sistemaCompetencia || 'No especificado'
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Calendario de Rondas -->
+                                <!-- Reemplazar la sección de Calendario de Rondas en torneo-detalles.html -->
+
+                                <!-- Calendario de Rondas -->
+                                <div class="config-subsection" *ngIf="tc.calendario && tc.calendario.length > 0">
+                                    <h4><i class="fa-solid fa-clock"></i> Calendario de Rondas</h4>
+                                    <div class="calendario-lista">
+                                        <div class="ronda-detalle" *ngFor="let ronda of tc.calendario">
+                                            <div class="ronda-numero">
+                                                <i class="fa-solid fa-chess-clock"></i>
+                                                <span>Ronda {{ ronda.numero }}</span>
+                                            </div>
+                                            <div class="ronda-fecha">
+                                                <i class="fa-solid fa-calendar-days"></i>
+                                                <span>{{ formatearFechaHoraRonda(ronda.fecha) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Premios -->
+                                <div class="config-subsection" *ngIf="tc.premios">
+                                    <h4><i class="fa-solid fa-trophy"></i> Premios</h4>
+                                    <div class="premios-lista">
+                                        <div class="premio-detalle"
+                                            *ngFor="let premio of obtenerPremios(tc.premios); let j = index">
+                                            <i class="fa-solid fa-medal" [class.medal-gold]="j === 0"
+                                                [class.medal-silver]="j === 1" [class.medal-bronze]="j === 2"
+                                                [class.medal-other]="j > 2"></i>
+                                            <span>{{ premio }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuracion Adicional -->
+            <div class="detalle-section" [class.collapsed]="!seccionesExpandidas.configuracionAdicional">
+                <div class="section-header clickable" (click)="toggleSeccion('configuracionAdicional')">
+                    <i class="fa-solid fa-gear"></i>
+                    <h2>Configuracion Adicional</h2>
+                    <button type="button" class="btn-toggle">
+                        <i class="fa-solid" [class.fa-chevron-up]="seccionesExpandidas.configuracionAdicional"
+                            [class.fa-chevron-down]="!seccionesExpandidas.configuracionAdicional"></i>
+                    </button>
+                </div>
+
+                <div class="section-content" *ngIf="seccionesExpandidas.configuracionAdicional">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Tiempo de Espera</span>
+                            <span class="info-value">{{ obtenerTiempoEspera() }} minutos</span>
+                        </div>
+                    </div>
+
+                    <div class="opciones-lista">
+                        <div class="opcion-item">
+                            <i class="fa-solid" [class.fa-circle-check]="requiereEquipo()"
+                                [class.fa-circle-xmark]="!requiereEquipo()" [class.text-success]="requiereEquipo()"
+                                [class.text-muted]="!requiereEquipo()"></i>
+                            <span>Los jugadores deben traer su equipo de ajedrez</span>
+                        </div>
+
+                        <div class="opcion-item">
+                            <i class="fa-solid" [class.fa-circle-check]="permiteBye()"
+                                [class.fa-circle-xmark]="!permiteBye()" [class.text-success]="permiteBye()"
+                                [class.text-muted]="!permiteBye()"></i>
+                            <span>Permitir solicitud de bye en primera ronda</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas Adicionales -->
+            <div class="detalle-section" [class.collapsed]="!seccionesExpandidas.notasAdicionales"
+                *ngIf="obtenerNotasGenerales()">
+                <div class="section-header clickable" (click)="toggleSeccion('notasAdicionales')">
+                    <i class="fa-solid fa-note-sticky"></i>
+                    <h2>Notas Adicionales</h2>
+                    <button type="button" class="btn-toggle">
+                        <i class="fa-solid" [class.fa-chevron-up]="seccionesExpandidas.notasAdicionales"
+                            [class.fa-chevron-down]="!seccionesExpandidas.notasAdicionales"></i>
+                    </button>
+                </div>
+
+                <div class="section-content" *ngIf="seccionesExpandidas.notasAdicionales">
+                    <div class="notas-content">
+                        <pre>{{ obtenerNotasGenerales() }}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Accion -->
+            <div class="form-actions">
+                <button type="button" class="btn-volver" (click)="volver()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Volver a Torneos
+                </button>
+                <button type="button" class="btn-editar" (click)="editarTorneo()" *ngIf="torneo.activo">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Editar Torneo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,5 @@
+<router-outlet></router-outlet>
+
+<!-- Modal de sesión cerrada remotamente -->
+<app-modal-sesion-cerrada [mostrar]="(mostrarModalSesionCerrada$ | async) || false" (continuar)="onModalContinuar()">
+</app-modal-sesion-cerrada>

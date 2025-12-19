@@ -1,0 +1,872 @@
+:root {
+    --color-dark-navy: #112239;
+    --color-slate: #212129;
+    --color-brown: #854D2E;
+    --color-dark-brown: #633017;
+    --color-tan: #E4C091;
+    --color-beige: #EBD2AA;
+    --color-light-gray: #E3E1DD;
+    --color-white: #FFFFFF;
+    --color-accent: #E54839;
+}
+
+.historial-container {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--color-light-gray);
+}
+
+.page-header {
+    background: var(--color-white);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.btn-volver {
+    padding: 0.75rem 1.25rem;
+    background: var(--color-brown);
+    color: var(--color-white);
+    border: 2px solid var(--color-brown);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+    color: var(--color-brown);
+    background-color: var(--color-white);
+    transform: translateX(-3px);
+}
+
+.header-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-dark-navy) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.header-icon i {
+    font-size: 2rem;
+    color: var(--color-white);
+}
+
+.header-text h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    margin: 0 0 0.25rem 0;
+}
+
+.header-text p {
+    color: var(--color-slate);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.btn-export-pdf {
+    padding: 0.75rem 1.25rem;
+    background: #EF4444;
+    color: var(--color-white);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-export-pdf:hover {
+    background: #DC2626;
+    transform: translateY(-2px);
+}
+
+.loading-container,
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+    background: var(--color-white);
+    border-radius: 12px;
+    margin: 2rem 0;
+}
+
+.loading-container i {
+    font-size: 3rem;
+    color: var(--color-brown);
+}
+
+.error-container i {
+    font-size: 3rem;
+    color: var(--color-accent);
+}
+
+.btn-retry {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-brown);
+    color: var(--color-white);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-retry:hover {
+    background: var(--color-dark-brown);
+    transform: translateY(-2px);
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.jugador-info-card {
+    background: var(--color-white);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.jugador-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-dark-navy) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.jugador-avatar i {
+    font-size: 2.5rem;
+    color: var(--color-white);
+}
+
+.jugador-details {
+    flex: 1;
+}
+
+.jugador-nombre {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    margin: 0 0 1rem 0;
+}
+
+.jugador-stats {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stat-item i {
+    color: var(--color-brown);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--color-slate);
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-dark-navy);
+}
+
+.jugador-record {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.record-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    min-width: 80px;
+}
+
+.record-item i {
+    font-size: 1.5rem;
+}
+
+.record-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.record-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.record-item.victoria {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.record-item.empate {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.record-item.derrota {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.partidas-section {
+    background: var(--color-white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.section-header {
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--color-light-gray);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-header i {
+    font-size: 1.5rem;
+    color: var(--color-brown);
+}
+
+.section-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    margin: 0;
+    flex: 1;
+}
+
+.badge {
+    padding: 0.375rem 0.875rem;
+    background: var(--color-brown);
+    color: var(--color-white);
+    border-radius: 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.partidas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+    padding: 1.5rem;
+}
+
+.partida-card {
+    background: var(--color-white);
+    border: 2px solid var(--color-light-gray);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.partida-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.partida-card.resultado-victoria {
+    border-left: 4px solid #10B981;
+}
+
+.partida-card.resultado-empate {
+    border-left: 4px solid #F59E0B;
+}
+
+.partida-card.resultado-derrota {
+    border-left: 4px solid #EF4444;
+}
+
+.partida-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-light-gray);
+}
+
+.partida-ronda,
+.partida-mesa {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+}
+
+.partida-ronda i,
+.partida-mesa i {
+    color: var(--color-brown);
+    font-size: 0.75rem;
+}
+
+.partida-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.color-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    width: fit-content;
+}
+
+.color-badge.color-blanco {
+    background: #F9FAFB;
+    border: 2px solid var(--color-dark-navy);
+    color: var(--color-dark-navy);
+}
+
+.color-badge.color-negro {
+    background: var(--color-dark-navy);
+    color: var(--color-white);
+}
+
+.vs-separator {
+    text-align: center;
+    font-weight: 700;
+    color: var(--color-slate);
+    font-size: 0.875rem;
+}
+
+.rival-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: var(--color-light-gray);
+    border-radius: 8px;
+}
+
+.rival-nombre {
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    font-size: 0.875rem;
+}
+
+.rival-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--color-slate);
+}
+
+.rival-rating i {
+    color: #F59E0B;
+}
+
+.partida-resultado {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--color-light-gray);
+}
+
+.resultado-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.resultado-victoria .resultado-badge {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: var(--color-white);
+}
+
+.resultado-empate .resultado-badge {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: var(--color-white);
+}
+
+.resultado-derrota .resultado-badge {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: var(--color-white);
+}
+
+.puntos-badge {
+    margin-left: auto;
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+.puntos-acumulados {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-slate);
+    font-weight: 600;
+}
+
+.puntos-acumulados i {
+    color: var(--color-brown);
+}
+
+.partida-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 2px solid var(--color-light-gray);
+    font-size: 0.8125rem;
+    color: var(--color-slate);
+}
+
+.partida-footer i {
+    color: var(--color-brown);
+}
+
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--color-light-gray);
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    margin: 0;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: var(--color-slate);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .jugador-info-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .jugador-stats {
+        justify-content: center;
+    }
+
+    .partidas-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.empty-state p {
+    font-size: 1rem;
+    color: var(--color-slate);
+    margin: 0;
+}
+
+.selector-jugador-section {
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.selector-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.selector-header i {
+    font-size: 4rem;
+    color: var(--color-brown);
+}
+
+.selector-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    margin: 0;
+}
+
+.selector-header p {
+    font-size: 1rem;
+    color: var(--color-slate);
+    margin: 0;
+}
+
+.mensaje-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba(133, 77, 46, 0.1);
+    border-left: 4px solid var(--color-brown);
+    border-radius: 8px;
+    color: var(--color-dark-navy);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.mensaje-info i {
+    color: var(--color-brown);
+    font-size: 1.25rem;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: var(--color-slate);
+    margin: 0;
+}
+
+.selector-jugador-section {
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.selector-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.selector-header i {
+    font-size: 4rem;
+    color: var(--color-brown);
+}
+
+.selector-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    margin: 0;
+}
+
+.selector-header p {
+    font-size: 1rem;
+    color: var(--color-slate);
+    margin: 0;
+}
+
+.mensaje-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba(133, 77, 46, 0.1);
+    border-left: 4px solid var(--color-brown);
+    border-radius: 8px;
+    color: var(--color-dark-navy);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.mensaje-info i {
+    color: var(--color-brown);
+    font-size: 1.25rem;
+}
+
+/* === FILTROS Y BÚSQUEDA === */
+.filtros-section {
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filtro-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    font-size: 0.875rem;
+}
+
+.filtro-group label i {
+    color: var(--color-brown);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-light-gray);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: var(--color-white);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-brown);
+    box-shadow: 0 0 0 3px rgba(133, 77, 46, 0.1);
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    padding-right: 2.5rem;
+}
+
+.search-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-slate);
+    pointer-events: none;
+}
+
+/* === LISTA DE JUGADORES === */
+.jugadores-list {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--color-light-gray);
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--color-dark-navy);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.list-header i {
+    color: var(--color-brown);
+    font-size: 1.25rem;
+}
+
+.jugadores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.jugador-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid var(--color-light-gray);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--color-white);
+}
+
+.jugador-card:hover {
+    border-color: var(--color-brown);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(133, 77, 46, 0.15);
+}
+
+.jugador-card.selected {
+    border-color: var(--color-brown);
+    background: rgba(133, 77, 46, 0.05);
+    box-shadow: 0 4px 12px rgba(133, 77, 46, 0.2);
+}
+
+.jugador-avatar-small {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--color-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.jugador-avatar-small i {
+    font-size: 1.5rem;
+    color: var(--color-white);
+}
+
+.jugador-info-small {
+    flex: 1;
+    min-width: 0;
+}
+
+.jugador-info-small .nombre {
+    display: block;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jugador-meta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--color-slate);
+}
+
+.jugador-meta i {
+    font-size: 0.75rem;
+}
+
+.jugador-meta .rating i {
+    color: #F59E0B;
+}
+
+.jugador-meta .puntos i {
+    color: var(--color-brown);
+}
+
+.arrow-icon {
+    color: var(--color-slate);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.jugador-card:hover .arrow-icon,
+.jugador-card.selected .arrow-icon {
+    color: var(--color-brown);
+    transform: translateX(4px);
+}
+
+/* === ESTADOS VACÍOS === */
+.empty-filtros {
+    padding: 3rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.empty-filtros i {
+    font-size: 4rem;
+    color: var(--color-light-gray);
+}
+
+.empty-filtros h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    margin: 0;
+}
+
+.empty-filtros p {
+    font-size: 1rem;
+    color: var(--color-slate);
+    margin: 0;
+}

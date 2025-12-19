@@ -1,0 +1,118 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onCerrar()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fa-solid fa-users"></i>
+                <h2>Emparejamiento Manual</h2>
+            </div>
+            <button class="btn-close-modal" (click)="onCerrar()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-section">
+                <div class="form-group">
+                    <label>
+                        <i class="fa-solid fa-chess-board"></i>
+                        Número de Mesa
+                    </label>
+                    <input type="number" 
+                           [(ngModel)]="numeroMesa" 
+                           class="form-control" 
+                           placeholder="Ej: 1"
+                           min="1"
+                           readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fa-solid fa-square"></i>
+                        Jugador con Blancas
+                    </label>
+                    <select [(ngModel)]="idJugadorBlanco" class="form-control">
+                        <option [value]="null">Seleccionar jugador</option>
+                        <option *ngFor="let jugador of jugadoresDisponibles" 
+                                [value]="jugador.idJugador"
+                                [disabled]="jugador.idJugador === idJugadorNegro">
+                            {{ jugador.nombre }} {{ jugador.apellido1 }} {{ jugador.apellido2 }}
+                            <span *ngIf="jugador.rating"> - {{ jugador.rating }}</span>
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fa-solid fa-square" style="color: var(--color-dark-navy);"></i>
+                        Jugador con Negras
+                    </label>
+                    <select [(ngModel)]="idJugadorNegro" class="form-control">
+                        <option [value]="null">Seleccionar jugador</option>
+                        <option *ngFor="let jugador of jugadoresDisponibles" 
+                                [value]="jugador.idJugador"
+                                [disabled]="jugador.idJugador === idJugadorBlanco">
+                            {{ jugador.nombre }} {{ jugador.apellido1 }} {{ jugador.apellido2 }}
+                            <span *ngIf="jugador.rating"> - {{ jugador.rating }}</span>
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fa-solid fa-note-sticky"></i>
+                        Notas (Opcional)
+                    </label>
+                    <textarea [(ngModel)]="notas" 
+                              class="form-control" 
+                              placeholder="Observaciones sobre esta mesa..."
+                              rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="preview-emparejamiento" *ngIf="idJugadorBlanco && idJugadorNegro">
+                <h3>
+                    <i class="fa-solid fa-eye"></i>
+                    Vista Previa
+                </h3>
+                <div class="preview-mesa">
+                    <div class="preview-header">
+                        <span class="mesa-badge">Mesa {{ numeroMesa }}</span>
+                    </div>
+                    <div class="preview-jugadores">
+                        <div class="preview-jugador jugador-blanco">
+                            <div class="jugador-color">
+                                <i class="fa-solid fa-square"></i>
+                            </div>
+                            <span>{{ getNombreJugador(idJugadorBlanco) }}</span>
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="preview-jugador jugador-negro">
+                            <div class="jugador-color">
+                                <i class="fa-solid fa-square"></i>
+                            </div>
+                            <span>{{ getNombreJugador(idJugadorNegro) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-message" *ngIf="errorValidacion">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>{{ errorValidacion }}</span>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-modal btn-cancel" (click)="onCerrar()">
+                <i class="fa-solid fa-times"></i>
+                Cancelar
+            </button>
+            <button class="btn-modal btn-confirm" 
+                    [disabled]="!formularioValido() || guardando"
+                    (click)="guardarMesa()">
+                <i class="fa-solid" [class.fa-spinner]="guardando" [class.fa-spin]="guardando" [class.fa-check]="!guardando"></i>
+                {{ guardando ? 'Guardando...' : 'Crear Mesa' }}
+            </button>
+        </div>
+    </div>
+</div>

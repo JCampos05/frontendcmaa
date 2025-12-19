@@ -1,0 +1,740 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
+import { TorneoService } from '../../../services/torneo/torneo';
+import { InscripcionService } from '../../../services/inscripcion/inscripcion';
+import { Torneo } from '../../../models/torneo';
+import { Inscripcion } from '../../../models/inscripcion';
+import { ModalEdicionInscripcionComponent } from '../../../componentes/modales/edicion-inscripcion/edicion-inscripcion';
+import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
+
+
+interface EstadisticasCategoria {
+  idCategoria: number;
+  nombreCategoria: string;
+  totalInscritos: number;
+  pagosConfirmados: number;
+  pagosPendientes: number;
+  totalRecaudado: number;
+  promedioRating: number;
+  ratingMasAlto: number;
+  ratingMasBajo: number;
+  inscripciones: Inscripcion[];
+}
+
+interface EstadisticasGenerales {
+  totalInscritos: number;
+  pagosConfirmados: number;
+  pagosPendientes: number;
+  totalRecaudado: number;
+  porcentajePagos: number;
+  promedioEdad: number;
+  promedioRating: number;
+}
+
+@Component({
+  selector: 'app-inscripciones-admin',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ModalEdicionInscripcionComponent, ToastNoti],
+  templateUrl: './inscripciones-torneo.html',
+  styleUrls: ['./inscripciones-torneo.css']
+})
+export class InscripcionesAdminComponent implements OnInit {
+  @ViewChild(ToastNoti) toast!: ToastNoti;
+
+  torneoSeleccionado: Torneo | null = null;
+  categoriaSeleccionada: number | null = null;
+
+  estadisticasGenerales: EstadisticasGenerales | null = null;
+  estadisticasPorCategoria: EstadisticasCategoria[] = [];
+  categorias: any[] = [];
+
+  cargando = false;
+  error: string | null = null;
+
+  filtroNombre = '';
+  filtroEstadoPago: string = 'todos';
+  filtroEstadoInscripcion: string = 'todos';
+
+  columnaOrden: string = 'fecha_inscripcion';
+  direccionOrden: 'ASC' | 'DESC' = 'DESC';
+
+  modalDetallesVisible = false;
+  inscripcionSeleccionada: Inscripcion | null = null;
+
+  modalEdicionVisible = false;
+
+  // Paginación
+  paginaActual = 1;
+  registrosPorPagina = 15;
+  Math = Math;
+  
+  constructor(
+    private torneoService: TorneoService,
+    private inscripcionService: InscripcionService,
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+    this.cargarTorneoActual();
+  }
+
+  cargarTorneoActual(): void {
+    this.cargando = true;
+    this.error = null;
+
+    this.torneoService.getActivos().subscribe({
+      next: (torneos) => {
+        if (torneos && torneos.length > 0) {
+          const torneosOrdenados = torneos.sort((a, b) => {
+            return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+          });
+
+          const hoy = new Date();
+          const tresDiasDespues = new Date();
+          tresDiasDespues.setDate(hoy.getDate() + 3);
+
+          const torneoEnRango = torneosOrdenados.find(t => {
+            const fechaTorneo = new Date(t.fecha);
+            return fechaTorneo >= hoy && fechaTorneo <= tresDiasDespues;
+          });
+
+          this.torneoSeleccionado = torneoEnRango || torneosOrdenados[0];
+
+          if (this.torneoSeleccionado?.idTorneo) {
+            this.cargarInscripciones(this.torneoSeleccionado.idTorneo);
+          }
+        } else {
+          this.error = 'No hay torneos activos';
+          this.cargando = false;
+        }
+      },
+      error: (err) => {
+        this.error = 'Error al cargar el torneo actual';
+        console.error('Error:', err);
+        this.cargando = false;
+      }
+    });
+  }
+
+  cargarInscripciones(idTorneo: number): void {
+    console.log('=== CARGANDO INSCRIPCIONES DEL TORNEO:', idTorneo);
+    this.inscripcionService.getByTorneo(idTorneo).subscribe({
+      next: (inscripciones) => {
+        console.log('=== INSCRIPCIONES RECIBIDAS:', inscripciones.length);
+        console.log('Datos completos:', inscripciones);
+        this.procesarEstadisticas(inscripciones);
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.error = 'Error al cargar inscripciones';
+        console.error('Error:', err);
+        this.cargando = false;
+      }
+    });
+  }
+
+  procesarEstadisticas(inscripciones: Inscripcion[]): void {
+    console.log('=== PROCESANDO ESTADÍSTICAS ===');
+    console.log('Total inscripciones recibidas:', inscripciones.length);
+
+    const categorias = new Map<number, EstadisticasCategoria>();
+
+    inscripciones.forEach(insc => {
+      const montoPagadoNum = Number(insc.montoPagado) || 0;
+      const costoCategoria = Number(insc.categoria?.costo) || 0;
+
+      // ✅ CORRECCIÓN: Validar que el pago esté 100% completo
+      const pagoCompleto = montoPagadoNum >= costoCategoria && costoCategoria > 0;
+
+      console.log('Procesando inscripción:', {
+        id: insc.idInscripcion,
+        jugador: `${insc.jugador?.nombre} ${insc.jugador?.apellido1}`,
+        montoPagado: montoPagadoNum,
+        costoCategoria: costoCategoria,
+        pagoCompleto: pagoCompleto,
+        estado: insc.estado
+      });
+
+      const idCat = insc.idCategoria || 0;
+
+      if (!categorias.has(idCat)) {
+        categorias.set(idCat, {
+          idCategoria: idCat,
+          nombreCategoria: insc.categoria?.nombre || 'Sin categoría',
+          totalInscritos: 0,
+          pagosConfirmados: 0,
+          pagosPendientes: 0,
+          totalRecaudado: 0,
+          promedioRating: 0,
+          ratingMasAlto: 0,
+          ratingMasBajo: 9999,
+          inscripciones: []
+        });
+      }
+
+      const cat = categorias.get(idCat)!;
+      cat.totalInscritos++;
+      cat.inscripciones.push(insc);
+
+      // ✅ CORRECCIÓN: Solo contar como confirmado si pagó el 100%
+      if (pagoCompleto) {
+        cat.pagosConfirmados++;
+        console.log(`✅ Pago completo - Monto: ${montoPagadoNum}`);
+      } else {
+        cat.pagosPendientes++;
+        console.log(`⏳ Pago pendiente/parcial - Pagado: ${montoPagadoNum} de ${costoCategoria}`);
+      }
+
+      // ✅ SIEMPRE sumar al total recaudado, sin importar si es pago completo o parcial
+      cat.totalRecaudado += montoPagadoNum;
+
+      const rating = insc.jugador?.rating || 0;
+      if (rating > 0) {
+        cat.ratingMasAlto = Math.max(cat.ratingMasAlto, rating);
+        cat.ratingMasBajo = Math.min(cat.ratingMasBajo, rating);
+      }
+    });
+
+    categorias.forEach(cat => {
+      const ratings = cat.inscripciones
+        .map(i => i.jugador?.rating || 0)
+        .filter(r => r > 0);
+
+      cat.promedioRating = ratings.length > 0
+        ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+        : 0;
+
+      if (cat.ratingMasBajo === 9999) cat.ratingMasBajo = 0;
+
+      console.log(`📊 Categoría ${cat.nombreCategoria}:`, {
+        totalInscritos: cat.totalInscritos,
+        pagosConfirmados: cat.pagosConfirmados,
+        pagosPendientes: cat.pagosPendientes,
+        totalRecaudado: cat.totalRecaudado
+      });
+    });
+
+    this.estadisticasPorCategoria = Array.from(categorias.values());
+    this.cargarCategorias();
+
+    const totalInscritos = inscripciones.length;
+
+    // ✅ CORRECCIÓN: Contar solo pagos 100% completos
+    const pagosConfirmados = inscripciones.filter(i => {
+      const montoPagado = Number(i.montoPagado) || 0;
+      const costo = Number(i.categoria?.costo) || 0;
+      return montoPagado >= costo && costo > 0;
+    }).length;
+
+    // ✅ CORRECCIÓN: Sumar TODO el dinero registrado, completo o parcial
+    const totalRecaudado = inscripciones.reduce((sum, i) => {
+      return sum + (Number(i.montoPagado) || 0);
+    }, 0);
+
+    const edades = inscripciones
+      .map(i => i.jugador?.edad || 0)
+      .filter(e => e > 0);
+
+    const ratings = inscripciones
+      .map(i => i.jugador?.rating || 0)
+      .filter(r => r > 0);
+
+    this.estadisticasGenerales = {
+      totalInscritos,
+      pagosConfirmados,
+      pagosPendientes: totalInscritos - pagosConfirmados,
+      totalRecaudado,
+      porcentajePagos: totalInscritos > 0 ? (pagosConfirmados / totalInscritos) * 100 : 0,
+      promedioEdad: edades.length > 0 ? edades.reduce((a, b) => a + b, 0) / edades.length : 0,
+      promedioRating: ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
+    };
+
+    console.log('=== ESTADÍSTICAS FINALES ===');
+    console.log('Total inscritos:', totalInscritos);
+    console.log('Pagos confirmados (100%):', pagosConfirmados);
+    console.log('Pagos pendientes/parciales:', totalInscritos - pagosConfirmados);
+    console.log('Total recaudado: $', totalRecaudado.toFixed(2));
+  }
+
+  cargarCategorias(): void {
+    this.categorias = this.estadisticasPorCategoria.map(ec => ({
+      idCategoria: ec.idCategoria,
+      nombre: ec.nombreCategoria
+    }));
+  }
+
+  seleccionarCategoria(idCategoria: number | null): void {
+    this.categoriaSeleccionada = idCategoria;
+    this.paginaActual = 1; // Resetear a página 1 al cambiar categoría
+  }
+
+  getInscripcionesFiltradas(): Inscripcion[] {
+    let inscripciones: Inscripcion[] = [];
+
+    if (this.categoriaSeleccionada === null) {
+      inscripciones = this.estadisticasPorCategoria.flatMap(c => c.inscripciones);
+    } else {
+      const cat = this.estadisticasPorCategoria.find(c => c.idCategoria === this.categoriaSeleccionada);
+      inscripciones = cat?.inscripciones || [];
+    }
+
+    if (this.filtroNombre) {
+      const filtro = this.filtroNombre.toLowerCase();
+      inscripciones = inscripciones.filter(i => {
+        const nombreCompleto = `${i.jugador?.nombre || ''} ${i.jugador?.apellido1 || ''} ${i.jugador?.apellido2 || ''}`.toLowerCase();
+        return nombreCompleto.includes(filtro);
+      });
+    }
+
+    if (this.filtroEstadoPago !== 'todos') {
+      inscripciones = inscripciones.filter(i => {
+        const montoPagado = Number(i.montoPagado) || 0;
+        const costoCategoria = Number(i.categoria?.costo) || 0;
+
+        if (this.filtroEstadoPago === 'confirmado') {
+          return montoPagado >= costoCategoria && costoCategoria > 0;
+        }
+        if (this.filtroEstadoPago === 'parcial') {
+          return montoPagado > 0 && montoPagado < costoCategoria;
+        }
+        if (this.filtroEstadoPago === 'pendiente') {
+          return montoPagado < costoCategoria;
+        }
+
+        return true;
+      });
+    }
+
+    if (this.filtroEstadoInscripcion !== 'todos') {
+      inscripciones = inscripciones.filter(i => i.estado === this.filtroEstadoInscripcion);
+    }
+
+    inscripciones.sort((a, b) => {
+      let valorA: any, valorB: any;
+
+      switch (this.columnaOrden) {
+        case 'nombre':
+          valorA = `${a.jugador?.nombre || ''} ${a.jugador?.apellido1 || ''}`;
+          valorB = `${b.jugador?.nombre || ''} ${b.jugador?.apellido1 || ''}`;
+          break;
+        case 'rating':
+          valorA = a.jugador?.rating || 0;
+          valorB = b.jugador?.rating || 0;
+          break;
+        case 'edad':
+          valorA = a.jugador?.edad || 0;
+          valorB = b.jugador?.edad || 0;
+          break;
+        case 'monto':
+          valorA = a.montoPagado || 0;
+          valorB = b.montoPagado || 0;
+          break;
+        case 'fecha_inscripcion':
+        default:
+          valorA = new Date(a.fechaInscripcion || 0).getTime();
+          valorB = new Date(b.fechaInscripcion || 0).getTime();
+      }
+
+      if (this.direccionOrden === 'ASC') {
+        return valorA > valorB ? 1 : -1;
+      } else {
+        return valorA < valorB ? 1 : -1;
+      }
+    });
+
+    return inscripciones;
+  }
+
+  ordenarPor(columna: string): void {
+    if (this.columnaOrden === columna) {
+      this.direccionOrden = this.direccionOrden === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+      this.columnaOrden = columna;
+      this.direccionOrden = 'ASC';
+    }
+  }
+
+  confirmarPago(inscripcion: Inscripcion): void {
+    if (!inscripcion.idInscripcion) return;
+
+    // Obtener el monto de la categoría
+    const monto = inscripcion.categoria?.costo || 0;
+
+    if (monto <= 0) {
+      this.toast.error('Error','La categoria no tiene un costo definido');
+      //alert('Error: La categoría no tiene un costo definido');
+      return;
+    }
+
+    const mensaje = `¿Confirmar pago de $${monto.toFixed(2)} para ${inscripcion.jugador?.nombre} ${inscripcion.jugador?.apellido1}?`;
+
+    if (!confirm(mensaje)) return;
+
+    console.log('=== CONFIRMANDO PAGO E INSCRIPCIÓN ===');
+    console.log('ID Inscripción:', inscripcion.idInscripcion);
+    console.log('Monto:', monto);
+
+    const datosActualizacion = {
+      pago_confirmado: true,
+      monto_pagado: Number(monto), 
+      estado: 'confirmado'
+    };
+
+    this.inscripcionService.update(inscripcion.idInscripcion, datosActualizacion).subscribe({
+      next: (response) => {
+
+        // Verificar que los datos se actualizaron
+        if (response.data) {
+          console.log('Datos actualizados:', {
+            pagoConfirmado: response.data.pagoConfirmado,
+            montoPagado: response.data.montoPagado,
+            estado: response.data.estado
+          });
+        }
+
+        this.toast.success('Jugador confirmado','Pago e inscripción confirmados exitosamente');
+        //alert('Pago e inscripción confirmados exitosamente');
+
+        // Recargar estadísticas para reflejar cambios
+        this.actualizarEstadisticas();
+      },
+      error: (err) => {
+        console.error('❌ Error al confirmar el pago:', err);
+        console.error('Detalles del error:', {
+          status: err.status,
+          statusText: err.statusText,
+          message: err?.error?.message,
+          error: err?.error,
+          fullError: err
+        });
+        const mensaje = err?.error?.message || err?.error?.mensaje || 'Error al confirmar el pago';
+        this.toast.error('Error', mensaje);
+        //alert(`Error: ${mensaje}`);
+      }
+    });
+  }
+
+
+  confirmarPagoModal(): void {
+    if (this.inscripcionSeleccionada && !this.inscripcionSeleccionada.pagoConfirmado) {
+      this.confirmarPago(this.inscripcionSeleccionada);
+      this.cerrarModal();
+    }
+  }
+
+  getMontoPagado(inscripcion: Inscripcion): number {
+    const montoPagado = Number(inscripcion.montoPagado) || 0;
+
+    console.log('getMontoPagado para inscripción:', {
+      id: inscripcion.idInscripcion,
+      montoPagado: montoPagado,
+      montoPagadoOriginal: inscripcion.montoPagado,
+      pagoConfirmado: inscripcion.pagoConfirmado,
+      costoCategoría: inscripcion.categoria?.costo
+    });
+
+    return montoPagado;
+  }
+
+
+  puedePagarInscripcion(inscripcion: Inscripcion): boolean {
+    const estadoPago = this.getEstadoPago(inscripcion);
+    const costoCategoría = inscripcion.categoria?.costo || 0;
+
+    // Mostrar botón si: el pago no está completo Y la categoría tiene costo
+    const puedePagar = estadoPago !== 'confirmado' && costoCategoría > 0;
+
+    console.log('puedePagarInscripcion:', {
+      id: inscripcion.idInscripcion,
+      estadoPago: estadoPago,
+      costoCategoría: costoCategoría,
+      resultado: puedePagar
+    });
+
+    return puedePagar;
+  }
+
+  actualizarEstadisticas(): void {
+    console.log('=== ACTUALIZANDO ESTADÍSTICAS ===');
+    if (this.torneoSeleccionado?.idTorneo) {
+      this.cargarInscripciones(this.torneoSeleccionado.idTorneo);
+    }
+  }
+
+  getEstadoPago(inscripcion: Inscripcion): 'confirmado' | 'parcial' | 'pendiente' {
+    const montoPagado = Number(inscripcion.montoPagado) || 0;
+    const costoCategoria = inscripcion.categoria?.costo || 0;
+    const pagoConfirmado = Boolean(inscripcion.pagoConfirmado);
+
+    // Si el pago está confirmado Y el monto es igual o mayor al costo
+    if (pagoConfirmado && montoPagado >= costoCategoria) {
+      return 'confirmado';
+    }
+
+    // Si hay un monto pagado pero es menor al costo (pago parcial)
+    if (montoPagado > 0 && montoPagado < costoCategoria) {
+      return 'parcial';
+    }
+
+    // Si no hay monto pagado o es 0
+    return 'pendiente';
+  }
+
+  getEstadoPagoClase(inscripcion: Inscripcion): string {
+    const estadoPago = this.getEstadoPago(inscripcion);
+
+    switch (estadoPago) {
+      case 'confirmado':
+        return 'status-confirmed';
+      case 'parcial':
+        return 'status-partial';
+      case 'pendiente':
+      default:
+        return 'status-pending';
+    }
+  }
+
+  getEstadoPagoTexto(inscripcion: Inscripcion): string {
+    const estadoPago = this.getEstadoPago(inscripcion);
+
+    switch (estadoPago) {
+      case 'confirmado':
+        return 'Confirmado';
+      case 'parcial':
+        return 'Pago Parcial';
+      case 'pendiente':
+      default:
+        return 'Pendiente';
+    }
+  }
+  getEstadoPagoIcono(inscripcion: Inscripcion): string {
+    const estadoPago = this.getEstadoPago(inscripcion);
+
+    switch (estadoPago) {
+      case 'confirmado':
+        return 'fa-circle-check';
+      case 'parcial':
+        return 'fa-circle-half-stroke';
+      case 'pendiente':
+      default:
+        return 'fa-clock';
+    }
+  }
+  formatearFecha(fecha: Date | string | undefined): string {
+    if (!fecha) return '-';
+
+    const fechaStr = typeof fecha === 'string' ? fecha : fecha.toISOString();
+    const [year, month, day] = fechaStr.split('T')[0].split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+
+    return date.toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  formatearFechaCompleta(fecha: Date | string | undefined): string {
+    if (!fecha) return '-';
+
+    const fechaStr = typeof fecha === 'string' ? fecha : fecha.toISOString();
+    const [year, month, day] = fechaStr.split('T')[0].split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+
+    return date.toLocaleDateString('es-MX', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  formatearTelefono(telefono: string | undefined): string {
+    if (!telefono) return '-';
+
+    const telefonoLimpio = telefono.replace(/\D/g, '');
+
+    if (telefonoLimpio.length === 10) {
+      return telefonoLimpio.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+    }
+
+    return telefono;
+  }
+
+  getEstadoClase(estado: string | undefined): string {
+    switch (estado) {
+      case 'confirmado': return 'status-confirmed';
+      case 'pendiente': return 'status-pending';
+      case 'cancelado': return 'status-cancelled';
+      default: return '';
+    }
+  }
+
+  getPorcentajePagosPorCategoria(cat: EstadisticasCategoria): number {
+    return cat.totalInscritos > 0
+      ? (cat.pagosConfirmados / cat.totalInscritos) * 100
+      : 0;
+  }
+
+  exportarDatos(): void {
+    const inscripciones = this.getInscripcionesFiltradas();
+    const csv = this.generarCSV(inscripciones);
+    this.descargarCSV(csv, `inscripciones_${this.torneoSeleccionado?.nombre || 'torneo'}.csv`);
+  }
+
+  private generarCSV(inscripciones: Inscripcion[]): string {
+    const headers = ['Nombre', 'Apellido1', 'Apellido2', 'Teléfono', 'Edad', 'Rating', 'Categoría', 'Estado Pago', 'Monto', 'Estado Inscripción', 'Fecha'];
+
+    const rows = inscripciones.map(i => [
+      i.jugador?.nombre || '',
+      i.jugador?.apellido1 || '',
+      i.jugador?.apellido2 || '',
+      i.jugador?.telefono || '',
+      i.jugador?.edad || '',
+      i.jugador?.rating || '',
+      i.categoria?.nombre || '',
+      i.pagoConfirmado ? 'Confirmado' : 'Pendiente',
+      i.montoPagado || 0,
+      i.estado || '',
+      this.formatearFecha(i.fechaInscripcion)
+    ]);
+
+    return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  }
+
+  private descargarCSV(contenido: string, nombreArchivo: string): void {
+    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', nombreArchivo);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  verDetalles(inscripcion: Inscripcion): void {
+    this.inscripcionSeleccionada = inscripcion;
+    this.modalDetallesVisible = true;
+  }
+
+  cerrarModal(): void {
+    this.modalDetallesVisible = false;
+    this.inscripcionSeleccionada = null;
+  }
+
+  editarInscripcion(inscripcion: Inscripcion): void {
+    console.log('=== ABRIENDO MODAL DE EDICIÓN ===');
+    console.log('Inscripción seleccionada:', inscripcion);
+    this.inscripcionSeleccionada = inscripcion;
+    this.modalEdicionVisible = true;
+  }
+
+  editarInscripcionModal(): void {
+    if (this.inscripcionSeleccionada) {
+      this.cerrarModal();
+      this.modalEdicionVisible = true;
+    }
+  }
+
+  cerrarModalEdicion(): void {
+    console.log('=== CERRANDO MODAL DE EDICIÓN ===');
+    this.modalEdicionVisible = false;
+    this.inscripcionSeleccionada = null;
+  }
+
+  onModalEdicionActualizado(): void {
+    console.log('=== EVENTO: Modal de edición actualizado ===');
+    this.cerrarModalEdicion();
+    this.actualizarEstadisticas();
+  }
+
+  eliminarInscripcion(inscripcion: Inscripcion): void {
+    if (!inscripcion.idInscripcion) return;
+
+    const confirmar = confirm(`¿Estás seguro de eliminar la inscripción de ${inscripcion.jugador?.nombre} ${inscripcion.jugador?.apellido1}?`);
+
+    if (confirmar) {
+      this.inscripcionService.delete(inscripcion.idInscripcion).subscribe({
+        next: () => {
+          //console.log('Inscripción eliminada exitosamente');
+          this.toast.success('Inscripcion elimnada','Inscripción eliminada exitosamente');
+          //alert('Inscripción eliminada exitosamente');
+          this.actualizarEstadisticas();
+        },
+        error: (err) => {
+          //onsole.error('Error al eliminar inscripción:', err);
+          this.toast.error('Error','Error al eliminar la inscripción');
+          //alert('Error al eliminar la inscripción');
+        }
+      });
+    }
+  }
+
+  eliminarInscripcionModal(): void {
+    if (this.inscripcionSeleccionada) {
+      this.cerrarModal();
+      this.eliminarInscripcion(this.inscripcionSeleccionada);
+    }
+  }
+
+  getInscripcionesPaginadas(): Inscripcion[] {
+    const inscripcionesFiltradas = this.getInscripcionesFiltradas();
+    const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
+    const fin = inicio + this.registrosPorPagina;
+    return inscripcionesFiltradas.slice(inicio, fin);
+  }
+
+  getTotalPaginas(): number {
+    const total = this.getInscripcionesFiltradas().length;
+    return Math.ceil(total / this.registrosPorPagina);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.getTotalPaginas()) {
+      this.paginaActual = pagina;
+    }
+  }
+
+  getPaginasArray(): number[] {
+    const totalPaginas = this.getTotalPaginas();
+    return Array.from({ length: totalPaginas }, (_, i) => i + 1);
+  }
+
+  getPaginasVisibles(): number[] {
+    const totalPaginas = this.getTotalPaginas();
+    const paginaActual = this.paginaActual;
+    const paginas: number[] = [];
+
+    if (totalPaginas <= 7) {
+      return this.getPaginasArray();
+    }
+
+    paginas.push(1);
+
+    if (paginaActual > 3) {
+      paginas.push(-1); // Indicador de puntos suspensivos
+    }
+
+    const inicio = Math.max(2, paginaActual - 1);
+    const fin = Math.min(totalPaginas - 1, paginaActual + 1);
+
+    for (let i = inicio; i <= fin; i++) {
+      paginas.push(i);
+    }
+
+    if (paginaActual < totalPaginas - 2) {
+      paginas.push(-1); // Indicador de puntos suspensivos
+    }
+
+    paginas.push(totalPaginas);
+
+    return paginas;
+  }
+}

@@ -1,0 +1,18 @@
+<div class="modal-overlay" *ngIf="mostrar" [@fadeIn]>
+    <div class="modal-content" [@slideUp]>
+        <div class="modal-icon">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </div>
+        <h2>Sesión Cerrada</h2>
+        <p class="mensaje-principal">
+            Tu sesión ha sido cerrada remotamente por un administrador.
+        </p>
+        <p class="mensaje-secundario">
+            Por favor, inicia sesión nuevamente para continuar.
+        </p>
+        <button class="btn-continuar" (click)="onContinuar()">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Ir al Login
+        </button>
+    </div>
+</div>

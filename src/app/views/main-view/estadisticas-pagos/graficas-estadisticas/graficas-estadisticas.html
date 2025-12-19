@@ -1,0 +1,59 @@
+<!-- Gráficas Principales -->
+<div class="graficas-grid">
+    <!-- Gráfica de Recaudación General -->
+    <div class="grafica-card">
+        <div class="grafica-header">
+            <div class="header-left">
+                <i class="fa-solid fa-chart-pie"></i>
+                <h3>Distribución de Pagos</h3>
+            </div>
+        </div>
+        <div class="grafica-body">
+            <canvas baseChart [data]="chartRecaudacionData" [type]="'doughnut'"
+                [options]="chartRecaudacionOptions">
+            </canvas>
+        </div>
+    </div>
+
+    <!-- Gráfica de Recaudación por Torneo -->
+    <div class="grafica-card">
+        <div class="grafica-header">
+            <div class="header-left">
+                <i class="fa-solid fa-chess"></i>
+                <h3>Recaudación por Torneo</h3>
+            </div>
+        </div>
+        <div class="grafica-body">
+            <canvas baseChart [data]="chartTorneosData" [type]="'bar'" [options]="chartTorneosOptions">
+            </canvas>
+        </div>
+    </div>
+
+    <!-- Gráfica de Evolución Temporal -->
+    <div class="grafica-card full-width">
+        <div class="grafica-header">
+            <div class="header-left">
+                <i class="fa-solid fa-chart-line"></i>
+                <h3>Evolución Temporal</h3>
+            </div>
+        </div>
+        <div class="grafica-body">
+            <canvas baseChart [data]="chartEvolucionData" [type]="'line'" [options]="chartEvolucionOptions">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfica de Categorías -->
+<div class="grafica-card">
+    <div class="grafica-header">
+        <div class="header-left">
+            <i class="fa-solid fa-layer-group"></i>
+            <h3>Recaudación por Categoría</h3>
+        </div>
+    </div>
+    <div class="grafica-body">
+        <canvas baseChart [data]="chartCategoriasData" [type]="'bar'" [options]="chartCategoriasOptions">
+        </canvas>
+    </div>
+</div>

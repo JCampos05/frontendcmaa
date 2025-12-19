@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
+
+:root {
+    --color-black: #000000;
+    --color-dark-navy: #212129;
+    --color-slate: #3E464B;
+    --color-brown: #854D2E;
+    --color-tan: #E4C091;
+    --color-cream: #EBDC2AA;
+    --color-light-gray: #E3E1DD;
+    --color-white: #FFFEFF;
+    --color-accent: #EA4759;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'ABeeZee', sans-serif;
+    background-color: var(--color-light-gray);
+    color: var(--color-dark-navy);
+    overflow-x: hidden;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-brown);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-slate);
+}

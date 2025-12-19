@@ -1,0 +1,211 @@
+<div class="torneo-actual-container">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-icon">
+            <i class="fa-solid fa-trophy"></i>
+        </div>
+        <div class="header-text">
+            <h1>Torneo Actual</h1>
+            <p>Vista general del torneo en curso</p>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading-container">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Cargando torneo actual...</p>
+    </div>
+
+    <!-- Sin Torneos -->
+    <div *ngIf="!cargando && !torneoActual && !error" class="empty-container">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <h3>No hay torneos activos</h3>
+        <p>Actualmente no hay torneos programados o activos</p>
+        <button class="btn-action" (click)="navegarNuevoTorneo()">
+            <i class="fa-solid fa-plus"></i>
+            Crear Torneo
+        </button>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !cargando" class="error-container">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <p>{{ error }}</p>
+        <button class="btn-retry" (click)="cargarTorneoActual()">
+            <i class="fa-solid fa-rotate-right"></i>
+            Reintentar
+        </button>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div *ngIf="!cargando && !error && torneoActual" class="content-wrapper">
+
+        <!-- Información del Torneo -->
+        <div class="torneo-info-card">
+            <div class="card-header">
+                <div class="torneo-titulo">
+                    <h2>{{ torneoActual.nombre || 'Sin nombre' }}</h2>
+                    <span class="estado-badge" [ngClass]="obtenerClaseEstado()">
+                        {{ obtenerEstadoTorneo() }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <div class="info-content">
+                            <span class="info-label">Fecha</span>
+                            <span class="info-value">{{ formatearFecha(torneoActual.fecha) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-clock"></i>
+                        <div class="info-content">
+                            <span class="info-label">Hora</span>
+                            <span class="info-value">{{ torneoActual.hora }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div class="info-content">
+                            <span class="info-label">Lugar</span>
+                            <span class="info-value">{{ torneoActual.lugar }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-chess-board"></i>
+                        <div class="info-content">
+                            <span class="info-label">Rondas</span>
+                            <span class="info-value">{{ torneoActual.rondas }} rondas</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item" *ngIf="torneoActual.cierreInscripciones">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                        <div class="info-content">
+                            <span class="info-label">Cierre Inscripciones</span>
+                            <span class="info-value">{{ formatearFecha(torneoActual.cierreInscripciones) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categorías Detalladas -->
+                <div class="categorias-section" *ngIf="getCategoriasDetalladas().length > 0">
+                    <div class="categorias-header">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Categorías y Costos</span>
+                    </div>
+                    <div class="categorias-detalladas-grid">
+                        <div class="categoria-detallada-card" *ngFor="let cat of getCategoriasDetalladas()">
+                            <div class="categoria-detallada-header">
+                                <i class="fa-solid fa-chess"></i>
+                                <h4>{{ cat.nombre }}</h4>
+                            </div>
+                            <div class="categoria-detallada-body">
+                                <div class="detalle-row">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                    <span class="detalle-label">Inscripción:</span>
+                                    <span class="detalle-valor">${{ cat.costo }}</span>
+                                </div>
+                                <div class="detalle-row">
+                                    <i class="fa-solid fa-hourglass-half"></i>
+                                    <span class="detalle-label">Ritmo:</span>
+                                    <span class="detalle-valor">{{ cat.ritmoJuego }}</span>
+                                </div>
+                                <div class="detalle-row">
+                                    <i class="fa-solid fa-diagram-project"></i>
+                                    <span class="detalle-label">Sistema:</span>
+                                    <span class="detalle-valor">{{ cat.sistemaCompetencia }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensaje cuando no hay categorías -->
+                <div class="categorias-section" *ngIf="getCategoriasDetalladas().length === 0">
+                    <div class="categorias-header">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Categorías</span>
+                    </div>
+                    <div class="sin-categorias-mensaje">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <p>No hay categorías configuradas para este torneo</p>
+                    </div>
+                </div>
+
+                <!-- Información Detallada del Torneo -->
+                <div class="informacion-detallada" *ngIf="torneoActual.notas">
+                    <div class="detalle-header">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Información Detallada</span>
+                    </div>
+
+                    <div class="detalles-grid">
+                        <div class="detalle-card" *ngFor="let detalle of getDetallesNotas()">
+                            <div class="detalle-icon">
+                                <i [class]="detalle.icono"></i>
+                            </div>
+                            <div class="detalle-content">
+                                <h4 class="detalle-titulo">{{ detalle.titulo }}</h4>
+                                <p class="detalle-texto">{{ detalle.texto }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="acciones-grid">
+            <div class="accion-card" (click)="navegarInscripciones()">
+                <div class="accion-icon">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="accion-content">
+                    <h3>Inscripciones</h3>
+                    <p>Gestionar inscripciones del torneo</p>
+                </div>
+                <i class="fa-solid fa-chevron-right accion-arrow"></i>
+            </div>
+            <div class="accion-card" (click)="navegarListas()">
+                <div class="accion-icon">
+                    <i class="fa-solid fa-list-ol nav-icon"></i>
+                </div>
+                <div class="accion-content">
+                    <h3>Listas</h3>
+                    <p>Ver listas preeliminares del torneo</p>
+                </div>
+                <i class="fa-solid fa-chevron-right accion-arrow"></i>
+            </div>
+            <div class="accion-card" (click)="navegarMesas()">
+                <div class="accion-icon">
+                    <i class="fa-solid fa-table-cells"></i>
+                </div>
+                <div class="accion-content">
+                    <h3>Mesas</h3>
+                    <p>Ver y gestionar mesas de juego</p>
+                </div>
+                <i class="fa-solid fa-chevron-right accion-arrow"></i>
+            </div>
+
+            <div class="accion-card" (click)="navegarResultados()">
+                <div class="accion-icon">
+                    <i class="fa-solid fa-ranking-star"></i>
+                </div>
+                <div class="accion-content">
+                    <h3>Resultados</h3>
+                    <p>Consultar resultados y clasificaciones</p>
+                </div>
+                <i class="fa-solid fa-chevron-right accion-arrow"></i>
+            </div>
+
+
+        </div>
+    </div>
+</div>

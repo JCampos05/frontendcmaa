@@ -1,0 +1,175 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onCerrar()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <h2>Cargar Emparejamientos</h2>
+            </div>
+            <button class="btn-close-modal" (click)="onCerrar()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Sección de carga -->
+            <div class="upload-section" *ngIf="!vistaPreviaActiva">
+                <div class="upload-icon">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+                <h3>Selecciona el archivo de emparejamientos</h3>
+                <p>Formato: Excel (.xlsx o .xls) con Round {{ numeroRonda || 1 }}</p>
+                
+                <label class="btn-upload-file">
+                    <i class="fa-solid fa-upload"></i>
+                    Seleccionar Archivo
+                    <input type="file" 
+                           accept=".xlsx,.xls" 
+                           (change)="onFileSelected($event)"
+                           hidden>
+                </label>
+
+                <div class="file-info" *ngIf="archivo">
+                    <i class="fa-solid fa-file-check"></i>
+                    <span>{{ archivo.name }}</span>
+                </div>
+
+                <div class="loading-file" *ngIf="procesando">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Procesando archivo...</span>
+                </div>
+            </div>
+
+            <!-- Vista previa de emparejamientos -->
+            <div class="preview-section" *ngIf="vistaPreviaActiva">
+                <div class="preview-stats">
+                    <div class="stat-item stat-success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <span class="stat-number">{{ getEmparejamientosValidos() }}</span>
+                            <span class="stat-label">Válidos</span>
+                        </div>
+                    </div>
+                    <div class="stat-item stat-error" *ngIf="getEmparejamientosInvalidos() > 0">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <div>
+                            <span class="stat-number">{{ getEmparejamientosInvalidos() }}</span>
+                            <span class="stat-label">No encontrados</span>
+                        </div>
+                    </div>
+                    <div class="stat-item stat-info">
+                        <i class="fa-solid fa-chess-board"></i>
+                        <div>
+                            <span class="stat-number">{{ emparejamientos.length }}</span>
+                            <span class="stat-label">Total mesas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" *ngIf="!archivoValido">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Algunos jugadores no fueron encontrados en el sistema. Verifica los nombres marcados en rojo.</span>
+                </div>
+
+                <div class="alert alert-success" *ngIf="archivoValido">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Todos los jugadores fueron encontrados. Puedes guardar {{ emparejamientos.length }} mesa(s).</span>
+                </div>
+
+                <div class="emparejamientos-list">
+                    <div *ngFor="let emp of emparejamientos" 
+                         class="emp-card"
+                         [class.emp-valido]="emp.blancoEncontrado && emp.negroEncontrado"
+                         [class.emp-invalido]="!emp.blancoEncontrado || !emp.negroEncontrado">
+                        
+                        <div class="emp-header">
+                            <span class="mesa-badge">Mesa {{ emp.numeroMesa }}</span>
+                            <i class="fa-solid" 
+                               [class.fa-circle-check]="emp.blancoEncontrado && emp.negroEncontrado"
+                               [class.fa-circle-xmark]="!emp.blancoEncontrado || !emp.negroEncontrado"
+                               [class.icon-success]="emp.blancoEncontrado && emp.negroEncontrado"
+                               [class.icon-error]="!emp.blancoEncontrado || !emp.negroEncontrado"></i>
+                        </div>
+
+                        <div class="emp-jugadores">
+                            <div class="jugador-item jugador-blanco" [class.no-encontrado]="!emp.blancoEncontrado">
+                                <div class="jugador-color">
+                                    <i class="fa-solid fa-square"></i>
+                                </div>
+                                <div class="jugador-info">
+                                    <span class="jugador-nombre">{{ emp.nombreBlancoCompleto }}</span>
+                                    <span class="jugador-estado">
+                                        <i class="fa-solid" 
+                                           [class.fa-check]="emp.blancoEncontrado"
+                                           [class.fa-xmark]="!emp.blancoEncontrado"></i>
+                                        {{ emp.blancoEncontrado ? 'Encontrado' : 'No encontrado' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="vs">VS</div>
+
+                            <div class="jugador-item jugador-negro" [class.no-encontrado]="!emp.negroEncontrado">
+                                <div class="jugador-color">
+                                    <i class="fa-solid fa-square"></i>
+                                </div>
+                                <div class="jugador-info">
+                                    <span class="jugador-nombre">{{ emp.nombreNegroCompleto }}</span>
+                                    <span class="jugador-estado">
+                                        <i class="fa-solid" 
+                                           [class.fa-check]="emp.negroEncontrado"
+                                           [class.fa-xmark]="!emp.negroEncontrado"></i>
+                                        {{ emp.negroEncontrado ? 'Encontrado' : 'No encontrado' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error -->
+            <div class="error-message" *ngIf="errorCarga">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>{{ errorCarga }}</span>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-modal btn-cancel" (click)="onCerrar()">
+                <i class="fa-solid fa-times"></i>
+                Cancelar
+            </button>
+            
+            <button class="btn-modal btn-back" 
+                    *ngIf="vistaPreviaActiva"
+                    (click)="resetModal()">
+                <i class="fa-solid fa-arrow-left"></i>
+                Cargar Otro Archivo
+            </button>
+
+            <button class="btn-modal btn-confirm" 
+                    *ngIf="vistaPreviaActiva"
+                    [disabled]="!archivoValido || guardando"
+                    (click)="confirmarGuardarMesas()">
+                <i class="fa-solid" 
+                   [class.fa-spinner]="guardando" 
+                   [class.fa-spin]="guardando" 
+                   [class.fa-save]="!guardando"></i>
+                {{ guardando ? 'Guardando...' : 'Guardar Mesas (' + emparejamientos.length + ')' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<app-modal-confirmacion
+    [mostrar]="modalConfirmacionVisible"
+    [titulo]="confirmacionTitulo"
+    [mensaje]="confirmacionMensaje"
+    [textoConfirmar]="confirmacionTextoConfirmar"
+    [tipoBotonPrimario]="'primary'"
+    [icono]="'fa-circle-question'"
+    [iconoBotonPrimario]="'fa-save'"
+    (confirmar)="guardarMesas(); cerrarModalConfirmacion()"
+    (cancelar)="cerrarModalConfirmacion()">
+</app-modal-confirmacion>
