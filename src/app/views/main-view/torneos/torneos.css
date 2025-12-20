@@ -565,6 +565,14 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+    .header-section {
+        padding: 1.5rem;
+    }
+
+    .header-content {
+        gap: 1.5rem;
+    }
+
     .torneo-item {
         grid-template-columns: auto 90px 1fr;
         grid-template-rows: auto auto auto;
@@ -594,41 +602,71 @@
 }
 
 @media (max-width: 768px) {
+    .header-section {
+        padding: 1.25rem;
+    }
+
     .header-content {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 1.25rem;
+    }
+
+    .header-title {
+        gap: 1rem;
     }
 
     .header-title > i {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
     }
 
     .header-title h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
+    }
+
+    .header-title p {
+        font-size: 1rem;
     }
 
     .btn-nuevo-torneo {
         width: 100%;
         justify-content: center;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
     }
 
     .filters-section {
         flex-direction: column;
         align-items: stretch;
+        padding: 0 1.25rem;
+        gap: 1.25rem;
     }
 
     .search-box {
         min-width: 100%;
     }
 
+    .search-box input {
+        padding: 0.875rem 1rem 0.875rem 3.25rem;
+        font-size: 0.95rem;
+    }
+
     .filter-buttons {
         flex-wrap: wrap;
+        gap: 0.75rem;
     }
 
     .filter-btn {
         flex: 1;
-        min-width: calc(33.333% - 0.67rem);
+        min-width: calc(33.333% - 0.5rem);
         justify-content: center;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .torneos-lista {
+        padding: 0 1.25rem 1.25rem;
+        gap: 1rem;
     }
 
     .torneo-item {
@@ -642,6 +680,8 @@
         grid-column: 1;
         grid-row: 1;
         width: fit-content;
+        padding: 0.45rem 0.875rem;
+        font-size: 0.8rem;
     }
 
     .item-fecha {
@@ -649,18 +689,22 @@
         grid-row: 2;
         width: fit-content;
         min-width: 90px;
+        padding: 1.1rem;
+    }
+
+    .fecha-dia {
+        font-size: 2.25rem;
+    }
+
+    .fecha-mes {
+        font-size: 0.85rem;
     }
 
     .item-info {
         grid-column: 1;
         grid-row: 3;
         padding-top: 0;
-    }
-
-    .item-acciones {
-        grid-column: 1;
-        grid-row: 4;
-        flex-wrap: wrap;
+        gap: 0.65rem;
     }
 
     .item-titulo {
@@ -671,33 +715,132 @@
         font-size: 0.9rem;
     }
 
+    .item-detalles {
+        gap: 0.65rem;
+    }
+
     .detalle-chip {
         font-size: 0.85rem;
         padding: 0.4rem 0.875rem;
     }
 
+    .detalle-chip i {
+        font-size: 0.9rem;
+    }
+
+    .item-extra {
+        gap: 1rem;
+    }
+
+    .extra-cierre,
+    .extra-categorias {
+        font-size: 0.85rem;
+    }
+
+    .item-acciones {
+        grid-column: 1;
+        grid-row: 4;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+    }
+
     .btn-ver {
         flex: 1 1 100%;
+        padding: 0.8rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-editar,
+    .btn-eliminar {
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+
+    .empty-state {
+        padding: 2.5rem 1.5rem;
+        margin: 3rem auto;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+    }
+
+    .btn-crear-primero {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .loading-container {
+        margin: 3rem auto;
+    }
+
+    .loading-container i {
+        font-size: 3.5rem;
+    }
+
+    .loading-container p {
+        font-size: 1.15rem;
     }
 
     .modal-content {
         width: 95%;
     }
 
+    .modal-header {
+        padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .modal-header i {
+        font-size: 1.75rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.35rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-body p {
+        font-size: 0.95rem;
+    }
+
     .modal-footer {
         flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.25rem 1.5rem;
     }
 
     .btn-modal-cancel,
     .btn-modal-delete {
         width: 100%;
         justify-content: center;
+        padding: 0.7rem 1.25rem;
+        font-size: 0.9rem;
     }
 }
 
 @media (max-width: 480px) {
-    .header-title {
+    .header-section {
+        padding: 1rem;
+    }
+
+    .header-content {
         gap: 1rem;
+    }
+
+    .header-title {
+        gap: 0.875rem;
     }
 
     .header-title > i {
@@ -712,8 +855,57 @@
         font-size: 0.95rem;
     }
 
+    .btn-nuevo-torneo {
+        padding: 0.8rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .filters-section {
+        padding: 0 1rem;
+        gap: 1rem;
+    }
+
+    .search-box input {
+        padding: 0.8rem 0.875rem 0.8rem 3rem;
+        font-size: 0.9rem;
+    }
+
+    .search-box i {
+        left: 1rem;
+        font-size: 1rem;
+    }
+
+    .filter-buttons {
+        gap: 0.65rem;
+    }
+
+    .filter-btn {
+        min-width: calc(33.333% - 0.43rem);
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .filter-btn i {
+        font-size: 0.9rem;
+    }
+
+    .torneos-lista {
+        padding: 0 1rem 1rem;
+        gap: 0.875rem;
+    }
+
     .torneo-item {
         padding: 1.25rem;
+        gap: 0.875rem;
+    }
+
+    .item-badge {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .item-badge i {
+        font-size: 0.75rem;
     }
 
     .item-fecha {
@@ -727,6 +919,10 @@
 
     .fecha-mes {
         font-size: 0.8rem;
+    }
+
+    .item-info {
+        gap: 0.6rem;
     }
 
     .item-titulo {
@@ -744,5 +940,263 @@
     .detalle-chip {
         font-size: 0.8rem;
         padding: 0.35rem 0.75rem;
+    }
+
+    .detalle-chip i {
+        font-size: 0.85rem;
+    }
+
+    .item-extra {
+        gap: 0.875rem;
+        flex-direction: column;
+    }
+
+    .extra-cierre,
+    .extra-categorias {
+        font-size: 0.8rem;
+    }
+
+    .extra-cierre i,
+    .extra-categorias i {
+        font-size: 0.9rem;
+    }
+
+    .item-acciones {
+        gap: 0.6rem;
+    }
+
+    .btn-ver {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-editar,
+    .btn-eliminar {
+        width: 38px;
+        height: 38px;
+        font-size: 0.85rem;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+        margin: 2.5rem auto;
+    }
+
+    .empty-state i {
+        font-size: 3.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.35rem;
+        margin-bottom: 0.65rem;
+    }
+
+    .empty-state p {
+        font-size: 0.95rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .btn-crear-primero {
+        padding: 0.8rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .loading-container {
+        margin: 2.5rem auto;
+        padding: 0 1rem;
+    }
+
+    .loading-container i {
+        font-size: 3rem;
+    }
+
+    .loading-container p {
+        font-size: 1.05rem;
+    }
+
+    .modal-header {
+        padding: 1.25rem 1.25rem 0.875rem;
+    }
+
+    .modal-header i {
+        font-size: 1.5rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 1.25rem;
+    }
+
+    .modal-body p {
+        font-size: 0.9rem;
+        margin-bottom: 0.65rem;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.25rem;
+    }
+
+    .btn-modal-cancel,
+    .btn-modal-delete {
+        padding: 0.65rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .header-section {
+        padding: 0.875rem;
+    }
+
+    .header-title > i {
+        font-size: 1.75rem;
+    }
+
+    .header-title h1 {
+        font-size: 1.35rem;
+    }
+
+    .header-title p {
+        font-size: 0.9rem;
+    }
+
+    .btn-nuevo-torneo {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .filters-section {
+        padding: 0 0.875rem;
+    }
+
+    .search-box input {
+        padding: 0.75rem 0.8rem 0.75rem 2.75rem;
+        font-size: 0.85rem;
+    }
+
+    .search-box i {
+        left: 0.875rem;
+        font-size: 0.95rem;
+    }
+
+    .filter-btn {
+        padding: 0.65rem 0.875rem;
+        font-size: 0.85rem;
+    }
+
+    .torneos-lista {
+        padding: 0 0.875rem 0.875rem;
+    }
+
+    .torneo-item {
+        padding: 1rem;
+    }
+
+    .item-badge {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.7rem;
+    }
+
+    .item-fecha {
+        padding: 0.875rem;
+        min-width: 75px;
+    }
+
+    .fecha-dia {
+        font-size: 1.85rem;
+    }
+
+    .fecha-mes {
+        font-size: 0.75rem;
+    }
+
+    .item-titulo {
+        font-size: 1.05rem;
+    }
+
+    .item-subtitulo {
+        font-size: 0.8rem;
+    }
+
+    .detalle-chip {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.65rem;
+    }
+
+    .detalle-chip i {
+        font-size: 0.8rem;
+    }
+
+    .extra-cierre,
+    .extra-categorias {
+        font-size: 0.75rem;
+    }
+
+    .extra-cierre i,
+    .extra-categorias i {
+        font-size: 0.85rem;
+    }
+
+    .btn-ver {
+        padding: 0.7rem 0.875rem;
+        font-size: 0.8rem;
+    }
+
+    .btn-editar,
+    .btn-eliminar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.8rem;
+    }
+
+    .empty-state {
+        padding: 1.75rem 0.875rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.9rem;
+    }
+
+    .btn-crear-primero {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .modal-header {
+        padding: 1rem 1rem 0.75rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-body p {
+        font-size: 0.85rem;
+    }
+
+    .modal-footer {
+        padding: 0.875rem 1rem;
+    }
+
+    .btn-modal-cancel,
+    .btn-modal-delete {
+        padding: 0.6rem 0.875rem;
+        font-size: 0.8rem;
     }
 }

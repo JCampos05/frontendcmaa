@@ -351,58 +351,43 @@
                 <div class="pagination-container" *ngIf="getInscripcionesFiltradas().length > 0">
                     <div class="pagination-info">
                         <span>
-                            Mostrando 
+                            Mostrando
                             <strong>{{ (paginaActual - 1) * registrosPorPagina + 1 }}</strong>
-                            a 
-                            <strong>{{ Math.min(paginaActual * registrosPorPagina, getInscripcionesFiltradas().length) }}</strong>
-                            de 
+                            a
+                            <strong>{{ Math.min(paginaActual * registrosPorPagina, getInscripcionesFiltradas().length)
+                                }}</strong>
+                            de
                             <strong>{{ getInscripcionesFiltradas().length }}</strong>
                             registros
                         </span>
                     </div>
 
                     <div class="pagination-controls">
-                        <button 
-                            class="btn-pagination" 
-                            [disabled]="paginaActual === 1"
-                            (click)="cambiarPagina(1)"
+                        <button class="btn-pagination" [disabled]="paginaActual === 1" (click)="cambiarPagina(1)"
                             title="Primera página">
                             <i class="fa-solid fa-angles-left"></i>
                         </button>
 
-                        <button 
-                            class="btn-pagination" 
-                            [disabled]="paginaActual === 1"
-                            (click)="cambiarPagina(paginaActual - 1)"
-                            title="Página anterior">
+                        <button class="btn-pagination" [disabled]="paginaActual === 1"
+                            (click)="cambiarPagina(paginaActual - 1)" title="Página anterior">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
 
                         <div class="pagination-numbers">
-                            <button
-                                *ngFor="let pagina of getPaginasVisibles()"
-                                class="btn-page-number"
-                                [class.active]="pagina === paginaActual"
-                                [class.dots]="pagina === -1"
-                                [disabled]="pagina === -1"
-                                (click)="pagina !== -1 && cambiarPagina(pagina)">
+                            <button *ngFor="let pagina of getPaginasVisibles()" class="btn-page-number"
+                                [class.active]="pagina === paginaActual" [class.dots]="pagina === -1"
+                                [disabled]="pagina === -1" (click)="pagina !== -1 && cambiarPagina(pagina)">
                                 {{ pagina === -1 ? '...' : pagina }}
                             </button>
                         </div>
 
-                        <button 
-                            class="btn-pagination" 
-                            [disabled]="paginaActual === getTotalPaginas()"
-                            (click)="cambiarPagina(paginaActual + 1)"
-                            title="Página siguiente">
+                        <button class="btn-pagination" [disabled]="paginaActual === getTotalPaginas()"
+                            (click)="cambiarPagina(paginaActual + 1)" title="Página siguiente">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
 
-                        <button 
-                            class="btn-pagination" 
-                            [disabled]="paginaActual === getTotalPaginas()"
-                            (click)="cambiarPagina(getTotalPaginas())"
-                            title="Última página">
+                        <button class="btn-pagination" [disabled]="paginaActual === getTotalPaginas()"
+                            (click)="cambiarPagina(getTotalPaginas())" title="Última página">
                             <i class="fa-solid fa-angles-right"></i>
                         </button>
                     </div>
@@ -588,17 +573,18 @@
     </app-modal-edicion-inscripcion>
 
     <!-- Modal de Confirmación de Pago -->
-    <app-modal-confirmacion 
-        [mostrar]="mostrarModalConfirmacion"
-        [titulo]="'Confirmar Pago'"
-        [mensaje]="getMensajeConfirmacion()"
-        [mensajeSecundario]="getMensajeSecundarioConfirmacion()"
-        [textoConfirmar]="'Confirmar Pago'"
-        [textoCancelar]="'Cancelar'"
-        [tipoBotonPrimario]="'secondary'"
-        [icono]="'fa-circle-dollar-to-slot'"
-        [iconoBotonPrimario]="'fa-check-circle'"
-        (confirmar)="onConfirmarPago()"
+    <app-modal-confirmacion [mostrar]="mostrarModalConfirmacion" [titulo]="'Confirmar Pago'"
+        [mensaje]="getMensajeConfirmacion()" [mensajeSecundario]="getMensajeSecundarioConfirmacion()"
+        [textoConfirmar]="'Confirmar Pago'" [textoCancelar]="'Cancelar'" [tipoBotonPrimario]="'secondary'"
+        [icono]="'fa-circle-dollar-to-slot'" [iconoBotonPrimario]="'fa-check-circle'" (confirmar)="onConfirmarPago()"
         (cancelar)="onCancelarConfirmacion()">
+    </app-modal-confirmacion>
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <app-modal-confirmacion [mostrar]="mostrarModalEliminacion" [titulo]="'Eliminar Inscripción'"
+        [mensaje]="getMensajeEliminacion()" [mensajeSecundario]="getMensajeSecundarioEliminacion()"
+        [textoConfirmar]="'Eliminar'" [textoCancelar]="'Cancelar'" [tipoBotonPrimario]="'danger'"
+        [icono]="'fa-triangle-exclamation'" [iconoBotonPrimario]="'fa-trash'" [tipoAdvertencia]="true"
+        (confirmar)="onConfirmarEliminacion()" (cancelar)="onCancelarEliminacion()">
     </app-modal-confirmacion>
 </div>

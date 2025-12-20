@@ -482,18 +482,9 @@ export class EditarTorneoComponent implements OnInit {
   cancelar(): void {
     const esSucio = this.hayFormularioSucio();
 
-    // DEBUG: Descomentar estas líneas para ver qué está pasando
-    console.log('=== DEBUG CANCELAR ===');
-    console.log('Formulario dirty?', this.torneoForm.dirty);
-    console.log('Hay cambios?', esSucio);
-    console.log('Valores actuales:', this.torneoForm.value);
-    console.log('Valores originales:', this.torneoOriginal);
-
     if (esSucio) {
       this.mostrarModalCambios = true;
-      console.log('Mostrando modal');
     } else {
-      console.log('Navegando sin modal');
       this.router.navigate(['/main-view/torneos']);
     }
   }
@@ -526,8 +517,6 @@ export class EditarTorneoComponent implements OnInit {
 
     // Si hay cambios, mostrar modal de confirmación
     const esSucio = this.hayFormularioSucio();
-    console.log('=== DEBUG GUARDAR ===');
-    console.log('Hay cambios?', esSucio);
 
     if (esSucio && !this.confirmacionGuardado) {
       this.mostrarModalCambios = true;
@@ -589,7 +578,7 @@ export class EditarTorneoComponent implements OnInit {
       this.router.navigate(['/main-view/torneos']);
     } catch (err: any) {
       this.error = err.error?.message || 'Error al actualizar el torneo';
-      console.error('Error completo:', err);
+      //console.error('Error completo:', err);
     } finally {
       this.loading = false;
       this.confirmacionGuardado = false;

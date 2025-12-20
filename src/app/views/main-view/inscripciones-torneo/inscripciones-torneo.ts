@@ -75,7 +75,11 @@ export class InscripcionesAdminComponent implements OnInit {
   paginaActual = 1;
   registrosPorPagina = 15;
   Math = Math;
-  
+
+  // Modal de confirmación de eliminación
+  mostrarModalEliminacion = false;
+  inscripcionParaEliminar: Inscripcion | null = null;
+
   constructor(
     private torneoService: TorneoService,
     private inscripcionService: InscripcionService,
@@ -334,7 +338,7 @@ export class InscripcionesAdminComponent implements OnInit {
     const monto = inscripcion.categoria?.costo || 0;
 
     if (monto <= 0) {
-      this.toast.error('Error','La categoria no tiene un costo definido');
+      this.toast.error('Error', 'La categoria no tiene un costo definido');
       return;
     }
 
@@ -350,13 +354,13 @@ export class InscripcionesAdminComponent implements OnInit {
 
     const datosActualizacion = {
       pago_confirmado: true,
-      monto_pagado: Number(monto), 
+      monto_pagado: Number(monto),
       estado: 'confirmado'
     };
 
     this.inscripcionService.update(this.inscripcionParaConfirmar.idInscripcion, datosActualizacion).subscribe({
       next: (response) => {
-        this.toast.success('Jugador confirmado','Pago e inscripción confirmados exitosamente');
+        this.toast.success('Jugador confirmado', 'Pago e inscripción confirmados exitosamente');
         this.mostrarModalConfirmacion = false;
         this.inscripcionParaConfirmar = null;
         this.actualizarEstadisticas();
@@ -378,21 +382,21 @@ export class InscripcionesAdminComponent implements OnInit {
 
   getMensajeConfirmacion(): string {
     if (!this.inscripcionParaConfirmar) return '';
-    
+
     const nombreCompleto = `${this.inscripcionParaConfirmar.jugador?.nombre} ${this.inscripcionParaConfirmar.jugador?.apellido1}`;
     const monto = this.inscripcionParaConfirmar.categoria?.costo || 0;
-    
+
     return `Se confirmará el pago de <strong>$${monto.toFixed(2)}</strong> para el jugador <strong>${nombreCompleto}</strong>`;
   }
 
   getMensajeSecundarioConfirmacion(): string {
     const montoPagado = Number(this.inscripcionParaConfirmar?.montoPagado) || 0;
     const costoCategoria = Number(this.inscripcionParaConfirmar?.categoria?.costo) || 0;
-    
+
     if (montoPagado > 0 && montoPagado < costoCategoria) {
       return `El jugador ya tiene un pago parcial de $${montoPagado.toFixed(2)}. Esta acción completará el pago total.`;
     }
-    
+
     return 'Esta acción actualizará el estado de la inscripción a confirmado.';
   }
 
@@ -610,19 +614,9 @@ export class InscripcionesAdminComponent implements OnInit {
   eliminarInscripcion(inscripcion: Inscripcion): void {
     if (!inscripcion.idInscripcion) return;
 
-    const confirmar = confirm(`¿Estás seguro de eliminar la inscripción de ${inscripcion.jugador?.nombre} ${inscripcion.jugador?.apellido1}?`);
-
-    if (confirmar) {
-      this.inscripcionService.delete(inscripcion.idInscripcion).subscribe({
-        next: () => {
-          this.toast.success('Inscripcion elimnada','Inscripción eliminada exitosamente');
-          this.actualizarEstadisticas();
-        },
-        error: (err) => {
-          this.toast.error('Error','Error al eliminar la inscripción');
-        }
-      });
-    }
+    // Guardar la inscripción y mostrar el modal
+    this.inscripcionParaEliminar = inscripcion;
+    this.mostrarModalEliminacion = true;
   }
 
   eliminarInscripcionModal(): void {
@@ -630,6 +624,43 @@ export class InscripcionesAdminComponent implements OnInit {
       this.cerrarModal();
       this.eliminarInscripcion(this.inscripcionSeleccionada);
     }
+  }
+
+  onConfirmarEliminacion(): void {
+    if (!this.inscripcionParaEliminar?.idInscripcion) return;
+
+    this.inscripcionService.delete(this.inscripcionParaEliminar.idInscripcion).subscribe({
+      next: () => {
+        this.toast.success('Inscripción eliminada', 'La inscripción se eliminó exitosamente');
+        this.mostrarModalEliminacion = false;
+        this.inscripcionParaEliminar = null;
+        this.actualizarEstadisticas();
+      },
+      error: (err) => {
+        console.error('Error al eliminar la inscripción:', err);
+        const mensaje = err?.error?.message || err?.error?.mensaje || 'Error al eliminar la inscripción';
+        this.toast.error('Error', mensaje);
+        this.mostrarModalEliminacion = false;
+        this.inscripcionParaEliminar = null;
+      }
+    });
+  }
+
+  onCancelarEliminacion(): void {
+    this.mostrarModalEliminacion = false;
+    this.inscripcionParaEliminar = null;
+  }
+
+  getMensajeEliminacion(): string {
+    if (!this.inscripcionParaEliminar) return '';
+
+    const nombreCompleto = `${this.inscripcionParaEliminar.jugador?.nombre} ${this.inscripcionParaEliminar.jugador?.apellido1}`;
+
+    return `¿Estás seguro de eliminar la inscripción de <strong>${nombreCompleto}</strong>?`;
+  }
+
+  getMensajeSecundarioEliminacion(): string {
+    return 'Esta acción no se puede deshacer. Toda la información relacionada con esta inscripción será eliminada permanentemente.';
   }
 
   getInscripcionesPaginadas(): Inscripcion[] {

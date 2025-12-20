@@ -357,6 +357,8 @@ export class ModalResultadoPartidaComponent implements OnInit, OnDestroy, OnChan
       timestampEdicion: this.timestampInicial || new Date().toISOString()
     };
 
+    console.log(' Enviando actualización de mesa:', mesaDto); // DEBUG
+
     this.mesaService.updateMesa(this.mesa.idMesa, mesaDto).subscribe({
       next: () => {
         this.detenerVerificacionConcurrencia();

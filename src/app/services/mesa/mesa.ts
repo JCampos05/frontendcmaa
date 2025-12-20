@@ -124,7 +124,8 @@ export class MesaService {
         return response;
       }),
       catchError(error => {
-        console.error('Error en updateMesa:', error);
+        //-> OJO daba error en cuanto se actualizaba PERO si se guarda correctamente (Pool constante con seccion critica)
+        //console.error('Error en updateMesa:', error); 
         return of(null);
       })
     );
@@ -147,7 +148,8 @@ export class MesaService {
       headers: this.getHeaders()
     }).pipe(
       catchError(error => {
-        console.error('Error al bloquear mesa:', error);
+        //-> OJO daba error en cuanto se actualizaba PERO si se guarda correctamente (Pool constante con seccion critica)
+        //console.error('Error al bloquear mesa:', error);
         throw error;
       })
     );

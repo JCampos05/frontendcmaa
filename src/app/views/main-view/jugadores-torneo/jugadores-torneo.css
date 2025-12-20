@@ -596,8 +596,16 @@
 }
 
 @media (max-width: 768px) {
+    .jugadores-torneo-container {
+        padding: 0.5rem;
+    }
+
     .page-header {
         padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
     }
 
     .header-icon {
@@ -613,15 +621,515 @@
         font-size: 1.5rem;
     }
 
+    .header-text p {
+        font-size: 0.9rem;
+    }
+
+    .content-wrapper {
+        gap: 1.5rem;
+    }
+
+    .selector-torneo-section {
+        padding: 1.25rem;
+    }
+
+    .selector-header h3 {
+        font-size: 1rem;
+    }
+
+    .form-control-torneo {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+
     .estadisticas-generales {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+
+    .torneo-info-card {
+        padding: 1.25rem;
+    }
+
+    .torneo-info-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .torneo-info-header i {
+        font-size: 1.5rem;
+    }
+
+    .torneo-info-header h3 {
+        font-size: 1.25rem;
+    }
+
+    .torneo-info-details {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .stat-icon i {
+        font-size: 1.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .section-header {
+        padding: 1.25rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .categorias-tabs {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .tab-btn {
+        padding: 0.65rem 1rem;
+        font-size: 0.9rem;
     }
 
     .categorias-grid {
         grid-template-columns: 1fr;
+        padding: 1.25rem;
+        gap: 1rem;
     }
 
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+
+    .tabla-header {
+        padding: 1.25rem;
+    }
+
+    .tabla-titulo h3 {
+        font-size: 1.1rem;
+    }
+
+    .tabla-responsive {
+        overflow-x: scroll;
+    }
+
+    .tabla-jugadores {
+        min-width: 600px;
+    }
+
+    .tabla-jugadores th,
+    .tabla-jugadores td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .cell-avatar {
+        gap: 0.5rem;
+    }
+
+    .avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .avatar i {
+        font-size: 0.75rem;
+    }
+
+    .empty-state {
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .jugadores-torneo-container {
+        padding: 0.25rem;
+    }
+
+    .page-header {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .header-icon {
+        width: 45px;
+        height: 45px;
+    }
+
+    .header-icon i {
+        font-size: 1.35rem;
+    }
+
+    .header-text h1 {
+        font-size: 1.25rem;
+    }
+
+    .header-text p {
+        font-size: 0.85rem;
+    }
+
+    .content-wrapper {
+        gap: 1rem;
+    }
+
+    .selector-torneo-section {
+        padding: 1rem;
+    }
+
+    .selector-header {
+        gap: 0.5rem;
+    }
+
+    .selector-header i {
+        font-size: 1.25rem;
+    }
+
+    .selector-header h3 {
+        font-size: 0.95rem;
+    }
+
+    .form-control-torneo {
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+
+    .estadisticas-generales {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+
+    .torneo-info-card {
+        padding: 1rem;
+    }
+
+    .torneo-info-header i {
+        font-size: 1.35rem;
+    }
+
+    .torneo-info-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .info-item {
+        font-size: 0.9rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .stat-icon i {
+        font-size: 1.15rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.35rem;
+    }
+
+    .section-header {
+        padding: 1rem;
+    }
+
+    .section-header i {
+        font-size: 1.25rem;
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+    }
+
+    .categorias-tabs {
+        padding: 0.5rem;
+    }
+
+    .tab-btn {
+        padding: 0.6rem 0.875rem;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .categorias-grid {
+        padding: 1rem;
+    }
+
+    .categoria-stats-card {
+        padding: 1rem;
+    }
+
+    .categoria-header-stats i {
+        font-size: 1.25rem;
+    }
+
+    .categoria-header-stats h3 {
+        font-size: 1rem;
+    }
+
+    .stat-item i {
+        font-size: 0.9rem;
+    }
+
+    .stat-item .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .stat-item .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .tabla-header {
+        padding: 1rem;
+    }
+
+    .tabla-titulo i {
+        font-size: 1.25rem;
+    }
+
+    .tabla-titulo h3 {
+        font-size: 1rem;
+    }
+
+    .tabla-titulo .badge {
+        padding: 0.3rem 0.7rem;
+        font-size: 0.8rem;
+    }
+
+    .tabla-jugadores {
+        min-width: 550px;
+        font-size: 0.8rem;
+    }
+
+    .tabla-jugadores th {
+        padding: 0.65rem 0.4rem;
+        font-size: 0.7rem;
+    }
+
+    .tabla-jugadores td {
+        padding: 0.65rem 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .th-content i:first-child {
+        font-size: 0.8rem;
+    }
+
+    .sort-icon {
+        font-size: 0.575rem;
+    }
+
+    .cell-avatar {
+        gap: 0.4rem;
+    }
+
+    .avatar {
+        width: 26px;
+        height: 26px;
+    }
+
+    .avatar i {
+        font-size: 0.7rem;
+    }
+
+    .categoria-badge {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .rating-badge {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .rating-badge i {
+        font-size: 0.575rem;
+    }
+
+    .sin-rating {
+        font-size: 0.7rem;
+    }
+
+    .empty-state {
+        padding: 2.5rem 0.875rem;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.9rem;
+    }
+
+    .loading-container,
+    .error-container {
+        padding: 3rem 1rem;
+    }
+
+    .loading-container i,
+    .error-container i {
+        font-size: 2.5rem;
+    }
+
+    .btn-retry {
+        padding: 0.65rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .page-header {
+        padding: 0.875rem;
+    }
+
+    .header-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .header-icon i {
+        font-size: 1.2rem;
+    }
+
+    .header-text h1 {
+        font-size: 1.1rem;
+    }
+
+    .header-text p {
+        font-size: 0.8rem;
+    }
+
+    .selector-torneo-section {
+        padding: 0.875rem;
+    }
+
+    .selector-header h3 {
+        font-size: 0.9rem;
+    }
+
+    .form-control-torneo {
+        padding: 0.65rem;
+        font-size: 0.85rem;
+    }
+
+    .torneo-info-card {
+        padding: 0.875rem;
+    }
+
+    .torneo-info-header h3 {
+        font-size: 1rem;
+    }
+
+    .stat-card {
+        padding: 0.875rem;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-icon i {
+        font-size: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .section-header {
+        padding: 0.875rem;
+    }
+
+    .section-header h2 {
+        font-size: 0.95rem;
+    }
+
+    .tab-btn {
+        padding: 0.55rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .categorias-grid {
+        padding: 0.875rem;
+    }
+
+    .categoria-stats-card {
+        padding: 0.875rem;
+    }
+
+    .categoria-header-stats h3 {
+        font-size: 0.95rem;
+    }
+
+    .stat-item .stat-value {
+        font-size: 1rem;
+    }
+
+    .tabla-header {
+        padding: 0.875rem;
+    }
+
+    .tabla-titulo h3 {
+        font-size: 0.95rem;
+    }
+
+    .tabla-jugadores {
+        min-width: 500px;
+    }
+
+    .tabla-jugadores th {
+        padding: 0.6rem 0.35rem;
+        font-size: 0.65rem;
+    }
+
+    .tabla-jugadores td {
+        padding: 0.6rem 0.35rem;
+        font-size: 0.75rem;
+    }
+
+    .cell-avatar {
+        gap: 0.35rem;
+    }
+
+    .avatar {
+        width: 24px;
+        height: 24px;
+    }
+
+    .avatar i {
+        font-size: 0.65rem;
     }
 }

@@ -629,56 +629,6 @@
     margin-top: 1rem;
 }
 
-@media (max-width: 768px) {
-    .page-header {
-        padding: 1.5rem;
-    }
-
-    .header-icon {
-        width: 50px;
-        height: 50px;
-    }
-
-    .header-icon i {
-        font-size: 1.5rem;
-    }
-
-    .header-text h1 {
-        font-size: 1.5rem;
-    }
-
-    .selectores-section {
-        grid-template-columns: 1fr;
-    }
-
-    .ronda-info {
-        grid-template-columns: 1fr;
-    }
-
-    .ronda-actions {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .btn-action {
-        flex: 1;
-        min-width: 150px;
-    }
-
-    .mesas-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .empty-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .empty-actions .btn-action {
-        width: 100%;
-    }
-}
-
 .crear-ronda-section {
     background: var(--color-white);
     border-radius: 12px;
@@ -741,17 +691,190 @@
     font-size: 1.1rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1.25rem;
+        gap: 1rem;
+    }
+
+    .header-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .header-icon i {
+        font-size: 1.5rem;
+    }
+
+    .header-text h1 {
+        font-size: 1.375rem;
+    }
+
+    .header-text p {
+        font-size: 0.875rem;
+    }
+
+    .selectores-section {
+        grid-template-columns: 1fr;
+        padding: 1.25rem;
+        gap: 1rem;
+    }
+
+    .ronda-info {
+        grid-template-columns: 1fr;
+        padding: 1.25rem;
+    }
+
+    .info-body {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .ronda-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+        padding: 0.875rem 1.25rem;
+    }
+
+    .ronda-completada-mensaje {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.875rem;
+        text-align: center;
+    }
+
+    .ronda-completada-mensaje i {
+        font-size: 1.25rem;
+    }
+
+    .section-header {
+        padding: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .section-header h2 {
+        font-size: 1.125rem;
+    }
+
+    .mesas-grid {
+        grid-template-columns: 1fr;
+        padding: 1.25rem;
+        gap: 1rem;
+    }
+
+    .mesa-card {
+        padding: 1rem;
+    }
+
+    .jugador-nombre {
+        font-size: 0.8125rem;
+    }
+
+    .empty-state {
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.125rem;
+    }
+
+    .empty-state p {
+        font-size: 0.9375rem;
+    }
+
+    .empty-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .empty-actions .btn-action {
+        width: 100%;
+    }
+
     .crear-ronda-section {
-        padding: 1.5rem;
+        padding: 1.25rem;
     }
 
     .empty-rondas-card {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
+    }
+
+    .empty-rondas-card i {
+        font-size: 2.5rem;
+    }
+
+    .empty-rondas-card h3 {
+        font-size: 1.125rem;
+    }
+
+    .empty-rondas-card p {
+        font-size: 0.9375rem;
     }
 
     .btn-crear-ronda {
         width: 100%;
         justify-content: center;
+        padding: 0.875rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header-text h1 {
+        font-size: 1.25rem;
+    }
+
+    .info-body {
+        grid-template-columns: 1fr;
+    }
+
+    .jugador-item {
+        padding: 0.625rem;
+    }
+
+    .jugador-color {
+        width: 28px;
+        height: 28px;
+    }
+
+    .mesa-header {
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .mesa-numero {
+        font-size: 0.9375rem;
+    }
+
+    .btn-action {
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .btn-action i {
+        font-size: 1rem;
+    }
+
+    .resultado-badge {
+        font-size: 0.8125rem;
+        padding: 0.5rem;
+    }
+
+    .mesa-notas {
+        font-size: 0.75rem;
+        padding: 0.625rem;
     }
 }
