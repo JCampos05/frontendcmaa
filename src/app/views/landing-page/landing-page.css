@@ -383,6 +383,23 @@
     transition: all 0.3s;
 }
 
+.btn-inscribirse:hover:not(:disabled) {
+    background: #d63b4d;
+    transform: translateX(5px);
+}
+
+.btn-inscribirse:disabled,
+.btn-inscribirse.btn-disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-inscribirse:disabled:hover,
+.btn-inscribirse.btn-disabled:hover {
+    transform: none;
+    background: #9ca3af;
+}
 .btn-inscribirse:hover {
     background: #d63b4d;
     transform: translateX(5px);
@@ -549,8 +566,28 @@
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
+.btn-card-inscripcion:hover:not(:disabled) {
+    background: var(--color-slate);
+}
+
+.btn-card-inscripcion:disabled,
+.btn-card-inscripcion.btn-disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-card-inscripcion:disabled:hover,
+.btn-card-inscripcion.btn-disabled:hover {
+    transform: none;
+    background: #9ca3af;
+}
 .btn-card-inscripcion:hover {
     background: var(--color-slate);
 }

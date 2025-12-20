@@ -107,9 +107,14 @@
         </div>
       </div>
 
-      <button (click)="irAInscripcion(torneoDestacado.idTorneo)" class="btn-inscribirse">
-        Inscribirme Ahora
-        <i class="fa-solid fa-arrow-right"></i>
+      <button 
+        (click)="irAInscripcion(torneoDestacado.idTorneo)" 
+        class="btn-inscribirse"
+        [disabled]="inscripcionesCerradas(torneoDestacado)"
+        [class.btn-disabled]="inscripcionesCerradas(torneoDestacado)">
+        <i class="fa-solid" [class.fa-arrow-right]="!inscripcionesCerradas(torneoDestacado)" 
+           [class.fa-lock]="inscripcionesCerradas(torneoDestacado)"></i>
+        {{ getMensajeInscripcion(torneoDestacado) }}
       </button>
 
       <div class="featured-visual">
@@ -154,8 +159,13 @@
             {{ getSistemaCompetencia(torneo) }}
           </p>
         </div>
-        <button (click)="irAInscripcion(torneo.idTorneo)" class="btn-card-inscripcion">
-          Inscribirse
+        <button 
+          (click)="irAInscripcion(torneo.idTorneo)" 
+          class="btn-card-inscripcion"
+          [disabled]="inscripcionesCerradas(torneo)"
+          [class.btn-disabled]="inscripcionesCerradas(torneo)">
+          <i class="fa-solid" [class.fa-lock]="inscripcionesCerradas(torneo)"></i>
+          {{ inscripcionesCerradas(torneo) ? 'Cerrado' : 'Inscribirse' }}
         </button>
       </div>
     </div>
@@ -206,10 +216,6 @@
         Forma parte de nuestra comunidad de jugadores apasionados por el ajedrez.
         Participa en torneos, mejora tu rating y conoce otros jugadores.
       </p>
-      <!--button routerLink="/login" class="btn-join">
-        Comenzar Ahora
-        <i class="fa-solid fa-chess-knight"></i>
-      </!--button-->
     </div>
   </section>
 

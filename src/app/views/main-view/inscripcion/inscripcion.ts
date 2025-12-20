@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { InscripcionService } from '../../../services/inscripcion/inscripcion';
 import { TorneoService } from '../../../services/torneo/torneo';
-import { TorneoCategoriaService } from '../../../services/torneo-categoria/torneo-categoria';
 
 @Component({
   selector: 'app-inscripcion',
@@ -30,8 +30,8 @@ export class InscripcionComponent implements OnInit {
 
   categoriaSeleccionada: any = null;
   costoInscripcion: number = 0;
+  torneoIdInicial: number | null = null;
 
-  // Arrays para los selectores de fecha
   dias: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
   meses = [
     { valor: 1, nombre: 'Enero' },
@@ -53,16 +53,15 @@ export class InscripcionComponent implements OnInit {
     private fb: FormBuilder,
     private inscripcionService: InscripcionService,
     private torneoService: TorneoService,
-    private torneoCategoriaService: TorneoCategoriaService
+    private route: ActivatedRoute,
+    private router: Router
   ) {
-    // Generar años (desde hace 100 años hasta el año actual)
     const anioActual = new Date().getFullYear();
     for (let i = anioActual; i >= anioActual - 100; i--) {
       this.anios.push(i);
     }
 
     this.inscripcionForm = this.fb.group({
-      // Paso 1: Datos personales
       nombre: ['', [
         Validators.required,
         Validators.minLength(2),
@@ -80,20 +79,14 @@ export class InscripcionComponent implements OnInit {
         Validators.maxLength(100),
         this.soloLetrasValidator
       ]],
-
-      // Paso 2: Datos de contacto
       telefono: ['', [
         Validators.required,
         Validators.pattern(/^\d{10}$/),
         this.telefonoValidator
       ]],
-
-      // Paso 3: Fecha de nacimiento
       dia_nacimiento: ['', Validators.required],
       mes_nacimiento: ['', Validators.required],
       anio_nacimiento: ['', Validators.required],
-
-      // Paso 4: Torneo y categoría
       torneo_id: ['', Validators.required],
       categoria_id: ['', Validators.required],
       notas: ['', Validators.maxLength(1000)]
@@ -101,7 +94,14 @@ export class InscripcionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarTorneosActivos();
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.torneoIdInicial = +params['id'];
+        this.cargarTorneosActivos();
+      } else {
+        this.cargarTorneosActivos();
+      }
+    });
   }
 
   soloLetrasValidator(control: AbstractControl): { [key: string]: any } | null {
@@ -120,10 +120,41 @@ export class InscripcionComponent implements OnInit {
   cargarTorneosActivos(): void {
     this.torneoService.getActivos().subscribe({
       next: (torneos) => {
-        this.torneos = torneos || [];
+        const ahora = new Date();
+        
+        this.torneos = (torneos || []).filter(torneo => {
+          const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
+          
+          if (!cierreInscripciones) {
+            return true;
+          }
+          
+          try {
+            const fechaCierre = new Date(cierreInscripciones);
+            return ahora < fechaCierre;
+          } catch (e) {
+            console.error('Error al verificar cierre de inscripciones:', e);
+            return true;
+          }
+        });
+
+        console.log('Torneos con inscripciones abiertas:', this.torneos);
+
+        if (this.torneos.length === 0) {
+          this.errores = ['No hay torneos disponibles con inscripciones abiertas en este momento'];
+        } else if (this.torneoIdInicial) {
+          const torneoEncontrado = this.torneos.find(t => t.idTorneo === this.torneoIdInicial);
+          
+          if (torneoEncontrado) {
+            this.inscripcionForm.patchValue({ torneo_id: this.torneoIdInicial });
+            this.onTorneoChange({ target: { value: this.torneoIdInicial.toString() } });
+          } else {
+            this.errores = ['El torneo seleccionado ya no tiene inscripciones abiertas'];
+          }
+        }
       },
       error: (error) => {
-        //console.error('Error al cargar torneos:', error);
+        console.error('Error al cargar torneos:', error);
         this.errores = ['Error al cargar los torneos disponibles'];
       }
     });
@@ -131,35 +162,45 @@ export class InscripcionComponent implements OnInit {
 
   onTorneoChange(event: any): void {
     const torneoId = event.target.value;
+    console.log('Torneo seleccionado - Valor:', torneoId, 'Tipo:', typeof torneoId);
 
     if (torneoId && torneoId !== '' && torneoId !== null) {
       const torneoIdNumero = Number(torneoId);
 
       if (isNaN(torneoIdNumero) || torneoIdNumero <= 0) {
-        //console.error('El ID del torneo no es válido:', torneoId);
+        console.error('El ID del torneo no es válido:', torneoId);
         this.errores = ['Error al seleccionar el torneo. Por favor, intente nuevamente.'];
         this.categorias = [];
         return;
       }
 
+      const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoIdNumero);
+      if (torneoSeleccionado) {
+        const cierreInscripciones = torneoSeleccionado.cierreInscripciones || torneoSeleccionado.cierre_inscripciones;
+        
+        if (cierreInscripciones) {
+          const fechaCierre = new Date(cierreInscripciones);
+          const ahora = new Date();
+          
+          if (ahora >= fechaCierre) {
+            this.errores = ['Las inscripciones para este torneo ya han cerrado'];
+            this.categorias = [];
+            this.inscripcionForm.patchValue({ torneo_id: '' });
+            return;
+          }
+        }
+      }
+
       this.loading = true;
       this.errores = [];
 
-      this.torneoCategoriaService.getByTorneo(torneoIdNumero).subscribe({
-        next: (torneosCategorias) => {
+      console.log('Cargando categorías para torneo ID:', torneoIdNumero);
+
+      this.torneoService.getCategoriasByTorneo(torneoIdNumero).subscribe({
+        next: (response) => {
           this.loading = false;
-
-          // Mapear para extraer las categorías con su información completa
-          this.categorias = torneosCategorias
-            .filter(tc => tc.activo !== false && tc.categoria)
-            .map(tc => ({
-              idCategoria: tc.idCategoria,
-              nombre: tc.categoria!.nombre,
-              costo: tc.categoria!.costo,
-              nota: tc.categoria!.nota
-            }));
-
-          //console.log('Categorías cargadas:', this.categorias);
+          console.log('Categorías recibidas:', response);
+          this.categorias = response.categorias || [];
 
           if (this.categorias.length === 0) {
             this.errores = ['Este torneo no tiene categorías disponibles'];
@@ -167,7 +208,7 @@ export class InscripcionComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          //console.error('Error al cargar categorías:', error);
+          console.error('Error al cargar categorías:', error);
           this.categorias = [];
 
           if (error.status === 404) {
@@ -183,7 +224,6 @@ export class InscripcionComponent implements OnInit {
       this.categorias = [];
     }
 
-    // Resetear la categoría seleccionada
     this.inscripcionForm.patchValue({ categoria_id: '' });
     this.categoriaSeleccionada = null;
     this.costoInscripcion = 0;
@@ -191,6 +231,7 @@ export class InscripcionComponent implements OnInit {
 
   onCategoriaChange(event: any): void {
     const categoriaId = event.target.value;
+    console.log('Categoría seleccionada - ID:', categoriaId);
 
     if (categoriaId && categoriaId !== '' && this.categorias.length > 0) {
       const categoriaIdNumero = Number(categoriaId);
@@ -198,6 +239,7 @@ export class InscripcionComponent implements OnInit {
 
       if (this.categoriaSeleccionada) {
         this.costoInscripcion = this.categoriaSeleccionada.costo || 0;
+        console.log('Costo de inscripción:', this.costoInscripcion);
       } else {
         this.costoInscripcion = 0;
       }
@@ -234,7 +276,6 @@ export class InscripcionComponent implements OnInit {
       return false;
     }
 
-    // Validar que la fecha sea válida
     const fecha = new Date(anio, mes - 1, dia);
     if (fecha.getDate() !== parseInt(dia) ||
       fecha.getMonth() !== parseInt(mes) - 1 ||
@@ -243,13 +284,11 @@ export class InscripcionComponent implements OnInit {
       return false;
     }
 
-    // Validar que no sea una fecha futura
     if (fecha > new Date()) {
       this.errores.push('La fecha de nacimiento no puede ser futura');
       return false;
     }
 
-    // Validar edad mínima (5 años)
     const hoy = new Date();
     let edad = hoy.getFullYear() - fecha.getFullYear();
     const mesActual = hoy.getMonth();
@@ -350,17 +389,31 @@ export class InscripcionComponent implements OnInit {
       return;
     }
 
-    // Construir fecha de nacimiento en formato ISO (YYYY-MM-DD)
+    const torneoId = Number(this.inscripcionForm.value.torneo_id);
+    const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoId);
+    
+    if (torneoSeleccionado) {
+      const cierreInscripciones = torneoSeleccionado.cierreInscripciones || torneoSeleccionado.cierre_inscripciones;
+      
+      if (cierreInscripciones) {
+        const fechaCierre = new Date(cierreInscripciones);
+        const ahora = new Date();
+        
+        if (ahora >= fechaCierre) {
+          this.errores = ['Las inscripciones para este torneo ya han cerrado'];
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+      }
+    }
+
     const dia = String(this.inscripcionForm.value.dia_nacimiento).padStart(2, '0');
     const mes = String(this.inscripcionForm.value.mes_nacimiento).padStart(2, '0');
     const anio = this.inscripcionForm.value.anio_nacimiento;
     const fecha_nacimiento = `${anio}-${mes}-${dia}`;
 
-    // Obtener los IDs como números
     const categoriaId = Number(this.inscripcionForm.value.categoria_id);
-    const torneoId = Number(this.inscripcionForm.value.torneo_id);
 
-    // Validar que los IDs sean válidos
     if (isNaN(categoriaId) || categoriaId <= 0) {
       this.errores = ['Debe seleccionar una categoría válida'];
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -375,35 +428,34 @@ export class InscripcionComponent implements OnInit {
 
     this.loading = true;
 
-    // IMPORTANTE: El backend espera idCategoria e idTorneo (camelCase)
     const inscripcionData = {
       nombre: this.inscripcionForm.value.nombre.trim(),
       apellido1: this.inscripcionForm.value.apellido1.trim(),
       apellido2: this.inscripcionForm.value.apellido2?.trim() || null,
       telefono: this.inscripcionForm.value.telefono.replace(/\s/g, ''),
       fecha_nacimiento: fecha_nacimiento,
-      idCategoria: categoriaId,  // Cambio: usar idCategoria
-      idTorneo: torneoId,        // Cambio: usar idTorneo
+      idCategoria: categoriaId,
+      idTorneo: torneoId,
       notas: this.inscripcionForm.value.notas?.trim() || null
     };
 
+    console.log('Enviando inscripción:', inscripcionData);
 
     this.inscripcionService.crearInscripcionPublica(inscripcionData).subscribe({
       next: (response) => {
         this.loading = false;
+        console.log('Inscripción exitosa:', response);
         if (response.success) {
           this.mensajeExito = true;
           this.inscripcionForm.reset();
           this.pasoActual = 1;
           this.submitted = false;
           this.categorias = [];
-          // Mantener el costo para mostrarlo en el modal
-          // No resetear: costoInscripcion y categoriaSeleccionada
         }
       },
       error: (error) => {
         this.loading = false;
-        //console.error('Error completo:', error);
+        console.error('Error completo:', error);
 
         if (error.error && error.error.errores && Array.isArray(error.error.errores)) {
           this.errores = error.error.errores;
@@ -432,12 +484,12 @@ export class InscripcionComponent implements OnInit {
 
   cerrarMensajeExito(): void {
     this.mensajeExito = false;
-    // Resetear el costo y categoría seleccionada
     this.costoInscripcion = 0;
     this.categoriaSeleccionada = null;
+    this.router.navigate(['/'])
+      .catch(error => console.error('Error al navegar:', error));
   }
 
-  // Verificar si hay datos en el formulario
   formularioTieneDatos(): boolean {
     const values = this.inscripcionForm.value;
     return Object.keys(values).some(key => {
@@ -446,7 +498,6 @@ export class InscripcionComponent implements OnInit {
     });
   }
 
-  // Intentar salir
   intentarSalir(): void {
     if (this.formularioTieneDatos()) {
       this.mostrarConfirmacionSalida = true;
@@ -455,23 +506,17 @@ export class InscripcionComponent implements OnInit {
     }
   }
 
-  // Cancelar salida
   cancelarSalida(): void {
     this.mostrarConfirmacionSalida = false;
   }
 
-  // Confirmar salida
   confirmarSalida(): void {
     this.mostrarConfirmacionSalida = false;
     this.salir();
   }
 
-  // Salir (navegar hacia atrás o a home)
   salir(): void {
-    // Aquí puedes usar el router para navegar
-    // this.router.navigate(['/home']);
-    // O simplemente:
-    window.history.back();
+    this.router.navigate(['/']);
   }
 
   get progreso(): number {

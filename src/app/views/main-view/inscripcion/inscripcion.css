@@ -865,3 +865,57 @@ textarea.form-control {
         font-size: 1.25rem;
     }
 }
+
+
+/* Estilos adicionales para el modal de advertencia */
+.modal-contenido.modal-advertencia {
+    max-width: 450px;
+}
+
+.modal-header.advertencia {
+    background-color: #fff3cd;
+}
+
+.modal-header.advertencia i {
+    color: #ffc107;
+}
+
+.modal-header.advertencia h2 {
+    color: #856404;
+}
+
+.modal-footer.modal-footer-doble {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.modal-footer.modal-footer-doble .btn {
+    flex: 1;
+}
+
+.btn-danger {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background-color: #b71c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+}
+
+/* Mensaje cuando no hay torneos disponibles */
+.mensaje-error.mensaje-info {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.mensaje-error.mensaje-info i {
+    color: #2196f3;
+}
+
+.mensaje-error.mensaje-info strong,
+.mensaje-error.mensaje-info li {
+    color: #1565c0;
+}

@@ -35,11 +35,6 @@ export class LandingComponent implements OnInit {
       respuesta: 'El costo varía según la categoría del torneo. Puedes consultar los precios en la sección de información cada torneo.',
       abierto: false
     },
-    /*{
-      pregunta: '¿Necesito tener rating FIDE?',
-      respuesta: 'No es obligatorio tener rating FIDE para participar en torneos locales, pero es recomendable para categorías avanzadas.',
-      abierto: false
-    },*/
     {
       pregunta: '¿Qué sistemas de juego se utilizan?',
       respuesta: 'Utilizamos principalmente el sistema Suizo y Round Robin, dependiendo del número de participantes y la categoría.',
@@ -93,8 +88,9 @@ export class LandingComponent implements OnInit {
 
   irAInscripcion(torneoId?: number): void {
     if (torneoId) {
-      //console.log('Navegando a inscripción con ID:', torneoId);
+      console.log('Navegando a inscripción con ID:', torneoId);
       this.router.navigate(['/inscripcion', torneoId]).then(
+        success => console.log('Navegación exitosa:', success),
         error => console.error('Error en navegación:', error)
       );
     } else {
@@ -102,12 +98,9 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  // Reemplazar los métodos formatearFecha, getDia y getMes en landing-page.ts:
-
   formatearFecha(fecha: Date | string): string {
     if (!fecha) return '';
 
-    // Extraer componentes de la fecha para evitar problemas de zona horaria
     const fechaStr = typeof fecha === 'string' ? fecha : fecha.toISOString();
     const [year, month, day] = fechaStr.split('T')[0].split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
@@ -120,14 +113,12 @@ export class LandingComponent implements OnInit {
   }
 
   getDia(fecha: Date | string): number {
-    // Crear fecha en zona horaria local para evitar desfases
     const fechaStr = typeof fecha === 'string' ? fecha : fecha.toISOString();
     const [year, month, day] = fechaStr.split('T')[0].split('-');
     return parseInt(day, 10);
   }
 
   getMes(fecha: Date | string): string {
-    // Crear fecha en zona horaria local para evitar desfases
     const fechaStr = typeof fecha === 'string' ? fecha : fecha.toISOString();
     const [year, month, day] = fechaStr.split('T')[0].split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
@@ -140,7 +131,6 @@ export class LandingComponent implements OnInit {
     try {
       const date = new Date(fecha);
 
-      // Verificar si la fecha es válida
       if (isNaN(date.getTime())) {
         return '';
       }
@@ -179,5 +169,32 @@ export class LandingComponent implements OnInit {
   cerrarModal(): void {
     this.modalAbierto = false;
     this.torneoSeleccionado = null;
+  }
+
+  // NUEVA FUNCIÓN: Verificar si las inscripciones están cerradas
+  inscripcionesCerradas(torneo: Torneo): boolean {
+    const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
+    
+    if (!cierreInscripciones) {
+      return false;
+    }
+
+    try {
+      const fechaCierre = new Date(cierreInscripciones);
+      const ahora = new Date();
+      
+      return ahora >= fechaCierre;
+    } catch (e) {
+      console.error('Error al verificar cierre de inscripciones:', e);
+      return false;
+    }
+  }
+
+  // NUEVA FUNCIÓN: Obtener el mensaje de estado de inscripciones
+  getMensajeInscripcion(torneo: Torneo): string {
+    if (this.inscripcionesCerradas(torneo)) {
+      return 'Inscripciones cerradas';
+    }
+    return 'Inscribirme Ahora';
   }
 }
