@@ -193,7 +193,7 @@ export class ListasTorneoComponent implements OnInit {
     const isValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
 
     if (!isValidExtension) {
-      this.toast.error('Error','Por favor selecciona un archivo Excel válido (.xls o .xlsx)');
+      this.toast.error('Error', 'Por favor selecciona un archivo Excel válido (.xls o .xlsx)');
       //alert('Por favor selecciona un archivo Excel válido (.xls o .xlsx)');
       event.target.value = '';
       return;
@@ -229,10 +229,10 @@ export class ListasTorneoComponent implements OnInit {
         this.procesando = false;
 
         //console.log('Archivo cargado exitosamente:', this.datosFenamac.length, 'registros');
-        this.toast.success('Archivo procesado',`Archivo cargado: ${this.datosFenamac.length} jugadores encontrados`);
+        this.toast.success('Archivo procesado', `Archivo cargado: ${this.datosFenamac.length} jugadores encontrados`);
         //alert(`Archivo cargado: ${this.datosFenamac.length} jugadores encontrados`);
       } catch (error) {
-        console.error('Error','Error al procesar el archivo:', error);
+        console.error('Error', 'Error al procesar el archivo:', error);
         this.error = 'Error al procesar el archivo Excel';
         this.procesando = false;
       }
@@ -357,38 +357,48 @@ export class ListasTorneoComponent implements OnInit {
     return cat?.jugadores || [];
   }
 
-  exportarExcel(): void {
-    const wb = XLSX.utils.book_new();
+exportarExcel(): void {
+  const wb = XLSX.utils.book_new();
 
-    this.estadisticasPorCategoria.forEach(cat => {
-      const datos = cat.jugadores.map((jugador, index) => ({
-        'NO': index + 1,
-        'TITLE': '',
-        'NAME': jugador.nombreCompleto,
-        'SEX': '',
-        'FED': 'MEX',
-        'Rating nat': jugador.rating
-      }));
+  // Determinar qué categorías exportar
+  const categoriasAExportar = this.categoriaSeleccionada === null 
+    ? this.estadisticasPorCategoria 
+    : this.estadisticasPorCategoria.filter(cat => cat.idCategoria === this.categoriaSeleccionada);
 
-      const ws = XLSX.utils.json_to_sheet(datos);
+  categoriasAExportar.forEach(cat => {
+    const datos = cat.jugadores.map((jugador, index) => ({
+      'NO': index + 1,
+      'TITLE': '',
+      'NAME': jugador.nombreCompleto,
+      'SEX': '',
+      'FED': 'MEX',
+      'Rating nat': jugador.rating
+    }));
 
-      ws['!cols'] = [
-        { wch: 5 },   // NO
-        { wch: 8 },   // TITLE
-        { wch: 35 },  // NAME
-        { wch: 5 },   // SEX
-        { wch: 6 },   // FED
-        { wch: 12 }   // Nat. Rating
-      ];
+    const ws = XLSX.utils.json_to_sheet(datos);
 
-      const nombreHoja = cat.nombreCategoria.substring(0, 31);
-      XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
-    });
+    ws['!cols'] = [
+      { wch: 5 },   // NO
+      { wch: 8 },   // TITLE
+      { wch: 35 },  // NAME
+      { wch: 5 },   // SEX
+      { wch: 6 },   // FED
+      { wch: 12 }   // Nat. Rating
+    ];
 
-    const nombreArchivo = `SwissManager_${this.torneoSeleccionado?.nombre || 'torneo'}_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(wb, nombreArchivo);
-    this.toast.success('Archivo creado','Archivo Excel creado correctamente');
-  }
+    const nombreHoja = cat.nombreCategoria.substring(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+  });
+
+  // Determinar el nombre del archivo según la categoría seleccionada
+  const nombreCategoria = this.categoriaSeleccionada === null 
+    ? 'Todas_Categorias' 
+    : categoriasAExportar[0]?.nombreCategoria.replace(/\s+/g, '_') || 'Categoria';
+  
+  const nombreArchivo = `SwissManager_${this.torneoSeleccionado?.nombre || 'torneo'}_${nombreCategoria}_${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb, nombreArchivo);
+  this.toast.success('Archivo creado','Archivo Excel creado correctamente');
+}
 
   formatearFecha(fecha: Date | string | undefined): string {
     if (!fecha) return '-';
