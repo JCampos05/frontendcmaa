@@ -169,16 +169,24 @@
                     (change)="onTorneoChange($event)">
                     <option value="">Seleccione un torneo</option>
                     <option *ngFor="let torneo of torneos" [value]="torneo.idTorneo">
-                        {{ torneo.nombre }} - {{ torneo.fecha | date:'dd/MM/yyyy' }}
+                        {{ torneo.nombre || torneo.lugar }} - {{ torneo.fecha | date:'dd/MM/yyyy' }}
                     </option>
                 </select>
             </div>
 
             <!-- Sección de depuración (eliminar después de resolver) -->
-            <!--div *ngIf="torneos.length > 0"
+            <!--div *ngIf="inscripcionForm.get('torneo_id')?.value"
                 style="background: #f0f0f0; padding: 10px; margin-top: 10px; font-size: 12px; border-radius: 4px;">
-                <strong>Debug - Torneos disponibles:</strong>
-                <pre>{{ torneos | json }}</pre>
+                <strong>Debug Info:</strong>
+                <div>Torneo ID: {{ inscripcionForm.get('torneo_id')?.value }}</div>
+                <div>Categorías cargadas: {{ categorias.length }}</div>
+                <div *ngIf="categorias.length > 0">
+                    <strong>Categorías disponibles:</strong>
+                    <pre style="max-height: 150px; overflow: auto; font-size: 11px;">{{ categorias | json }}</pre>
+                </div>
+                <div *ngIf="errores.length > 0" style="color: red;">
+                    <strong>Errores:</strong> {{ errores.join(', ') }}
+                </div>
             </!--div-->
 
             <div class="form-group" *ngIf="categorias.length > 0">
@@ -189,8 +197,8 @@
                     [class.invalido]="inscripcionForm.get('categoria_id')?.invalid && (inscripcionForm.get('categoria_id')?.touched || submitted)"
                     (change)="onCategoriaChange($event)">
                     <option value="">Seleccione una categoría</option>
-                    <option *ngFor="let cat of categorias" [value]="cat.idCategoria">
-                        {{ cat.nombre }}
+                    <option *ngFor="let cat of categorias" [value]="cat.categoria?.idCategoria || cat.idCategoria">
+                        {{ cat.categoria?.nombre || cat.nombre }} - ${{ cat.categoria?.costo || cat.costo | number:'1.2-2' }}
                     </option>
                 </select>
             </div>
@@ -264,7 +272,7 @@
                     </div>
                     <div class="modal-costo-categoria" *ngIf="categoriaSeleccionada">
                         <i class="fas fa-tag"></i>
-                        {{ categoriaSeleccionada.nombre }}
+                        {{ categoriaSeleccionada.categoria?.nombre || categoriaSeleccionada.nombre }}
                     </div>
                 </div>
 
@@ -276,7 +284,7 @@
                         </p>
                         <p>Una vez realizado el pago, su estado cambiará a <strong>ACTIVO</strong> en el torneo
                             seleccionado.</p>
-                        <p>El pago debe realizarse antes de que el torneo inicie.</p>
+                        <p>El pago debe realizarse de manera presencial en las oficinas del comité.</p>
                     </div>
                 </div>
             </div>

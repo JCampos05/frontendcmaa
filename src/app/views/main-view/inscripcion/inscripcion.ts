@@ -121,14 +121,14 @@ export class InscripcionComponent implements OnInit {
     this.torneoService.getActivos().subscribe({
       next: (torneos) => {
         const ahora = new Date();
-        
+
         this.torneos = (torneos || []).filter(torneo => {
           const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
-          
+
           if (!cierreInscripciones) {
             return true;
           }
-          
+
           try {
             const fechaCierre = new Date(cierreInscripciones);
             return ahora < fechaCierre;
@@ -144,7 +144,7 @@ export class InscripcionComponent implements OnInit {
           this.errores = ['No hay torneos disponibles con inscripciones abiertas en este momento'];
         } else if (this.torneoIdInicial) {
           const torneoEncontrado = this.torneos.find(t => t.idTorneo === this.torneoIdInicial);
-          
+
           if (torneoEncontrado) {
             this.inscripcionForm.patchValue({ torneo_id: this.torneoIdInicial });
             this.onTorneoChange({ target: { value: this.torneoIdInicial.toString() } });
@@ -174,33 +174,19 @@ export class InscripcionComponent implements OnInit {
         return;
       }
 
-      const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoIdNumero);
-      if (torneoSeleccionado) {
-        const cierreInscripciones = torneoSeleccionado.cierreInscripciones || torneoSeleccionado.cierre_inscripciones;
-        
-        if (cierreInscripciones) {
-          const fechaCierre = new Date(cierreInscripciones);
-          const ahora = new Date();
-          
-          if (ahora >= fechaCierre) {
-            this.errores = ['Las inscripciones para este torneo ya han cerrado'];
-            this.categorias = [];
-            this.inscripcionForm.patchValue({ torneo_id: '' });
-            return;
-          }
-        }
-      }
-
       this.loading = true;
-      this.errores = [];
+      this.errores = []; // Limpiar errores previos
 
       console.log('Cargando categorías para torneo ID:', torneoIdNumero);
 
       this.torneoService.getCategoriasByTorneo(torneoIdNumero).subscribe({
         next: (response) => {
           this.loading = false;
-          console.log('Categorías recibidas:', response);
+          console.log('Respuesta completa de categorías:', response);
+
+          // El backend devuelve { success: true, categorias: [...] }
           this.categorias = response.categorias || [];
+          console.log('Categorías cargadas:', this.categorias.length);
 
           if (this.categorias.length === 0) {
             this.errores = ['Este torneo no tiene categorías disponibles'];
@@ -224,6 +210,7 @@ export class InscripcionComponent implements OnInit {
       this.categorias = [];
     }
 
+    // Resetear la categoría seleccionada
     this.inscripcionForm.patchValue({ categoria_id: '' });
     this.categoriaSeleccionada = null;
     this.costoInscripcion = 0;
@@ -391,14 +378,14 @@ export class InscripcionComponent implements OnInit {
 
     const torneoId = Number(this.inscripcionForm.value.torneo_id);
     const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoId);
-    
+
     if (torneoSeleccionado) {
       const cierreInscripciones = torneoSeleccionado.cierreInscripciones || torneoSeleccionado.cierre_inscripciones;
-      
+
       if (cierreInscripciones) {
         const fechaCierre = new Date(cierreInscripciones);
         const ahora = new Date();
-        
+
         if (ahora >= fechaCierre) {
           this.errores = ['Las inscripciones para este torneo ya han cerrado'];
           window.scrollTo({ top: 0, behavior: 'smooth' });

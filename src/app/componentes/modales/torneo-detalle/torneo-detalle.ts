@@ -39,8 +39,27 @@ export class TorneoDetalleModalComponent {
   formatearFechaCorta(fecha: Date | string): string {
     if (!fecha) return 'No especificado';
     try {
-      const date = new Date(fecha);
+      // Parsear la fecha del backend sin conversión de zona horaria
+      const fechaStr = typeof fecha === 'string' ? fecha : fecha.toISOString();
+
+      // Extraer componentes de la fecha (formato: 2025-12-19 12:00:00 o 2025-12-19T12:00:00.000Z)
+      const match = fechaStr.match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})/);
+
+      if (!match) return 'No especificado';
+
+      const [, year, month, day, hour, minute] = match;
+
+      // Crear fecha local sin conversión de zona horaria
+      const date = new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hour),
+        parseInt(minute)
+      );
+
       if (isNaN(date.getTime())) return 'No especificado';
+
       return date.toLocaleDateString('es-MX', {
         day: '2-digit',
         month: 'short',
@@ -70,12 +89,12 @@ export class TorneoDetalleModalComponent {
 
   getCategorias(): TorneoCategoria[] {
     if (!this.torneo) return [];
-    
+
     // Intentar ambos alias del backend
     const categorias = this.torneo.torneoCategoria || this.torneo.torneo_categorias;
-    
+
     if (!categorias || !Array.isArray(categorias)) return [];
-    
+
     // Filtrar solo categorías activas
     return categorias.filter(cat => cat.activo !== false);
   }
@@ -90,32 +109,32 @@ export class TorneoDetalleModalComponent {
 
   getPremios(categoria: TorneoCategoria): string[] {
     if (!categoria.premios) return [];
-    
+
     try {
-      const premiosObj = typeof categoria.premios === 'string' 
-        ? JSON.parse(categoria.premios) 
+      const premiosObj = typeof categoria.premios === 'string'
+        ? JSON.parse(categoria.premios)
         : categoria.premios;
-      
+
       const premiosArray: string[] = [];
-      
+
       // Ordenar las claves numéricamente
       const claves = Object.keys(premiosObj).sort((a, b) => parseInt(a) - parseInt(b));
-      
+
       claves.forEach(key => {
         const numero = parseInt(key);
         const lugar = this.obtenerNombreLugar(numero);
         const valor = premiosObj[key];
-        
+
         // Limpiar el valor si viene en formato "monto - descripción"
         let valorLimpio = valor;
         if (typeof valor === 'string' && valor.includes(' - ')) {
           const partes = valor.split(' - ');
           valorLimpio = partes[0]; // Solo tomar la parte del monto
         }
-        
+
         premiosArray.push(`${lugar}: ${valorLimpio}`);
       });
-      
+
       return premiosArray;
     } catch (e) {
       console.error('Error al parsear premios:', e);
@@ -136,12 +155,12 @@ export class TorneoDetalleModalComponent {
 
   getDesempates(categoria: TorneoCategoria): string[] {
     if (!categoria.desempates) return [];
-    
+
     try {
-      const desempates = typeof categoria.desempates === 'string' 
-        ? JSON.parse(categoria.desempates) 
+      const desempates = typeof categoria.desempates === 'string'
+        ? JSON.parse(categoria.desempates)
         : categoria.desempates;
-      
+
       return Array.isArray(desempates) ? desempates : [];
     } catch (e) {
       console.error('Error al parsear desempates:', e);
@@ -151,12 +170,12 @@ export class TorneoDetalleModalComponent {
 
   getCalendario(categoria: TorneoCategoria): any[] {
     if (!categoria.calendario) return [];
-    
+
     try {
-      const calendario = typeof categoria.calendario === 'string' 
-        ? JSON.parse(categoria.calendario) 
+      const calendario = typeof categoria.calendario === 'string'
+        ? JSON.parse(categoria.calendario)
         : categoria.calendario;
-      
+
       return Array.isArray(calendario) ? calendario : [];
     } catch (e) {
       console.error('Error al parsear calendario:', e);
@@ -170,8 +189,8 @@ export class TorneoDetalleModalComponent {
   }
 
   hayInformacionAdicional(categoria: TorneoCategoria): boolean {
-    return this.getPremios(categoria).length > 0 
-      || this.getDesempates(categoria).length > 0 
+    return this.getPremios(categoria).length > 0
+      || this.getDesempates(categoria).length > 0
       || this.getCalendario(categoria).length > 0;
   }
 }
