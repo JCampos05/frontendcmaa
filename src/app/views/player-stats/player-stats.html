@@ -218,43 +218,108 @@
 
             <!-- TAB: HISTORIAL COMPLETO -->
             <div class="tab-content" *ngIf="tabActivo === 'historial'">
-                <div class="historial-section" *ngIf="jugadorSeleccionado.historial.length > 0">
-                    <div class="historial-header">
-                        <h3 class="historial-title">Todos los Torneos</h3>
-                        <span class="historial-count">{{ jugadorSeleccionado.historial.length }} participación{{
-                            jugadorSeleccionado.historial.length !== 1 ? 'es' : '' }}</span>
+                <div class="historial-section" *ngIf="torneosPasados.length > 0 || torneosFuturos.length > 0">
+                    
+                    <!-- TORNEOS FUTUROS -->
+                    <div class="torneos-subseccion" *ngIf="torneosFuturos.length > 0">
+                        <div class="subseccion-header futuros">
+                            <div class="subseccion-icon">
+                                <i class="fa-solid fa-calendar-plus"></i>
+                            </div>
+                            <div class="subseccion-info">
+                                <h3 class="subseccion-title">Próximos Torneos</h3>
+                                <span class="subseccion-count">{{ torneosFuturos.length }} inscripción{{ torneosFuturos.length !== 1 ? 'es' : '' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline">
+                            <div class="timeline-item torneo-futuro"
+                                *ngFor="let participacion of torneosFuturos; let i = index">
+                                <div class="timeline-marker futuro">
+                                    <i class="fa-solid fa-hourglass-half"></i>
+                                </div>
+                                <div class="timeline-card">
+                                    <div class="timeline-badge futuro">
+                                        <i class="fa-solid fa-clock"></i>
+                                        Por Jugar
+                                    </div>
+                                    <div class="timeline-date">{{ formatearFecha(participacion.torneo.fecha) }}</div>
+                                    <h4 class="timeline-title">{{ participacion.torneo.nombre || participacion.torneo.lugar }}</h4>
+                                    <div class="timeline-details">
+                                        <span class="timeline-detail">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            {{ participacion.torneo.lugar }}
+                                        </span>
+                                        <span class="timeline-detail" *ngIf="participacion.categoria">
+                                            <i class="fa-solid fa-layer-group"></i>
+                                            {{ participacion.categoria.nombre }}
+                                        </span>
+                                        <span class="timeline-detail">
+                                            <i class="fa-solid fa-chess"></i>
+                                            {{ participacion.torneo.rondas }} rondas
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="timeline">
-                        <div class="timeline-item"
-                            *ngFor="let participacion of jugadorSeleccionado.historial; let i = index">
-                            <div class="timeline-marker">
-                                <i class="fa-solid fa-chess-board"></i>
+                    <!-- SEPARADOR -->
+                    <div class="historial-divider" *ngIf="torneosFuturos.length > 0 && torneosPasados.length > 0">
+                        <span class="divider-line"></span>
+                        <span class="divider-text">
+                            <i class="fa-solid fa-calendar"></i>
+                            Historial
+                        </span>
+                        <span class="divider-line"></span>
+                    </div>
+
+                    <!-- TORNEOS PASADOS -->
+                    <div class="torneos-subseccion" *ngIf="torneosPasados.length > 0">
+                        <div class="subseccion-header pasados">
+                            <div class="subseccion-icon">
+                                <i class="fa-solid fa-calendar-check"></i>
                             </div>
-                            <div class="timeline-card">
-                                <div class="timeline-date">{{ formatearFecha(participacion.torneo.fecha) }}</div>
-                                <h4 class="timeline-title">{{ participacion.torneo.nombre || participacion.torneo.lugar
-                                    }}</h4>
-                                <div class="timeline-details">
-                                    <span class="timeline-detail">
-                                        <i class="fa-solid fa-location-dot"></i>
-                                        {{ participacion.torneo.lugar }}
-                                    </span>
-                                    <span class="timeline-detail" *ngIf="participacion.categoria">
-                                        <i class="fa-solid fa-layer-group"></i>
-                                        {{ participacion.categoria.nombre }}
-                                    </span>
-                                    <span class="timeline-detail">
-                                        <i class="fa-solid fa-chess"></i>
-                                        {{ participacion.torneo.rondas }} rondas
-                                    </span>
+                            <div class="subseccion-info">
+                                <h3 class="subseccion-title">Torneos Jugados</h3>
+                                <span class="subseccion-count">{{ torneosPasados.length }} participación{{ torneosPasados.length !== 1 ? 'es' : '' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline">
+                            <div class="timeline-item torneo-pasado"
+                                *ngFor="let participacion of torneosPasados; let i = index">
+                                <div class="timeline-marker pasado">
+                                    <i class="fa-solid fa-chess-board"></i>
+                                </div>
+                                <div class="timeline-card">
+                                    <div class="timeline-badge pasado">
+                                        <i class="fa-solid fa-check"></i>
+                                        Finalizado
+                                    </div>
+                                    <div class="timeline-date">{{ formatearFecha(participacion.torneo.fecha) }}</div>
+                                    <h4 class="timeline-title">{{ participacion.torneo.nombre || participacion.torneo.lugar }}</h4>
+                                    <div class="timeline-details">
+                                        <span class="timeline-detail">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            {{ participacion.torneo.lugar }}
+                                        </span>
+                                        <span class="timeline-detail" *ngIf="participacion.categoria">
+                                            <i class="fa-solid fa-layer-group"></i>
+                                            {{ participacion.categoria.nombre }}
+                                        </span>
+                                        <span class="timeline-detail">
+                                            <i class="fa-solid fa-chess"></i>
+                                            {{ participacion.torneo.rondas }} rondas
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="no-data" *ngIf="jugadorSeleccionado.historial.length === 0">
+                <div class="no-data" *ngIf="torneosPasados.length === 0 && torneosFuturos.length === 0">
                     <i class="fa-solid fa-calendar-xmark"></i>
                     <h4>Sin historial de torneos</h4>
                     <p>Este jugador aún no tiene participaciones confirmadas en torneos.</p>

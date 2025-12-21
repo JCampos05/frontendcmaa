@@ -36,6 +36,10 @@ export class PlayerStatsComponent implements OnInit {
 
   tabActivo: 'ultimo' | 'historial' = 'ultimo';
 
+  // Nuevas propiedades para torneos separados
+  torneosPasados: any[] = [];
+  torneosFuturos: any[] = [];
+
   constructor(private jugadorService: JugadorService) { }
 
   ngOnInit(): void { }
@@ -50,12 +54,20 @@ export class PlayerStatsComponent implements OnInit {
     this.jugadorSeleccionado = null;
     this.errorStats = '';
 
+    console.log('Buscando jugadores con:', {
+      nombre: this.searchNombre.trim() || undefined,
+      apellido1: this.searchApellido1.trim() || undefined,
+      apellido2: this.searchApellido2.trim() || undefined
+    });
+
     this.jugadorService.search(
       this.searchNombre.trim() || undefined,
       this.searchApellido1.trim() || undefined,
       this.searchApellido2.trim() || undefined
     ).subscribe({
       next: (jugadores: any) => {
+        console.log('Jugadores encontrados:', jugadores);
+        console.log('Primer jugador completo:', JSON.stringify(jugadores[0], null, 2));
         this.resultadosBusqueda = jugadores;
         this.sinResultados = jugadores.length === 0;
         this.buscando = false;
@@ -73,10 +85,16 @@ export class PlayerStatsComponent implements OnInit {
     this.cargandoStats = true;
     this.errorStats = '';
 
+    console.log('Cargando estadísticas para jugador:', jugador);
 
     this.jugadorService.getPublicStats(jugador.idJugador).subscribe({
       next: (data) => {
+        console.log('Estadísticas recibidas:', data);
         this.jugadorSeleccionado = data;
+        
+        // Separar torneos en pasados y futuros
+        this.separarTorneos();
+        
         this.cargandoStats = false;
         this.resultadosBusqueda = [];
         this.sinResultados = false;
@@ -87,6 +105,63 @@ export class PlayerStatsComponent implements OnInit {
         this.cargandoStats = false;
       }
     });
+  }
+
+  /**
+   * Separa los torneos en pasados y futuros según la fecha actual
+   */
+  separarTorneos(): void {
+    if (!this.jugadorSeleccionado || !this.jugadorSeleccionado.historial) {
+      this.torneosPasados = [];
+      this.torneosFuturos = [];
+      return;
+    }
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Normalizar a medianoche para comparación justa
+
+    this.torneosPasados = [];
+    this.torneosFuturos = [];
+
+    this.jugadorSeleccionado.historial.forEach((participacion: any) => {
+      const fechaTorneo = new Date(participacion.torneo.fecha);
+      fechaTorneo.setHours(0, 0, 0, 0);
+
+      if (fechaTorneo < hoy) {
+        this.torneosPasados.push(participacion);
+      } else {
+        this.torneosFuturos.push(participacion);
+      }
+    });
+
+    // Ordenar pasados: más reciente primero (descendente)
+    this.torneosPasados.sort((a, b) => {
+      const fechaA = new Date(a.torneo.fecha).getTime();
+      const fechaB = new Date(b.torneo.fecha).getTime();
+      return fechaB - fechaA;
+    });
+
+    // Ordenar futuros: más próximo primero (ascendente)
+    this.torneosFuturos.sort((a, b) => {
+      const fechaA = new Date(a.torneo.fecha).getTime();
+      const fechaB = new Date(b.torneo.fecha).getTime();
+      return fechaA - fechaB;
+    });
+
+    console.log(`📊 Torneos separados: ${this.torneosPasados.length} pasados, ${this.torneosFuturos.length} futuros`);
+  }
+
+  /**
+   * Determina si un torneo es pasado o futuro
+   */
+  esTorneoPasado(fecha: Date | string): boolean {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    const fechaTorneo = new Date(fecha);
+    fechaTorneo.setHours(0, 0, 0, 0);
+    
+    return fechaTorneo < hoy;
   }
 
   cambiarTab(tab: 'ultimo' | 'historial'): void {
@@ -100,6 +175,8 @@ export class PlayerStatsComponent implements OnInit {
     this.searchApellido2 = '';
     this.resultadosBusqueda = [];
     this.sinResultados = false;
+    this.torneosPasados = [];
+    this.torneosFuturos = [];
   }
 
   formatearFecha(fecha: string | Date): string {

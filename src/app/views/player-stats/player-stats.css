@@ -623,6 +623,124 @@
     font-weight: 500;
 }
 
+/* Subsecciones de torneos */
+.torneos-subseccion {
+    margin-bottom: 3rem;
+}
+
+.subseccion-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+.subseccion-header.futuros {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    border-left: 4px solid #4CAF50;
+}
+
+.subseccion-header.pasados {
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    border-left: 4px solid #2196F3;
+}
+
+.subseccion-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.subseccion-header.futuros .subseccion-icon {
+    background: #4CAF50;
+    color: white;
+}
+
+.subseccion-header.pasados .subseccion-icon {
+    background: #2196F3;
+    color: white;
+}
+
+.subseccion-info {
+    flex: 1;
+}
+
+.subseccion-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+    font-weight: 400;
+}
+
+.subseccion-header.futuros .subseccion-title {
+    color: #2E7D32;
+}
+
+.subseccion-header.pasados .subseccion-title {
+    color: #1565C0;
+}
+
+.subseccion-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.subseccion-header.futuros .subseccion-count {
+    background: rgba(76, 175, 80, 0.2);
+    color: #2E7D32;
+}
+
+.subseccion-header.pasados .subseccion-count {
+    background: rgba(33, 150, 243, 0.2);
+    color: #1565C0;
+}
+
+/* Divider entre secciones */
+.historial-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 3rem 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--color-light-gray), transparent);
+}
+
+.divider-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-slate);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1.5rem;
+    background: var(--color-white);
+    border: 2px solid var(--color-light-gray);
+    border-radius: 50px;
+}
+
+.divider-text i {
+    color: var(--color-brown);
+}
+
+/* Timeline */
 .timeline {
     position: relative;
     padding-left: 3rem;
@@ -643,13 +761,13 @@
     margin-bottom: 2rem;
 }
 
+/* Timeline markers diferentes para pasados y futuros */
 .timeline-marker {
     position: absolute;
     left: -2.35rem;
     top: 0.5rem;
     width: 2.5rem;
     height: 2.5rem;
-    background: var(--color-brown);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -658,14 +776,39 @@
     font-size: 1.2rem;
     z-index: 2;
     box-shadow: 0 0 0 4px var(--color-light-gray);
+    transition: all 0.3s;
 }
 
+.timeline-marker.futuro {
+    background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+}
+
+.timeline-marker.pasado {
+    background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+}
+
+.timeline-item:hover .timeline-marker {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px var(--color-light-gray);
+}
+
+/* Timeline cards */
 .timeline-card {
     background: var(--color-white);
     padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.timeline-item.torneo-futuro .timeline-card {
+    border-left: 4px solid #4CAF50;
+}
+
+.timeline-item.torneo-pasado .timeline-card {
+    border-left: 4px solid #2196F3;
 }
 
 .timeline-card:hover {
@@ -673,11 +816,42 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
 }
 
+/* Badge en timeline card */
+.timeline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.timeline-badge.futuro {
+    background: rgba(76, 175, 80, 0.15);
+    color: #2E7D32;
+}
+
+.timeline-badge.pasado {
+    background: rgba(33, 150, 243, 0.15);
+    color: #1565C0;
+}
+
 .timeline-date {
-    color: var(--color-brown);
     font-size: 0.9rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
+}
+
+.timeline-item.torneo-futuro .timeline-date {
+    color: #4CAF50;
+}
+
+.timeline-item.torneo-pasado .timeline-date {
+    color: #2196F3;
 }
 
 .timeline-title {
@@ -927,139 +1101,152 @@
     }
 }
 
-@media (max-width: 480px) {
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
     .page-header {
-        padding: 1rem;
-    }
-
-    .header-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.35rem;
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
     }
 
     .page-title {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
     }
 
-    .page-subtitle {
-        font-size: 0.85rem;
-    }
-
-    .search-section {
-        padding: 0 0.75rem 0.75rem;
+    .search-section,
+    .stats-content {
+        padding: 0 1rem 1rem;
     }
 
     .search-card {
-        padding: 1.25rem;
+        padding: 1.5rem;
     }
 
-    .search-title {
-        font-size: 1.2rem;
-        gap: 0.5rem;
-    }
-
-    .search-description {
-        font-size: 0.9rem;
+    .search-header {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .btn-regresar {
-        padding: 0.65rem 1.25rem;
-        font-size: 0.95rem;
+        width: 100%;
+        justify-content: center;
     }
 
     .form-row {
-        gap: 1rem;
+        grid-template-columns: 1fr;
     }
 
-    .form-group label {
-        font-size: 0.9rem;
+    .player-header {
+        flex-direction: column;
+        text-align: center;
     }
 
-    .form-input {
-        padding: 0.7rem;
-        font-size: 0.9rem;
+    .player-name {
+        font-size: 1.8rem;
     }
 
-    .btn-search {
-        padding: 0.8rem 1.25rem;
-        font-size: 0.95rem;
+    .player-meta {
+        justify-content: center;
     }
 
-    .results-title {
-        font-size: 1.05rem;
+    .tabs-header {
+        flex-direction: column;
     }
 
-    .result-card {
-        padding: 1rem;
+    .torneo-details-grid {
+        grid-template-columns: 1fr;
     }
 
-    .result-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.35rem;
+    /* Ajustes para subsecciones en móvil */
+    .subseccion-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.25rem;
     }
 
-    .result-name {
+    .subseccion-title {
+        font-size: 1.3rem;
+    }
+
+    /* Ajustes para timeline en móvil */
+    .timeline {
+        padding-left: 2.5rem;
+    }
+
+    .timeline::before {
+        left: 0.75rem;
+    }
+
+    .timeline-marker {
+        left: -1.85rem;
+        width: 2rem;
+        height: 2rem;
         font-size: 1rem;
+        box-shadow: 0 0 0 3px var(--color-light-gray);
     }
 
-    .result-rating {
-        font-size: 0.85rem;
+    .timeline-item:hover .timeline-marker {
+        box-shadow: 0 0 0 4px var(--color-light-gray);
     }
 
-    .status-badge {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.65rem;
+    .timeline-card {
+        padding: 1.25rem;
     }
 
-    .result-arrow {
-        right: 1rem;
-        top: 1.25rem;
-        font-size: 1rem;
-    }
-
-    .no-results,
-    .loading-section,
-    .error-section {
-        padding: 1.75rem 0.875rem;
-    }
-
-    .no-results i,
-    .loading-section i,
-    .error-section i {
-        font-size: 2.25rem;
-    }
-
-    .no-results p,
-    .loading-section p,
-    .error-section p {
-        font-size: 0.95rem;
-    }
-
-    .btn-retry {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .page-header {
-        padding: 0.875rem;
-    }
-
-    .header-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-    }
-
-    .page-title {
+    .timeline-title {
         font-size: 1.1rem;
     }
 
+    .timeline-details {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .timeline-badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.85rem;
+    }
+
+    /* Divider en móvil */
+    .historial-divider {
+        margin: 2rem 0;
+    }
+
+    .divider-text {
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
+    }
+
+    /* Torneos subsección en móvil */
+    .torneos-subseccion {
+        margin-bottom: 2rem;
+    }
+
+    /* Result cards en móvil */
+    .result-card {
+        flex-wrap: wrap;
+    }
+
+    .result-badges {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+    }
+
+    .result-arrow {
+        position: absolute;
+        right: 1rem;
+        top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.3rem;
+    }
+
     .page-subtitle {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
     }
 
     .search-card {
@@ -1067,58 +1254,47 @@
     }
 
     .search-title {
-        font-size: 1.1rem;
-    }
-
-    .search-description {
-        font-size: 0.85rem;
-    }
-
-    .btn-regresar {
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .form-group label {
-        font-size: 0.85rem;
-    }
-
-    .form-input {
-        padding: 0.65rem;
-        font-size: 0.85rem;
+        font-size: 1.4rem;
     }
 
     .btn-search {
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
+        width: 100%;
     }
 
-    .result-card {
-        padding: 0.875rem;
+    .player-name {
+        font-size: 1.5rem;
     }
 
-    .result-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
+    .player-meta {
+        gap: 0.75rem;
     }
 
-    .result-name {
+    .meta-item {
         font-size: 0.95rem;
     }
 
-    .result-rating {
-        font-size: 0.8rem;
+    .subseccion-title {
+        font-size: 1.1rem;
     }
 
-    .status-badge {
-        font-size: 0.65rem;
-        padding: 0.25rem 0.55rem;
+    .subseccion-count {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.75rem;
     }
 
-    .result-arrow {
-        right: 0.875rem;
-        top: 1rem;
-        font-size: 0.9rem;
+    .timeline-card {
+        padding: 1rem;
+    }
+
+    .timeline-title {
+        font-size: 1rem;
+    }
+
+    .timeline-date {
+        font-size: 0.85rem;
+    }
+
+    .timeline-detail {
+        font-size: 0.85rem;
     }
 }

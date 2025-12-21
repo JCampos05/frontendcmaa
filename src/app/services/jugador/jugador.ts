@@ -14,6 +14,52 @@ export class JugadorService {
   constructor(private http: HttpClient) { }
 
   /**
+   * Función auxiliar para normalizar fechas
+   * Convierte fechas del formato backend a objetos Date correctos sin problemas de zona horaria
+   */
+  private normalizarFecha(fecha: string | Date | null | undefined): Date | null {
+    if (!fecha) return null;
+    
+    if (typeof fecha === 'string') {
+      // Si la fecha viene en formato ISO (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss)
+      // Extraemos solo la parte de la fecha para evitar problemas de zona horaria
+      const fechaSolo = fecha.split('T')[0];
+      const [year, month, day] = fechaSolo.split('-').map(Number);
+      
+      // Crear fecha en hora local (sin ajustes de zona horaria)
+      return new Date(year, month - 1, day);
+    }
+    
+    return new Date(fecha);
+  }
+
+  /**
+   * Función auxiliar para transformar datos de torneo
+   */
+  private transformarTorneo(torneo: any): any {
+    if (!torneo) return null;
+    
+    return {
+      ...torneo,
+      fecha: this.normalizarFecha(torneo.fecha)
+    };
+  }
+
+  /**
+   * Función auxiliar para transformar inscripción con datos relacionados
+   */
+  private transformarInscripcion(inscripcion: any): any {
+    if (!inscripcion) return null;
+    
+    return {
+      ...inscripcion,
+      fecha_inscripcion: this.normalizarFecha(inscripcion.fecha_inscripcion),
+      fecha_actualizacion: this.normalizarFecha(inscripcion.fecha_actualizacion),
+      torneo: this.transformarTorneo(inscripcion.torneo)
+    };
+  }
+
+  /**
    * GET /api/jugadores - Obtener todos los jugadores (protegido)
    * Acepta parámetros de filtrado opcionales
    */
@@ -77,8 +123,8 @@ export class JugadorService {
   }
 
   /**
- * GET /api/jugadores/search - Buscar jugadores por nombre (público)
- */
+   * GET /api/jugadores/search - Buscar jugadores por nombre (público)
+   */
   search(nombre?: string, apellido1?: string, apellido2?: string): Observable<Jugador[]> {
     let params = new HttpParams();
     if (nombre) params = params.set('nombre', nombre);
@@ -92,12 +138,41 @@ export class JugadorService {
 
   /**
    * GET /api/jugadores/:id/stats - Obtener estadísticas públicas de un jugador
+   * TRANSFORMACIÓN DE FECHAS
    */
   getPublicStats(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}/stats`).pipe(
-      map(response => response.data || response)
+      map(response => {
+        const data = response.data || response;
+        
+        //console.log('📥 Datos crudos recibidos:', data);
+        
+        // Transformar último torneo si existe
+        if (data.ultimoTorneo) {
+          data.ultimoTorneo = this.transformarInscripcion(data.ultimoTorneo);
+        }
+        
+        // Transformar historial completo
+        if (data.historial && Array.isArray(data.historial)) {
+          data.historial = data.historial.map((inscripcion: any) => 
+            this.transformarInscripcion(inscripcion)
+          );
+        }
+        
+        // Transformar fechas del jugador
+        if (data.jugador) {
+          if (data.jugador.fecha_nacimiento) {
+            data.jugador.fecha_nacimiento = this.normalizarFecha(data.jugador.fecha_nacimiento);
+          }
+          if (data.jugador.fecha_registro) {
+            data.jugador.fecha_registro = this.normalizarFecha(data.jugador.fecha_registro);
+          }
+        }        
+        return data;
+      })
     );
   }
+
   /**
    * GET /api/jugadores/:id/full - Obtener jugador completo con todas las relaciones (protegido)
    */
@@ -105,7 +180,6 @@ export class JugadorService {
     return this.http.get<any>(`${this.apiUrl}/${id}/full`).pipe(
       map(response => {
         const data = response.data || response;
-        //console.log('Datos recibidos en getFullById:', data);
         return data;
       })
     );
