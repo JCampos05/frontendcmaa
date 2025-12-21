@@ -174,21 +174,6 @@
                 </select>
             </div>
 
-            <!-- Sección de depuración (eliminar después de resolver) -->
-            <!--div *ngIf="inscripcionForm.get('torneo_id')?.value"
-                style="background: #f0f0f0; padding: 10px; margin-top: 10px; font-size: 12px; border-radius: 4px;">
-                <strong>Debug Info:</strong>
-                <div>Torneo ID: {{ inscripcionForm.get('torneo_id')?.value }}</div>
-                <div>Categorías cargadas: {{ categorias.length }}</div>
-                <div *ngIf="categorias.length > 0">
-                    <strong>Categorías disponibles:</strong>
-                    <pre style="max-height: 150px; overflow: auto; font-size: 11px;">{{ categorias | json }}</pre>
-                </div>
-                <div *ngIf="errores.length > 0" style="color: red;">
-                    <strong>Errores:</strong> {{ errores.join(', ') }}
-                </div>
-            </!--div-->
-
             <div class="form-group" *ngIf="categorias.length > 0">
                 <label for="categoria_id">
                     Categoría <span class="requerido">*</span>
@@ -280,11 +265,63 @@
                     <i class="fas fa-info-circle"></i>
                     <div>
                         <p><strong>Importante:</strong></p>
-                        <p>Su inscripción quedará en estado <strong>PENDIENTE</strong> hasta que se confirme el pago.
-                        </p>
-                        <p>Una vez realizado el pago, su estado cambiará a <strong>ACTIVO</strong> en el torneo
-                            seleccionado.</p>
-                        <p>El pago debe realizarse de manera presencial en las oficinas del comité.</p>
+                        <p>Su inscripción quedará en estado <strong>PENDIENTE</strong> hasta que se confirme el pago.</p>
+                        <p>Una vez realizado el pago, su estado cambiará a <strong>ACTIVO</strong> en el torneo seleccionado.</p>
+                        <p>Favor de poner en concepto de la transferencia el nombre completo del participante</p>
+                    </div>
+                </div>
+
+                <div class="info-bancaria">
+                    <div class="info-bancaria-header">
+                        <i class="fas fa-university"></i>
+                        <strong>Datos para Transferencia Bancaria</strong>
+                    </div>
+                    <div class="info-bancaria-contenido">
+                        <div class="dato-bancario">
+                            <i class="fas fa-user"></i>
+                            <div>
+                                <span class="dato-label">Titular de la cuenta:</span>
+                                <span class="dato-value">Rayda Elisa Leal Ruiz</span>
+                            </div>
+                        </div>
+                        <div class="dato-bancario">
+                            <i class="fas fa-building"></i>
+                            <div>
+                                <span class="dato-label">Banco:</span>
+                                <span class="dato-value">BBVA</span>
+                            </div>
+                        </div>
+                        <div class="dato-bancario">
+                            <i class="fas fa-credit-card"></i>
+                            <div>
+                                <span class="dato-label">Cuenta:</span>
+                                <span class="dato-value clabe">1538534514</span>
+                            </div>
+                        </div>
+                        <div class="dato-bancario">
+                            <i class="fas fa-credit-card"></i>
+                            <div>
+                                <span class="dato-label">CLABE:</span>
+                                <span class="dato-value clabe">012 180 0153 8534 5147</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-bancaria-nota">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Solo se aceptan transferencias bancarias</strong>
+                    </div>
+                </div>
+
+                <div class="info-comprobante">
+                    <i class="fas fa-receipt"></i>
+                    <div>
+                        <p><strong>Envío de Comprobante:</strong></p>
+                        <p>Una vez realizada la transferencia, envíe su comprobante de pago por WhatsApp al número:</p>
+                        <div class="numero-whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            <a href="https://wa.me/526682297372" target="_blank">+52 668 229 7372</a>
+                        </div>
+                        <!--p class="comprobante-nota">Incluya su nombre completo y el torneo al que se inscribió.</!--p-->
                     </div>
                 </div>
             </div>

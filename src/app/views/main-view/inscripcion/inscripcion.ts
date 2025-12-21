@@ -138,7 +138,7 @@ export class InscripcionComponent implements OnInit {
           }
         });
 
-        console.log('Torneos con inscripciones abiertas:', this.torneos);
+        //console.log('Torneos con inscripciones abiertas:', this.torneos);
 
         if (this.torneos.length === 0) {
           this.errores = ['No hay torneos disponibles con inscripciones abiertas en este momento'];
@@ -162,13 +162,13 @@ export class InscripcionComponent implements OnInit {
 
   onTorneoChange(event: any): void {
     const torneoId = event.target.value;
-    console.log('Torneo seleccionado - Valor:', torneoId, 'Tipo:', typeof torneoId);
+    //console.log('Torneo seleccionado - Valor:', torneoId, 'Tipo:', typeof torneoId);
 
     if (torneoId && torneoId !== '' && torneoId !== null) {
       const torneoIdNumero = Number(torneoId);
 
       if (isNaN(torneoIdNumero) || torneoIdNumero <= 0) {
-        console.error('El ID del torneo no es válido:', torneoId);
+        //console.error('El ID del torneo no es válido:', torneoId);
         this.errores = ['Error al seleccionar el torneo. Por favor, intente nuevamente.'];
         this.categorias = [];
         return;
@@ -177,16 +177,16 @@ export class InscripcionComponent implements OnInit {
       this.loading = true;
       this.errores = []; // Limpiar errores previos
 
-      console.log('Cargando categorías para torneo ID:', torneoIdNumero);
+      //console.log('Cargando categorías para torneo ID:', torneoIdNumero);
 
       this.torneoService.getCategoriasByTorneo(torneoIdNumero).subscribe({
         next: (response) => {
           this.loading = false;
-          console.log('Respuesta completa de categorías:', response);
+          //console.log('Respuesta completa de categorías:', response);
 
           // El backend devuelve { success: true, categorias: [...] }
           this.categorias = response.categorias || [];
-          console.log('Categorías cargadas:', this.categorias.length);
+          //console.log('Categorías cargadas:', this.categorias.length);
 
           if (this.categorias.length === 0) {
             this.errores = ['Este torneo no tiene categorías disponibles'];
@@ -218,7 +218,7 @@ export class InscripcionComponent implements OnInit {
 
   onCategoriaChange(event: any): void {
     const categoriaId = event.target.value;
-    console.log('Categoría seleccionada - ID:', categoriaId);
+    //console.log('Categoría seleccionada - ID:', categoriaId);
 
     if (categoriaId && categoriaId !== '' && this.categorias.length > 0) {
       const categoriaIdNumero = Number(categoriaId);
@@ -226,7 +226,7 @@ export class InscripcionComponent implements OnInit {
 
       if (this.categoriaSeleccionada) {
         this.costoInscripcion = this.categoriaSeleccionada.costo || 0;
-        console.log('Costo de inscripción:', this.costoInscripcion);
+        //console.log('Costo de inscripción:', this.costoInscripcion);
       } else {
         this.costoInscripcion = 0;
       }
@@ -426,12 +426,12 @@ export class InscripcionComponent implements OnInit {
       notas: this.inscripcionForm.value.notas?.trim() || null
     };
 
-    console.log('Enviando inscripción:', inscripcionData);
+    //console.log('Enviando inscripción:', inscripcionData);
 
     this.inscripcionService.crearInscripcionPublica(inscripcionData).subscribe({
       next: (response) => {
         this.loading = false;
-        console.log('Inscripción exitosa:', response);
+        //console.log('Inscripción exitosa:', response);
         if (response.success) {
           this.mensajeExito = true;
           this.inscripcionForm.reset();
