@@ -1,6 +1,7 @@
 import { Premio } from './premio';
 import { Inscripcion } from './inscripcion';
 import { TorneoCategoria } from './torneo-categoria';
+import { SistemaPago } from './sistema-pago';
 
 export interface Torneo {
     idTorneo?: number;
@@ -17,6 +18,8 @@ export interface Torneo {
     cierreInscripciones?: Date | string;
     cierre_inscripciones?: Date | string;
     
+    idSistemaPago?: number;
+    
     activo?: boolean;
     fechaCreacion?: Date | string;
     fecha_creacion?: Date | string;
@@ -29,4 +32,6 @@ export interface Torneo {
     inscripciones?: Inscripcion[];
     torneoCategoria?: TorneoCategoria[];
     torneo_categorias?: TorneoCategoria[];
+    sistemaPago?: SistemaPago;
+    sistema_pago?: SistemaPago;
 }

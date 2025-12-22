@@ -5,6 +5,7 @@ import { TorneoService } from '../../../services/torneo/torneo';
 import { TorneoCategoria } from '../../../models/torneo-categoria';
 import { Torneo } from '../../../models/torneo';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
+import { SistemaPago } from '../../../models/sistema-pago';
 
 @Component({
   selector: 'app-torneo-detalle',
@@ -18,11 +19,13 @@ export class TorneoDetalleComponent implements OnInit {
 
   torneo?: Torneo;
   torneoCategorias: TorneoCategoria[] = [];
+  sistemaPago?: SistemaPago;
   loading = true;
   torneoId?: number;
 
   seccionesExpandidas = {
     informacionGeneral: true,
+    sistemaPago: true,
     categoriasTorneo: true,
     configuracionPorCategoria: true,
     configuracionAdicional: true,
@@ -79,6 +82,11 @@ export class TorneoDetalleComponent implements OnInit {
         };
         this.torneoCategorias = torneo.torneoCategoria || [];
 
+        // Cargar sistema de pago si existe
+        if (torneo.sistemaPago || torneo.sistema_pago) {
+          this.sistemaPago = torneo.sistemaPago || torneo.sistema_pago;
+        }
+
         // Expandir primera categoría por defecto
         if (this.torneoCategorias.length > 0) {
           this.categoriasExpandidas[0] = true;
@@ -89,7 +97,7 @@ export class TorneoDetalleComponent implements OnInit {
       error: (error) => {
         //console.error('Error al cargar torneo:', error);
         //this.mostrarAlerta('Error al cargar los datos del torneo', 'error');
-        this.toast.error('Error','Error al cargar los datos del torneo');
+        this.toast.error('Error', 'Error al cargar los datos del torneo');
         this.router.navigate(['/main-view/torneos']);
       }
     });
@@ -192,29 +200,29 @@ export class TorneoDetalleComponent implements OnInit {
     return hora;
   }
 
-formatearFechaHoraRonda(fechaHora: string): string {
-  if (!fechaHora) return 'Sin fecha programada';
-  
-  try {
-    const date = new Date(fechaHora);
-    
-    // Verificar si la fecha es válida
-    if (isNaN(date.getTime())) {
+  formatearFechaHoraRonda(fechaHora: string): string {
+    if (!fechaHora) return 'Sin fecha programada';
+
+    try {
+      const date = new Date(fechaHora);
+
+      // Verificar si la fecha es válida
+      if (isNaN(date.getTime())) {
+        return 'Sin fecha programada';
+      }
+
+      return date.toLocaleDateString('es-MX', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      console.error('Error al formatear fecha de ronda:', e);
       return 'Sin fecha programada';
     }
-    
-    return date.toLocaleDateString('es-MX', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  } catch (e) {
-    console.error('Error al formatear fecha de ronda:', e);
-    return 'Sin fecha programada';
   }
-}
 
   obtenerPremios(premios: any): string[] {
     if (!premios) return [];
@@ -259,5 +267,17 @@ formatearFechaHoraRonda(fechaHora: string): string {
     if (this.torneoId) {
       this.router.navigate(['/main-view/editar-torneo', this.torneoId]);
     }
+  }
+
+  formatearClabe(clabe: string): string {
+    if (!clabe) return '';
+    // Formato: XXX XXX XXXXXXXXXXX X (3-3-11-1)
+    return clabe.replace(/(\d{3})(\d{3})(\d{11})(\d{1})/, '$1 $2 $3 $4');
+  }
+
+  formatearTelefono(telefono: string): string {
+    if (!telefono) return '';
+    // Formato: (XXX) XXX-XXXX
+    return telefono.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
   }
 }

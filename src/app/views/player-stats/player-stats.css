@@ -940,12 +940,14 @@
     color: #C62828;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSIVE PLAYER STATS ===== */
+
 @media (max-width: 768px) {
+    /* Page Header */
     .page-header {
         flex-direction: column;
         align-items: flex-start;
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
         gap: 1rem;
     }
 
@@ -960,21 +962,22 @@
     }
 
     .page-subtitle {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
     }
 
+    /* Search Section */
     .search-section,
     .stats-content {
         padding: 0 1rem 1rem;
     }
 
     .search-card {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
     }
 
     .search-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 1rem;
     }
 
@@ -989,11 +992,14 @@
     .btn-regresar {
         width: 100%;
         justify-content: center;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
     }
 
+    /* Form */
     .form-row {
         grid-template-columns: 1fr;
-        gap: 1.25rem;
+        gap: 1rem;
     }
 
     .form-group label {
@@ -1002,23 +1008,37 @@
 
     .form-input {
         padding: 0.75rem;
-        font-size: 0.95rem;
+        font-size: 1rem;
     }
 
     .btn-search {
         width: 100%;
         padding: 0.875rem 1.5rem;
         font-size: 1rem;
+        align-self: stretch;
+    }
+
+    /* Results Section */
+    .results-section {
+        margin-top: 1.5rem;
     }
 
     .results-title {
         font-size: 1.15rem;
         padding: 0 0.5rem;
+        margin-bottom: 1rem;
     }
 
     .result-card {
-        padding: 1.25rem;
+        padding: 1.25rem 1rem;
         flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .result-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
     }
 
     .result-info {
@@ -1028,6 +1048,7 @@
 
     .result-name {
         font-size: 1.05rem;
+        margin-bottom: 0.35rem;
     }
 
     .result-rating {
@@ -1036,8 +1057,9 @@
 
     .result-badges {
         width: 100%;
-        margin-top: 0.75rem;
+        margin-top: 0.5rem;
         justify-content: flex-start;
+        order: 3;
     }
 
     .status-badge {
@@ -1047,16 +1069,18 @@
 
     .result-arrow {
         position: absolute;
-        right: 1.25rem;
-        top: 1.5rem;
+        right: 1rem;
+        top: 1.25rem;
+        font-size: 1rem;
     }
 
+    /* No Results / Loading / Error */
     .no-results,
     .loading-section,
     .error-section,
     .no-data {
         padding: 2rem 1rem;
-        margin: 1rem 0;
+        margin: 1rem;
     }
 
     .no-results i,
@@ -1064,6 +1088,11 @@
     .error-section i,
     .no-data i {
         font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .no-data h4 {
+        font-size: 1.15rem;
     }
 
     .no-results p,
@@ -1073,108 +1102,203 @@
         font-size: 1rem;
     }
 
-    .player-header {
-        flex-direction: column;
-        text-align: center;
+    .btn-retry {
+        padding: 0.75rem 1.75rem;
+        font-size: 0.95rem;
     }
 
-    .player-name {
-        font-size: 1.8rem;
+    /* Player Info Card */
+    .player-info-card {
+        padding: 1.75rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 15px;
     }
 
-    .player-meta {
-        justify-content: center;
-    }
-
-    .tabs-header {
-        flex-direction: column;
-    }
-
-    .torneo-details-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .historial-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem;
-    }
-
-    .page-title {
-        font-size: 1.5rem;
-    }
-
-    .search-section,
-    .stats-content {
-        padding: 0 1rem 1rem;
-    }
-
-    .search-card {
-        padding: 1.5rem;
-    }
-
-    .search-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .btn-regresar {
+    .btn-back {
+        padding: 0.65rem 1.25rem;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
         width: 100%;
         justify-content: center;
     }
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
     .player-header {
         flex-direction: column;
+        align-items: center;
         text-align: center;
+        gap: 1.5rem;
+    }
+
+    .player-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 3rem;
     }
 
     .player-name {
         font-size: 1.8rem;
+        margin-bottom: 0.875rem;
     }
 
     .player-meta {
         justify-content: center;
+        gap: 1rem;
+    }
+
+    .meta-item {
+        font-size: 0.95rem;
+    }
+
+    .meta-item.meta-estado,
+    .meta-item.meta-pago {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.85rem;
+    }
+
+    /* Tabs */
+    .tabs-container {
+        border-radius: 12px;
     }
 
     .tabs-header {
         flex-direction: column;
     }
 
-    .torneo-details-grid {
-        grid-template-columns: 1fr;
+    .tab-button {
+        padding: 1.25rem;
+        font-size: 1rem;
+        justify-content: center;
     }
 
-    /* Ajustes para subsecciones en móvil */
+    .tab-button.active::after {
+        height: 2px;
+    }
+
+    .tab-content {
+        padding: 1.75rem 1rem;
+    }
+
+    /* Último Torneo */
+    .ultimo-torneo-section {
+        max-width: 100%;
+    }
+
+    .torneo-card-detailed {
+        padding: 1.5rem 1rem;
+        border-radius: 12px;
+    }
+
+    .torneo-badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .torneo-name {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .torneo-details-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .detail-item {
+        gap: 0.875rem;
+    }
+
+    .detail-item > i {
+        font-size: 1.5rem;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+    }
+
+    .detail-value {
+        font-size: 1rem;
+    }
+
+    /* Historial Section */
+    .historial-section {
+        max-width: 100%;
+    }
+
+    .historial-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding-bottom: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .historial-title {
+        font-size: 1.5rem;
+    }
+
+    .historial-count {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.875rem;
+    }
+
+    /* Subsecciones */
+    .torneos-subseccion {
+        margin-bottom: 2rem;
+    }
+
     .subseccion-header {
         flex-direction: column;
+        align-items: center;
         text-align: center;
-        padding: 1.25rem;
+        padding: 1.25rem 1rem;
+        gap: 0.75rem;
+    }
+
+    .subseccion-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
     }
 
     .subseccion-title {
         font-size: 1.3rem;
+        margin-bottom: 0.35rem;
     }
 
-    /* Ajustes para timeline en móvil */
+    .subseccion-count {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.875rem;
+    }
+
+    /* Divider */
+    .historial-divider {
+        margin: 2rem 0;
+        gap: 0.75rem;
+    }
+
+    .divider-text {
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
+        white-space: nowrap;
+    }
+
+    .divider-text i {
+        font-size: 0.9rem;
+    }
+
+    /* Timeline */
     .timeline {
         padding-left: 2.5rem;
     }
 
     .timeline::before {
         left: 0.75rem;
+        width: 2px;
+    }
+
+    .timeline-item {
+        margin-bottom: 1.75rem;
     }
 
     .timeline-marker {
@@ -1186,61 +1310,55 @@
     }
 
     .timeline-item:hover .timeline-marker {
+        transform: scale(1.05);
         box-shadow: 0 0 0 4px var(--color-light-gray);
     }
 
     .timeline-card {
-        padding: 1.25rem;
+        padding: 1.25rem 1rem;
+        border-radius: 8px;
     }
 
-    .timeline-title {
-        font-size: 1.1rem;
-    }
-
-    .timeline-details {
-        flex-direction: column;
-        gap: 0.75rem;
+    .timeline-card:hover {
+        transform: translateX(3px);
     }
 
     .timeline-badge {
         font-size: 0.75rem;
         padding: 0.35rem 0.85rem;
+        margin-bottom: 0.65rem;
     }
 
-    /* Divider en móvil */
-    .historial-divider {
-        margin: 2rem 0;
-    }
-
-    .divider-text {
+    .timeline-date {
         font-size: 0.85rem;
-        padding: 0.4rem 1rem;
+        margin-bottom: 0.4rem;
     }
 
-    /* Torneos subsección en móvil */
-    .torneos-subseccion {
-        margin-bottom: 2rem;
+    .timeline-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.875rem;
     }
 
-    /* Result cards en móvil */
-    .result-card {
-        flex-wrap: wrap;
+    .timeline-details {
+        flex-direction: column;
+        gap: 0.65rem;
     }
 
-    .result-badges {
-        width: 100%;
-        justify-content: flex-start;
-        margin-top: 0.5rem;
+    .timeline-detail {
+        font-size: 0.9rem;
     }
 
-    .result-arrow {
-        position: absolute;
-        right: 1rem;
-        top: 1.5rem;
+    .timeline-detail i {
+        font-size: 0.95rem;
     }
 }
 
+/* Extra small devices */
 @media (max-width: 480px) {
+    .page-header {
+        padding: 1.25rem 0.875rem;
+    }
+
     .page-title {
         font-size: 1.3rem;
     }
@@ -1250,15 +1368,59 @@
     }
 
     .search-card {
-        padding: 1rem;
+        padding: 1.25rem 0.875rem;
+        border-radius: 12px;
     }
 
     .search-title {
-        font-size: 1.4rem;
+        font-size: 1.25rem;
     }
 
-    .btn-search {
-        width: 100%;
+    .search-description {
+        font-size: 0.9rem;
+    }
+
+    .form-input {
+        font-size: 0.95rem;
+    }
+
+    .btn-search,
+    .btn-regresar {
+        font-size: 0.95rem;
+        padding: 0.75rem 1.25rem;
+    }
+
+    .result-card {
+        padding: 1rem 0.875rem;
+    }
+
+    .result-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .result-name {
+        font-size: 1rem;
+    }
+
+    .result-rating {
+        font-size: 0.85rem;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.65rem;
+    }
+
+    .player-info-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .player-avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 2.5rem;
     }
 
     .player-name {
@@ -1270,20 +1432,91 @@
     }
 
     .meta-item {
+        font-size: 0.9rem;
+    }
+
+    .meta-item.meta-estado,
+    .meta-item.meta-pago {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.75rem;
+    }
+
+    .tab-button {
+        padding: 1rem;
         font-size: 0.95rem;
     }
 
+    .tab-content {
+        padding: 1.5rem 0.875rem;
+    }
+
+    .torneo-card-detailed {
+        padding: 1.25rem 0.875rem;
+    }
+
+    .torneo-badge {
+        font-size: 0.8rem;
+        padding: 0.35rem 1rem;
+    }
+
+    .torneo-name {
+        font-size: 1.3rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .detail-item > i {
+        font-size: 1.3rem;
+    }
+
+    .detail-label {
+        font-size: 0.8rem;
+    }
+
+    .detail-value {
+        font-size: 0.95rem;
+    }
+
+    .subseccion-header {
+        padding: 1rem 0.875rem;
+    }
+
+    .subseccion-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
     .subseccion-title {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
     }
 
     .subseccion-count {
         font-size: 0.75rem;
-        padding: 0.3rem 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+
+    .divider-text {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.875rem;
+    }
+
+    .timeline {
+        padding-left: 2rem;
+    }
+
+    .timeline::before {
+        left: 0.5rem;
+    }
+
+    .timeline-marker {
+        left: -1.6rem;
+        width: 1.75rem;
+        height: 1.75rem;
+        font-size: 0.9rem;
     }
 
     .timeline-card {
-        padding: 1rem;
+        padding: 1rem 0.875rem;
     }
 
     .timeline-title {
@@ -1291,10 +1524,33 @@
     }
 
     .timeline-date {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
 
     .timeline-detail {
         font-size: 0.85rem;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+    .page-header {
+        padding: 1rem;
+    }
+
+    .player-header {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 2.5rem;
+    }
+
+    .subseccion-header {
+        flex-direction: row;
+        text-align: left;
     }
 }

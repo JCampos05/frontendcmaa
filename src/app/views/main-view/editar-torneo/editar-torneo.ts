@@ -12,7 +12,9 @@ import { CategoriaService } from '../../../services/categoria/categoria';
 import { RitmoJuegoService } from '../../../services/ritmo-juego/ritmo-juego';
 import { SistemaCompetenciaService } from '../../../services/sistema-competencia/sistema-competencia';
 import { SistemaDesempateService } from '../../../services/sistema-desempates/sistema-desempates';
+import { SistemaPagoService } from '../../../services/sistema-pago/sistema-pago';
 
+import { SistemaPago } from '../../../models/sistema-pago';
 import { Categoria } from '../../../models/categoria';
 import { RitmoJuego } from '../../../models/ritmo-juego';
 import { SistemaCompetencia } from '../../../models/sistema-competencia';
@@ -37,6 +39,7 @@ export class EditarTorneoComponent implements OnInit {
   ritmosJuego: RitmoJuego[] = [];
   sistemasCompetencia: SistemaCompetencia[] = [];
   sistemasDesempate: SistemaDesempate[] = [];
+  sistemasPago: SistemaPago[] = [];
 
   // UI State
   categoriasSeleccionadas: number[] = [];
@@ -64,7 +67,8 @@ export class EditarTorneoComponent implements OnInit {
     private categoriaService: CategoriaService,
     private ritmoJuegoService: RitmoJuegoService,
     private sistemaCompetenciaService: SistemaCompetenciaService,
-    private sistemaDesempateService: SistemaDesempateService
+    private sistemaDesempateService: SistemaDesempateService,
+    private sistemaPagoService: SistemaPagoService
   ) {
     this.torneoForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -73,6 +77,7 @@ export class EditarTorneoComponent implements OnInit {
       fecha: ['', Validators.required],
       hora: ['', Validators.required],
       cierreInscripciones: ['', Validators.required],
+      idSistemaPago: [null],
       tiempoEspera: [10, [Validators.min(0)]],
       permitirByePrimeraRonda: [true],
       notas: [''],
@@ -98,6 +103,7 @@ export class EditarTorneoComponent implements OnInit {
         ritmosJuego: this.ritmoJuegoService.getAll(true),
         sistemasCompetencia: this.sistemaCompetenciaService.getAll(true),
         sistemasDesempate: this.sistemaDesempateService.getAll(true),
+        sistemasPago: this.sistemaPagoService.getAll(true),
         torneo: this.torneoService.getById(this.idTorneo)
       }).toPromise();
 
@@ -110,6 +116,7 @@ export class EditarTorneoComponent implements OnInit {
       this.ritmosJuego = resultado.ritmosJuego || [];
       this.sistemasCompetencia = resultado.sistemasCompetencia || [];
       this.sistemasDesempate = resultado.sistemasDesempate || [];
+      this.sistemasPago = resultado.sistemasPago || [];
 
       const torneo: any = resultado.torneo;
       if (!torneo) {
@@ -145,6 +152,7 @@ export class EditarTorneoComponent implements OnInit {
       fecha: fechaISO,
       hora: torneo.hora || '',
       cierreInscripciones: cierreISO,
+      idSistemaPago: torneo.idSistemaPago || null,
       tiempoEspera: 10,
       permitirByePrimeraRonda: true,
       notas: torneo.notas || ''
@@ -538,6 +546,7 @@ export class EditarTorneoComponent implements OnInit {
         fecha: formValue.fecha,
         hora: formValue.hora,
         cierre_inscripciones: formValue.cierreInscripciones,
+        idSistemaPago: formValue.idSistemaPago || null,
         notas: formValue.notas || null,
         rondas: Math.max(...formValue.configuracionCategorias.map((c: any) => c.rondas)),
         categorias: this.categoriasSeleccionadas.map(id => this.getNombreCategoria(id)),

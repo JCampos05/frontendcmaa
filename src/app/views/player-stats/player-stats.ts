@@ -54,26 +54,17 @@ export class PlayerStatsComponent implements OnInit {
     this.jugadorSeleccionado = null;
     this.errorStats = '';
 
-    console.log('Buscando jugadores con:', {
-      nombre: this.searchNombre.trim() || undefined,
-      apellido1: this.searchApellido1.trim() || undefined,
-      apellido2: this.searchApellido2.trim() || undefined
-    });
-
     this.jugadorService.search(
       this.searchNombre.trim() || undefined,
       this.searchApellido1.trim() || undefined,
       this.searchApellido2.trim() || undefined
     ).subscribe({
       next: (jugadores: any) => {
-        console.log('Jugadores encontrados:', jugadores);
-        console.log('Primer jugador completo:', JSON.stringify(jugadores[0], null, 2));
         this.resultadosBusqueda = jugadores;
         this.sinResultados = jugadores.length === 0;
         this.buscando = false;
       },
       error: (error) => {
-        console.error('Error al buscar jugadores:', error);
         this.buscando = false;
         this.sinResultados = true;
         this.errorStats = 'Error al buscar jugadores. Por favor intenta de nuevo.';
@@ -85,11 +76,9 @@ export class PlayerStatsComponent implements OnInit {
     this.cargandoStats = true;
     this.errorStats = '';
 
-    console.log('Cargando estadísticas para jugador:', jugador);
 
     this.jugadorService.getPublicStats(jugador.idJugador).subscribe({
       next: (data) => {
-        console.log('Estadísticas recibidas:', data);
         this.jugadorSeleccionado = data;
         
         // Separar torneos en pasados y futuros
@@ -100,7 +89,6 @@ export class PlayerStatsComponent implements OnInit {
         this.sinResultados = false;
       },
       error: (error) => {
-        console.error('Error al cargar estadísticas:', error);
         this.errorStats = 'No se pudieron cargar las estadísticas del jugador';
         this.cargandoStats = false;
       }
@@ -147,8 +135,6 @@ export class PlayerStatsComponent implements OnInit {
       const fechaB = new Date(b.torneo.fecha).getTime();
       return fechaA - fechaB;
     });
-
-    console.log(`📊 Torneos separados: ${this.torneosPasados.length} pasados, ${this.torneosFuturos.length} futuros`);
   }
 
   /**

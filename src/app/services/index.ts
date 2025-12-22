@@ -17,3 +17,4 @@ export * from './usuario/usuario';
 export * from './historial-acceso/historial-acceso';
 export * from './logs-sistema/logs-sistema';
 export * from './sesiones-activas/sesiones-activas';
+export * from './sistema-pago/sistema-pago';

@@ -218,6 +218,14 @@
     font-weight: 500;
 }
 
+/* CLABE Format */
+.clabe-format {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: var(--color-brown);
+}
+
 /* Badges */
 .badge {
     display: inline-flex;

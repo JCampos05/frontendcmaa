@@ -29,6 +29,7 @@ export const routes: Routes = [
             {path: 'torneos', loadComponent: () => import('./views/main-view/torneos/torneos').then(m => m.TorneosComponent)},
             {path: 'editar-torneo/:id', loadComponent: () => import('./views/main-view/editar-torneo/editar-torneo').then(m => m.EditarTorneoComponent)},
             {path: 'detalle-torneo/:id', loadComponent: () => import('./views/main-view/torneo-detalles/torneo-detalles').then(m => m.TorneoDetalleComponent)},
+            {path: 'sistemas-pago' , loadComponent: () => import('./views/main-view/sistemas-pago/sistemas-pago').then(m => m.SistemasPagoComponent)},
             //{path: 'resultados-torneo/:id', loadComponent: () => import('./views/main-view/resultados-torneo/resultados-torneo').then(m => m.ResultadosTorneoComponent)},
             
             // Gestión de Jugadores

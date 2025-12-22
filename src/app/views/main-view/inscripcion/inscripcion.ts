@@ -31,6 +31,7 @@ export class InscripcionComponent implements OnInit {
   categoriaSeleccionada: any = null;
   costoInscripcion: number = 0;
   torneoIdInicial: number | null = null;
+  sistemaPago: any = null;
 
   dias: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
   meses = [
@@ -162,31 +163,32 @@ export class InscripcionComponent implements OnInit {
 
   onTorneoChange(event: any): void {
     const torneoId = event.target.value;
-    //console.log('Torneo seleccionado - Valor:', torneoId, 'Tipo:', typeof torneoId);
 
     if (torneoId && torneoId !== '' && torneoId !== null) {
       const torneoIdNumero = Number(torneoId);
 
       if (isNaN(torneoIdNumero) || torneoIdNumero <= 0) {
-        //console.error('El ID del torneo no es válido:', torneoId);
         this.errores = ['Error al seleccionar el torneo. Por favor, intente nuevamente.'];
         this.categorias = [];
+        this.sistemaPago = null;
         return;
       }
 
-      this.loading = true;
-      this.errores = []; // Limpiar errores previos
+      // Obtener información del sistema de pago del torneo seleccionado
+      const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoIdNumero);
+      if (torneoSeleccionado && torneoSeleccionado.sistema_pago) {
+        this.sistemaPago = torneoSeleccionado.sistema_pago;
+      } else {
+        this.sistemaPago = null;
+      }
 
-      //console.log('Cargando categorías para torneo ID:', torneoIdNumero);
+      this.loading = true;
+      this.errores = [];
 
       this.torneoService.getCategoriasByTorneo(torneoIdNumero).subscribe({
         next: (response) => {
           this.loading = false;
-          //console.log('Respuesta completa de categorías:', response);
-
-          // El backend devuelve { success: true, categorias: [...] }
           this.categorias = response.categorias || [];
-          //console.log('Categorías cargadas:', this.categorias.length);
 
           if (this.categorias.length === 0) {
             this.errores = ['Este torneo no tiene categorías disponibles'];
@@ -208,9 +210,9 @@ export class InscripcionComponent implements OnInit {
       });
     } else {
       this.categorias = [];
+      this.sistemaPago = null;
     }
 
-    // Resetear la categoría seleccionada
     this.inscripcionForm.patchValue({ categoria_id: '' });
     this.categoriaSeleccionada = null;
     this.costoInscripcion = 0;
@@ -473,6 +475,7 @@ export class InscripcionComponent implements OnInit {
     this.mensajeExito = false;
     this.costoInscripcion = 0;
     this.categoriaSeleccionada = null;
+    this.sistemaPago = null;
     this.router.navigate(['/'])
       .catch(error => console.error('Error al navegar:', error));
   }
@@ -508,5 +511,22 @@ export class InscripcionComponent implements OnInit {
 
   get progreso(): number {
     return (this.pasoActual / this.totalPasos) * 100;
+  }
+
+  formatearClabe(clabe: string): string {
+    if (!clabe) return '';
+    // Formato: XXX XXX XXXX XXXX XXXX
+    return clabe.replace(/(\d{3})(\d{3})(\d{4})(\d{4})(\d{4})/, '$1 $2 $3 $4 $5');
+  }
+
+  formatearTelefono(telefono: string): string {
+    if (!telefono) return '';
+    // Remover caracteres no numéricos
+    const numeros = telefono.replace(/\D/g, '');
+    // Formato: XXX XXX XXXX
+    if (numeros.length === 10) {
+      return numeros.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+    }
+    return telefono;
   }
 }

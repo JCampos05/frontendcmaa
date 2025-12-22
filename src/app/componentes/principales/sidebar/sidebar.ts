@@ -135,6 +135,11 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     if (this.esMobile) this.cerrarSidebarMovil();
   }
 
+  cargarSistemasPago(): void {
+    this.router.navigate(['/main-view/sistemas-pago']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
   verResultadosTorneos(): void {
     this.router.navigate(['/main-view/resultado-todos-torneos']);
     if (this.esMobile) this.cerrarSidebarMovil();
@@ -260,6 +265,10 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if (ruta === '/main-view/configuracion-torneos') {
+      return this.rutaActual === ruta;
+    }
+
+    if (ruta === '/main-view/sistemas-pago') {
       return this.rutaActual === ruta;
     }
 

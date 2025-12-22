@@ -23,7 +23,8 @@
                 </div>
 
                 <!-- Submenu de Torneo Actual -->
-                <div class="submenu" *ngIf="!isCollapsed || esMobile" [class.submenu-visible]="submenuTorneoActualExpandido">
+                <div class="submenu" *ngIf="!isCollapsed || esMobile"
+                    [class.submenu-visible]="submenuTorneoActualExpandido">
                     <div class="nav-item submenu-item" (click)="cargarInscripcionesTorneo()"
                         [class.active]="esRutaActiva('/main-view/inscripciones-torneo')">
                         <div class="nav-item-content">
@@ -67,7 +68,8 @@
                 </div>
 
                 <!-- Submenu de Inscripciones -->
-                <div class="submenu" *ngIf="!isCollapsed || esMobile" [class.submenu-visible]="submenuInscripcionesExpandido">
+                <div class="submenu" *ngIf="!isCollapsed || esMobile"
+                    [class.submenu-visible]="submenuInscripcionesExpandido">
                     <div class="nav-item submenu-item" (click)="cargarJugadoresPorTorneo()"
                         [class.active]="esRutaActiva('/main-view/jugadores-torneo')">
                         <div class="nav-item-content">
@@ -141,6 +143,13 @@
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Config. Torneos</span>
                     </div>
                 </div>
+                <div class="nav-item" (click)="cargarSistemasPago()"
+                    [class.active]="esRutaActiva('/main-view/sistemas-pago')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-credit-card nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Sistemas de Pago</span>
+                    </div>
+                </div>
             </div>
 
             <!-- GESTIÓN JUGADORES -->
@@ -148,7 +157,7 @@
                 <div class="section-title" *ngIf="!isCollapsed || esMobile">GESTIÓN JUGADORES</div>
                 <div class="section-divider" *ngIf="isCollapsed && !esMobile"></div>
 
-                <div class="nav-item" (click)="cargarGestionJugadores()" 
+                <div class="nav-item" (click)="cargarGestionJugadores()"
                     [class.active]="esRutaActiva('/main-view/gestion-jugadores')">
                     <div class="nav-item-content">
                         <i class="fa-solid fa-user-gear nav-icon"></i>
@@ -185,7 +194,7 @@
     <div class="sidebar-footer" *ngIf="!isCollapsed || esMobile">
         <div class="footer-content">
             <i class="fa-solid fa-chess-knight"></i>
-            <span>v1.2.3</span>
+            <span>v1.3.0</span>
         </div>
     </div>
 </aside>

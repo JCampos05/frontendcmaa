@@ -1,4 +1,4 @@
-const production = true; // Cambia esto a true para usar la URL de producción
+const production = false; // Cambia esto a true para usar la URL de producción
 
 export const environment = {
     production: production,

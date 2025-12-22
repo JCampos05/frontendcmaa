@@ -16,3 +16,4 @@ export * from './ronda';
 export * from './historial-acceso';
 export * from './log-sistema';
 export * from './sesion-activa';
+export * from './sistema-pago';

@@ -281,28 +281,28 @@
                             <i class="fas fa-user"></i>
                             <div>
                                 <span class="dato-label">Titular de la cuenta:</span>
-                                <span class="dato-value">Rayda Elisa Leal Ruiz</span>
+                                <span class="dato-value">{{ sistemaPago?.nombreCuenta || 'No disponible' }}</span>
                             </div>
                         </div>
                         <div class="dato-bancario">
                             <i class="fas fa-building"></i>
                             <div>
                                 <span class="dato-label">Banco:</span>
-                                <span class="dato-value">BBVA</span>
+                                <span class="dato-value">{{ sistemaPago?.banco || 'No disponible' }}</span>
                             </div>
                         </div>
                         <div class="dato-bancario">
                             <i class="fas fa-credit-card"></i>
                             <div>
                                 <span class="dato-label">Cuenta:</span>
-                                <span class="dato-value clabe">1538534514</span>
+                                <span class="dato-value clabe">{{ sistemaPago?.numeroCuenta || 'No disponible' }}</span>
                             </div>
                         </div>
                         <div class="dato-bancario">
                             <i class="fas fa-credit-card"></i>
                             <div>
                                 <span class="dato-label">CLABE:</span>
-                                <span class="dato-value clabe">012 180 0153 8534 5147</span>
+                                <span class="dato-value clabe">{{ formatearClabe(sistemaPago?.clabe) || 'No disponible' }}</span>
                             </div>
                         </div>
                     </div>
@@ -319,7 +319,13 @@
                         <p>Una vez realizada la transferencia, envíe su comprobante de pago por WhatsApp al número:</p>
                         <div class="numero-whatsapp">
                             <i class="fab fa-whatsapp"></i>
-                            <a href="https://wa.me/526682297372" target="_blank">+52 668 229 7372</a>
+                            <a [href]="'https://wa.me/52' + sistemaPago.telefono.replace(/\D/g, '')" target="_blank">
+                                +52 {{ formatearTelefono(sistemaPago.telefono) }}
+                            </a>
+                        </div>
+                        <div class="numero-whatsapp" *ngIf="!sistemaPago?.telefono">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>No disponible</span>
                         </div>
                         <!--p class="comprobante-nota">Incluya su nombre completo y el torneo al que se inscribió.</!--p-->
                     </div>

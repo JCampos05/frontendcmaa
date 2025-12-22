@@ -103,6 +103,63 @@
                 </div>
             </div>
 
+            <!-- Sistema de Pago -->
+            <div class="detalle-section" [class.collapsed]="!seccionesExpandidas.sistemaPago" *ngIf="sistemaPago">
+                <div class="section-header clickable" (click)="toggleSeccion('sistemaPago')">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <h2>Sistema de Pago</h2>
+                    <button type="button" class="btn-toggle">
+                        <i class="fa-solid" 
+                           [class.fa-chevron-up]="seccionesExpandidas.sistemaPago"
+                           [class.fa-chevron-down]="!seccionesExpandidas.sistemaPago"></i>
+                    </button>
+                </div>
+
+                <div class="section-content" *ngIf="seccionesExpandidas.sistemaPago">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-building-columns"></i>
+                                Banco
+                            </span>
+                            <span class="info-value">{{ sistemaPago.banco }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-user"></i>
+                                Titular de la Cuenta
+                            </span>
+                            <span class="info-value">{{ sistemaPago.nombreCuenta }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-hashtag"></i>
+                                Número de Cuenta
+                            </span>
+                            <span class="info-value">{{ sistemaPago.numeroCuenta }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-barcode"></i>
+                                CLABE Interbancaria
+                            </span>
+                            <span class="info-value clabe-format">{{ formatearClabe(sistemaPago.clabe) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fa-solid fa-phone"></i>
+                                Teléfono de Contacto
+                            </span>
+                            <span class="info-value">{{ formatearTelefono(sistemaPago.telefono) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Categorias del Torneo -->
             <div class="detalle-section" [class.collapsed]="!seccionesExpandidas.categoriasTorneo"
                 *ngIf="torneoCategorias.length > 0">
@@ -178,9 +235,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Calendario de Rondas -->
-                                <!-- Reemplazar la sección de Calendario de Rondas en torneo-detalles.html -->
 
                                 <!-- Calendario de Rondas -->
                                 <div class="config-subsection" *ngIf="tc.calendario && tc.calendario.length > 0">
