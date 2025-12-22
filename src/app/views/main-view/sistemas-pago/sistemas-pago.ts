@@ -160,7 +160,8 @@ export class SistemasPagoComponent implements OnInit {
 
   formatearClabe(clabe: string): string {
     if (!clabe) return '';
-    return clabe.replace(/(\d{3})(\d{3})(\d{11})(\d{1})/, '$1 $2 $3 $4');
+    // Formato: XXX XXX XXXX XXXX XXXX
+    return clabe.replace(/(\d{3})(\d{3})(\d{4})(\d{4})(\d{4})/, '$1 $2 $3 $4 $5');
   }
 
   formatearTelefono(telefono: string): string {
