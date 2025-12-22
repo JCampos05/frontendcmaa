@@ -24,7 +24,7 @@ export class LoginComponent {
   ) {
     // Si ya está autenticado, redirigir al dashboard
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['./main-view']);
+      this.router.navigate(['./main-view/torneo-actual']);
     }
   }
 
@@ -44,7 +44,7 @@ export class LoginComponent {
     this.authService.login(this.telefono, this.password).subscribe({
       next: (response) => {
         this.loading = false;
-        this.router.navigate(['/main-view']);
+        this.router.navigate(['/main-view/torneo-actual']);
       },
       error: (error) => {
         this.loading = false;
