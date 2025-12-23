@@ -96,7 +96,7 @@ export class JugadoresTorneoComponent implements OnInit {
     if (this.torneoSeleccionado?.idTorneo) {
       this.categoriaSeleccionada = null;
       this.cargarInscripciones(this.torneoSeleccionado.idTorneo);
-      this.toast.success('Torneo encontrado','Torneo seleccionado y cargado correctamente');
+      this.toast.success('Torneo encontrado', 'Torneo seleccionado y cargado correctamente');
     }
   }
 
@@ -104,13 +104,63 @@ export class JugadoresTorneoComponent implements OnInit {
     if (!torneo || !torneo.fecha) return false;
 
     const fechaTorneo = new Date(torneo.fecha);
+    fechaTorneo.setHours(0, 0, 0, 0);
+
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
     const diferenciaDias = Math.floor((fechaTorneo.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
 
-    // Es actual si está entre -3 días (pasó hace 3 días) y +7 días (es en 7 días)
-    return diferenciaDias >= -3 && diferenciaDias <= 7;
+    // Filtrar torneos en el rango válido (-3 a +7 días)
+    const torneosEnRango = this.torneos.filter(t => {
+      if (!t || !t.fecha) return false;
+      const ft = new Date(t.fecha);
+      ft.setHours(0, 0, 0, 0);
+      const diff = Math.floor((ft.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+      return diff >= -3 && diff <= 7;
+    });
+
+    if (torneosEnRango.length === 0) return false;
+
+    // Buscar el torneo HOY
+    const torneoHoy = torneosEnRango.find(t => {
+      const ft = new Date(t.fecha);
+      ft.setHours(0, 0, 0, 0);
+      return ft.getTime() === hoy.getTime();
+    });
+
+    if (torneoHoy) {
+      return torneo.idTorneo === torneoHoy.idTorneo;
+    }
+
+    // Buscar torneos futuros (dentro de los próximos 7 días)
+    const torneosFuturos = torneosEnRango
+      .filter(t => {
+        const ft = new Date(t.fecha);
+        ft.setHours(0, 0, 0, 0);
+        return ft.getTime() > hoy.getTime();
+      })
+      .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+
+    if (torneosFuturos.length > 0) {
+      // El más cercano en el futuro es el actual
+      return torneo.idTorneo === torneosFuturos[0].idTorneo;
+    }
+
+    // Si no hay torneos futuros, buscar el más reciente del pasado (últimos 3 días)
+    const torneosPasados = torneosEnRango
+      .filter(t => {
+        const ft = new Date(t.fecha);
+        ft.setHours(0, 0, 0, 0);
+        return ft.getTime() < hoy.getTime();
+      })
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+
+    if (torneosPasados.length > 0) {
+      return torneo.idTorneo === torneosPasados[0].idTorneo;
+    }
+
+    return false;
   }
 
   cargarInscripciones(idTorneo: number): void {

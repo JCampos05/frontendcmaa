@@ -75,10 +75,18 @@
                     <i class="fa-solid fa-users"></i>
                     <h2>Jugadores Inscritos</h2>
                 </div>
-                <button class="btn-export-excel" (click)="exportarExcel()">
-                    <i class="fa-solid fa-file-excel"></i>
-                    Exportar Listas
-                </button>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn-export-excel" (click)="exportarExcel()" style="background: #059669;">
+                        <i class="fa-solid fa-file-excel"></i>
+                        Exportar Listas
+                    </button>
+                    <button class="btn-export-excel"
+                        (click)="mostrarDetalleCoincidencias = !mostrarDetalleCoincidencias" *ngIf="archivoSeleccionado"
+                        style="background: #6366F1;">
+                        <i class="fa-solid" [ngClass]="mostrarDetalleCoincidencias ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        {{ mostrarDetalleCoincidencias ? 'Ocultar Detalle' : 'Ver Detalle' }}
+                    </button>
+                </div>
             </div>
 
             <div class="categorias-tabs">
@@ -106,6 +114,8 @@
                             <th class="col-telefono">Teléfono</th>
                             <th class="col-categoria" *ngIf="categoriaSeleccionada === null">Categoría</th>
                             <th class="col-rating">Rating</th>
+                            <th class="col-nombre" *ngIf="mostrarDetalleCoincidencias && archivoSeleccionado">Detalle
+                                FENAMAC</th>
                             <th class="col-estado">Estado</th>
                         </tr>
                     </thead>
@@ -132,6 +142,26 @@
                                         *ngIf="jugador.rating !== jugador.ratingAnterior && archivoSeleccionado">
                                         <i class="fa-solid fa-arrow-right"></i>
                                         {{ jugador.ratingAnterior }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="col-nombre" *ngIf="mostrarDetalleCoincidencias && archivoSeleccionado">
+                                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                    <span *ngIf="jugador.encontrado"
+                                        style="color: #059669; font-size: 0.8125rem; font-weight: 500;">
+                                        {{ jugador.nombreEncontradoFEN }}
+                                    </span>
+                                    <span *ngIf="!jugador.encontrado"
+                                        style="color: #DC2626; font-size: 0.8125rem; font-weight: 500;">
+                                        No encontrado en FENAMAC
+                                    </span>
+                                    <span *ngIf="jugador.encontrado && jugador.scoreCoincidencia"
+                                        class="categoria-badge"
+                                        [style.background]="jugador.scoreCoincidencia >= 85 ? '#D1FAE5' : '#FEF3C7'"
+                                        [style.color]="jugador.scoreCoincidencia >= 85 ? '#065F46' : '#92400E'">
+                                        <i class="fa-solid fa-circle-check"
+                                            style="font-size: 0.65rem; margin-right: 0.25rem;"></i>
+                                        Encontrado - {{ jugador.scoreCoincidencia }}% coincidencia
                                     </span>
                                 </div>
                             </td>
@@ -192,17 +222,11 @@
             </div>
         </div>
     </div>
-        <app-modal-confirmacion
-        [mostrar]="mostrarModalConfirmacion"
-        titulo="Confirmar actualización"
+    <app-modal-confirmacion [mostrar]="mostrarModalConfirmacion" titulo="Confirmar actualización"
         mensaje="¿Estás seguro de actualizar los ratings de TODOS los jugadores inscritos?"
         mensajeSecundario="Esta acción actualizará los ratings de todos los jugadores con la información del archivo FENAMAC cargado."
-        textoConfirmar="Actualizar"
-        textoCancelar="Cancelar"
-        icono="fa-triangle-exclamation"
-        iconoBotonPrimario="fa-sync-alt"
-        tipoBotonPrimario="primary"
-        (confirmar)="confirmarActualizacion()"
+        textoConfirmar="Actualizar" textoCancelar="Cancelar" icono="fa-triangle-exclamation"
+        iconoBotonPrimario="fa-sync-alt" tipoBotonPrimario="primary" (confirmar)="confirmarActualizacion()"
         (cancelar)="cancelarActualizacion()">
     </app-modal-confirmacion>
 </div>

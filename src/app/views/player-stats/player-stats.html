@@ -1,7 +1,34 @@
 <div class="player-stats-container">
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <i class="fa-solid fa-chess-knight logo-icon"></i>
+                <h1 class="logo-text">Comité Municipal de Ajedrez Ahome</h1>
+            </div>
+            <nav class="nav-menu">
+                <a routerLink="/" class="nav-link">Inicio</a>
+                <a routerLink="/players-stats" class="nav-link active">Jugadores</a>
+                <a routerLink="/jugador-resultado" class="nav-link">Resultados</a>
+                <a routerLink="/login" class="btn-login">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Iniciar Sesión
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-content">
+            
+            <h2 class="hero-title">Estadísticas de Jugadores</h2>
+            <p class="hero-subtitle">Consulta tu historial y estadísticas en torneos</p>
+        </div>
+        <div class="chess-board-bg"></div>
+    </section>
 
     <!-- HEADER ESTILO CONFIGURACIÓN -->
-    <div class="page-header">
+    <!--div class="page-header">
         <div class="header-icon">
             <i class="fa-solid fa-chart-line"></i>
         </div>
@@ -9,7 +36,7 @@
             <h1 class="page-title">Estadísticas de Jugadores</h1>
             <p class="page-subtitle">Consulta tu historial y estadísticas en torneos</p>
         </div>
-    </div>
+    </!--div-->
 
     <!-- FORMULARIO DE BÚSQUEDA -->
     <div class="search-section" *ngIf="!jugadorSeleccionado">
@@ -22,10 +49,10 @@
                     </h3>
                     <p class="search-description">Introduce tu nombre y apellidos para ver tus estadísticas</p>
                 </div>
-                <button class="btn-regresar" routerLink="./landing-page">
+                <!--button class="btn-regresar" routerLink="./landing-page">
                     <i class="fa-solid fa-arrow-left"></i>
                     Regresar
-                </button>
+                </!--button-->
             </div>
 
             <form class="search-form" (ngSubmit)="buscarJugadores()">

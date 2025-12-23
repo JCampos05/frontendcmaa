@@ -7,6 +7,7 @@ export const routes: Routes = [
     {path: 'login', loadComponent: () => import('./authentication/login/login').then(m => m.LoginComponent)},
     {path: 'inscripcion/:id' , loadComponent: () => import('./views/main-view/inscripcion/inscripcion').then(m => m.InscripcionComponent)},
     {path: 'players-stats' , loadComponent: () => import('./views/player-stats/player-stats').then(m => m.PlayerStatsComponent)},
+    {path: 'jugador-resultado' , loadComponent: () => import('./views/jugador-resultado/jugador-resultado').then(m => m.JugadorResultadoComponent)},
     {path: 'main-view', loadComponent: () => import('./views/main-view/main-view').then(m => m.MainView),
     
         canActivate: [authGuard],
@@ -26,6 +27,7 @@ export const routes: Routes = [
             {path: 'nuevo-torneo', loadComponent: () => import('./views/main-view/nuevo-torneo/nuevo-torneo').then(m => m.NuevoTorneoComponent)},
             {path: 'configuracion-torneos', loadComponent: () => import('./views/main-view/configuracion-torneos/configuracion-torneos').then(m => m.ConfiguracionTorneosComponent)},
             {path: 'resultado-todos-torneos' , loadComponent: () => import('./views/main-view/resultado-todos-torneos/resultado-todos-torneos').then(m => m.ResultadosTodoTorneosComponent)},
+            {path: 'visualizacion-mesas' , loadComponent: () => import('./views/main-view/visualizacion-mesas/visualizacion-mesas').then(m => m.VisualizacionMesasComponent)},
             {path: 'torneos', loadComponent: () => import('./views/main-view/torneos/torneos').then(m => m.TorneosComponent)},
             {path: 'editar-torneo/:id', loadComponent: () => import('./views/main-view/editar-torneo/editar-torneo').then(m => m.EditarTorneoComponent)},
             {path: 'detalle-torneo/:id', loadComponent: () => import('./views/main-view/torneo-detalles/torneo-detalles').then(m => m.TorneoDetalleComponent)},

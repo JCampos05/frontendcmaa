@@ -129,7 +129,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
   }
 
   cargarRondas(idTorneo: number, idTorneoCat: number): void {
-    this.rondaService.getRondasByTorneo(idTorneo).subscribe({
+    this.rondaService.getRondasByTorneoCategoria(idTorneo, idTorneoCat).subscribe({
       next: (response) => {
         const rondasArray = Array.isArray(response) ? response : [];
         this.rondasDisponibles = rondasArray.sort((a, b) => a.numeroRonda - b.numeroRonda);
@@ -325,12 +325,12 @@ export class ResultadosTodoTorneosComponent implements OnInit {
 
     try {
       const logoBase64 = await this.cargarImagenComoBase64('/LogoComite.jpg');
-      
+
       // Crear versión con opacidad moderada para marca de agua
       const logoMarcaAgua = await this.aplicarOpacidad(logoBase64, 0.08);
 
       // NO agregar marca de agua aquí - se agregará con didDrawPage
-      
+
       // Agregar logo en el encabezado (lado izquierdo) - sin opacidad
       doc.addImage(logoBase64, 'JPEG', 14, 10, 25, 25);
 
@@ -341,7 +341,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
 
       doc.setFontSize(12);
       doc.setTextColor(133, 77, 46);
-      
+
       const categoria = this.categorias.find(c => c.idTorneoCat === Number(this.categoriaSeleccionada));
       const nomCat = categoria?.categoria?.nombre || 'Sin categoría';
       const textoRonda = this.rondaSeleccionada === 0 ? 'Lista Inicial' : `Ronda ${this.rondaSeleccionada}`;
@@ -365,7 +365,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
         head: [['Pos', 'Jugador', 'Rating', 'Pts', 'PJ', 'V', 'E', 'D']],
         body: data,
         theme: 'striped',
-        styles: { 
+        styles: {
           fontSize: 10,
           textColor: [17, 34, 57]
         },
@@ -384,7 +384,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
           const logoSize = 120;
           const xCenter = (pageWidth - logoSize) / 2;
           const yCenter = (pageHeight - logoSize) / 2 + 10;
-          
+
           doc.addImage(logoMarcaAgua, 'PNG', xCenter, yCenter, logoSize, logoSize);
         }
       });
@@ -392,7 +392,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
       // Guardar PDF
       const nombreCategoria = categoria?.categoria?.nombre || 'sin_categoria';
       doc.save(`resultados_${nombreCategoria}_ronda${this.rondaSeleccionada}.pdf`);
-      this.toast.success('PDF generado','Archivo PDF creado exitosamente');
+      this.toast.success('PDF generado', 'Archivo PDF creado exitosamente');
     } catch (error) {
       //console.error('Error al generar PDF:', error);
       this.toast.warning('Error al generar archivo PDF; creando PDF de respaldo');
@@ -403,13 +403,13 @@ export class ResultadosTodoTorneosComponent implements OnInit {
   private aplicarOpacidad(imagenBase64: string, opacidad: number): Promise<string> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      
+
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
-        
+
         if (ctx) {
           // Limpiar canvas para mantener transparencia
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -421,11 +421,11 @@ export class ResultadosTodoTorneosComponent implements OnInit {
           reject(new Error('No se pudo crear el contexto del canvas'));
         }
       };
-      
+
       img.onerror = () => {
         reject(new Error('Error al aplicar opacidad'));
       };
-      
+
       img.src = imagenBase64;
     });
   }
@@ -434,14 +434,14 @@ export class ResultadosTodoTorneosComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'Anonymous';
-      
+
       img.onload = () => {
         try {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
           const ctx = canvas.getContext('2d');
-          
+
           if (ctx) {
             ctx.drawImage(img, 0, 0);
             const dataURL = canvas.toDataURL('image/jpeg');
@@ -453,11 +453,11 @@ export class ResultadosTodoTorneosComponent implements OnInit {
           reject(error);
         }
       };
-      
+
       img.onerror = (error) => {
         reject(new Error(`Error al cargar la imagen desde ${url}`));
       };
-      
+
       img.src = url + '?t=' + new Date().getTime();
     });
   }
@@ -493,7 +493,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
       head: [['Pos', 'Jugador', 'Rating', 'Pts', 'PJ', 'V', 'E', 'D']],
       body: data,
       theme: 'striped',
-      styles: { 
+      styles: {
         fontSize: 10,
         textColor: [17, 34, 57]
       },
@@ -509,7 +509,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
 
     const nombreCategoria = categoria?.categoria?.nombre || 'sin_categoria';
     doc.save(`resultados_${nombreCategoria}_ronda${this.rondaSeleccionada}.pdf`);
-    this.toast.success('PDF generado','PDF de respaldo creado exitosamente');
+    this.toast.success('PDF generado', 'PDF de respaldo creado exitosamente');
   }
 
   exportarExcel(): void {
@@ -533,7 +533,7 @@ export class ResultadosTodoTorneosComponent implements OnInit {
     XLSX.utils.book_append_sheet(wb, ws, 'Resultados');
 
     XLSX.writeFile(wb, `resultados_${categoria?.categoria?.nombre}_ronda${this.rondaSeleccionada}.xlsx`);
-    this.toast.success('Excel generado','Archivo Excel creado exitosamente');
+    this.toast.success('Excel generado', 'Archivo Excel creado exitosamente');
   }
 
   formatearFecha(fecha: Date | string | undefined): string {

@@ -34,7 +34,6 @@
                 class="form-control-torneo">
                 <option *ngFor="let torneo of torneos" [ngValue]="torneo">
                     {{ torneo.nombre }} - {{ formatearFecha(torneo.fecha) }}
-                    <span *ngIf="esTorneoActual(torneo)">(Actual)</span>
                 </option>
             </select>
         </div>

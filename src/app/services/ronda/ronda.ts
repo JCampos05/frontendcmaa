@@ -11,7 +11,7 @@ import { Ronda, CreateRondaDto, UpdateRondaDto } from '../../models/ronda';
 export class RondaService {
   private apiUrl = `${environment.apiUrl}/rondas`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -36,8 +36,8 @@ export class RondaService {
   }
 
   getRondasByTorneo(idTorneo: number): Observable<Ronda[]> {
-    return this.http.get<any>(`${this.apiUrl}/torneo/${idTorneo}`, { 
-      headers: this.getHeaders() 
+    return this.http.get<any>(`${this.apiUrl}/torneo/${idTorneo}`, {
+      headers: this.getHeaders()
     }).pipe(
       map(response => {
         // Normalizar la respuesta para siempre devolver un array
@@ -53,9 +53,26 @@ export class RondaService {
     );
   }
 
+  getRondasByTorneoCategoria(idTorneo: number, idTorneoCategoria: number): Observable<Ronda[]> {
+    return this.http.get<any>(`${this.apiUrl}/torneo/${idTorneo}/categoria/${idTorneoCategoria}`, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        if (response.data) return response.data;
+        if (response.rondas) return response.rondas;
+        if (Array.isArray(response)) return response;
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error en getRondasByTorneoCategoria:', error);
+        return of([]);
+      })
+    );
+  }
+
   getRondaById(id: number): Observable<Ronda | null> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`, { 
-      headers: this.getHeaders() 
+    return this.http.get<any>(`${this.apiUrl}/${id}`, {
+      headers: this.getHeaders()
     }).pipe(
       map(response => {
         if (response.data) return response.data;
@@ -70,8 +87,8 @@ export class RondaService {
   }
 
   createRonda(ronda: CreateRondaDto): Observable<Ronda | null> {
-    return this.http.post<any>(this.apiUrl, ronda, { 
-      headers: this.getHeaders() 
+    return this.http.post<any>(this.apiUrl, ronda, {
+      headers: this.getHeaders()
     }).pipe(
       map(response => {
         if (response.data) return response.data;
@@ -86,8 +103,8 @@ export class RondaService {
   }
 
   updateRonda(id: number, ronda: UpdateRondaDto): Observable<Ronda | null> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, ronda, { 
-      headers: this.getHeaders() 
+    return this.http.put<any>(`${this.apiUrl}/${id}`, ronda, {
+      headers: this.getHeaders()
     }).pipe(
       map(response => {
         if (response.data) return response.data;
@@ -102,8 +119,8 @@ export class RondaService {
   }
 
   deleteRonda(id: number): Observable<boolean> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`, { 
-      headers: this.getHeaders() 
+    return this.http.delete<any>(`${this.apiUrl}/${id}`, {
+      headers: this.getHeaders()
     }).pipe(
       map(response => response.success || true),
       catchError(error => {

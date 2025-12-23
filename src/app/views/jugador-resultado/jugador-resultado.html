@@ -1,0 +1,378 @@
+<div class="resultado-container">
+    <!-- HEADER - Igual que Landing Page -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <i class="fa-solid fa-chess-knight logo-icon"></i>
+                <h1 class="logo-text">Comité Municipal de Ajedrez Ahome</h1>
+            </div>
+            <nav class="nav-menu">
+                <a routerLink="/" class="nav-link">Inicio</a>
+                <a routerLink="/players-stats" class="nav-link">Jugadores</a>
+                <a routerLink="/jugador-resultado" class="nav-link active">Resultados</a>
+                <a routerLink="/login" class="btn-login">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Iniciar Sesión
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION con Buscador -->
+    <section class="hero-section">
+        <div class="hero-content-resultado">
+            <div class="hero-text">
+                <h2 class="hero-title">Resultados de Torneos</h2>
+                <p class="hero-subtitle">Consulta los pareos y resultados de todos los torneos</p>
+            </div>
+
+            <!-- Buscador de Jugador -->
+            <div class="search-player-section">
+                <div class="search-header">
+                    <i class="fa-solid fa-user-magnifying-glass"></i>
+                    <h3>Buscar mi nombre</h3>
+                </div>
+                <div class="search-input-group">
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            [(ngModel)]="nombreJugadorBusqueda"
+                            (keyup.enter)="buscarJugador()"
+                            placeholder="Ingresa tu nombre o apellido...">
+                    </div>
+                    <button class="btn-search" (click)="buscarJugador()">
+                        <i class="fa-solid fa-search"></i>
+                        <span class="btn-text">Buscar</span>
+                    </button>
+                    <button class="btn-clear" (click)="limpiarBusqueda()" *ngIf="nombreJugadorBusqueda">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Indicador de resultado de búsqueda -->
+                <div class="player-status found" *ngIf="jugadorEncontrado && nombreJugadorBusqueda">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Jugador encontrado en esta ronda</span>
+                </div>
+                <div class="player-status not-found" *ngIf="!jugadorEncontrado && nombreJugadorBusqueda && !cargandoMesas && mesasRonda.length > 0">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>El jugador no está participando en esta ronda</span>
+                </div>
+            </div>
+        </div>
+        <div class="chess-board-bg"></div>
+    </section>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content">
+        <!-- Loading Global -->
+        <div *ngIf="cargandoTorneos" class="loading-container">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Cargando torneos...</p>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="error && !cargandoTorneos" class="error-container">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <p>{{ error }}</p>
+            <button class="btn-retry" (click)="reintentar()">
+                <i class="fa-solid fa-rotate-right"></i>
+                Reintentar
+            </button>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div *ngIf="!cargandoTorneos && !error" class="content-wrapper">
+
+            <!-- Selectores -->
+            <div class="selectores-section">
+                <!-- Selector de Torneo -->
+                <div class="selector-group">
+                    <label>
+                        <i class="fa-solid fa-trophy"></i>
+                        Torneo
+                    </label>
+                    <select [(ngModel)]="torneoSeleccionado" (ngModelChange)="onTorneoChange()" class="form-control">
+                        <option [ngValue]="null">Seleccionar torneo</option>
+                        <option *ngFor="let torneo of torneos" [ngValue]="torneo">
+                            {{ torneo.nombre || torneo.lugar }} - {{ formatearFecha(torneo.fecha) }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Selector de Categoría -->
+                <div class="selector-group">
+                    <label>
+                        <i class="fa-solid fa-layer-group"></i>
+                        Categoría
+                    </label>
+                    <select 
+                        [(ngModel)]="categoriaSeleccionada" 
+                        (ngModelChange)="onCategoriaChange()" 
+                        class="form-control"
+                        [disabled]="!torneoSeleccionado || cargandoCategorias || categorias.length === 0">
+                        <option [ngValue]="null">Seleccionar categoría</option>
+                        <option *ngFor="let cat of categorias" [ngValue]="cat">
+                            {{ cat.categoria?.nombre }} ({{ cat.rondas }} rondas)
+                        </option>
+                    </select>
+                    <span *ngIf="cargandoCategorias" class="loading-mini">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                    </span>
+                </div>
+
+                <!-- Selector de Ronda -->
+                <div class="selector-group">
+                    <label>
+                        <i class="fa-solid fa-list-ol"></i>
+                        Ronda
+                    </label>
+                    <select 
+                        [(ngModel)]="rondaSeleccionada" 
+                        (ngModelChange)="onRondaChange()" 
+                        class="form-control"
+                        [disabled]="!categoriaSeleccionada || cargandoRondas || rondasDisponibles.length === 0">
+                        <option [ngValue]="null">Seleccionar ronda</option>
+                        <option *ngFor="let ronda of rondasDisponibles" [ngValue]="ronda.numeroRonda">
+                            Ronda {{ ronda.numeroRonda }}
+                            <span *ngIf="ronda.estado === 'finalizada'"> - Finalizada</span>
+                            <span *ngIf="ronda.estado === 'en_curso'"> - En curso</span>
+                            <span *ngIf="ronda.estado === 'pendiente'"> - Pendiente</span>
+                        </option>
+                    </select>
+                    <span *ngIf="cargandoRondas" class="loading-mini">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Información del Torneo Seleccionado -->
+            <div class="torneo-info" *ngIf="torneoSeleccionado">
+                <div class="info-card-main">
+                    <div class="info-header-main">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <h3>Información del Torneo</h3>
+                    </div>
+                    <div class="info-body-main">
+                        <div class="info-item-main">
+                            <span class="info-label-main">Nombre:</span>
+                            <span class="info-value-main">{{ torneoSeleccionado.nombre || 'Sin nombre' }}</span>
+                        </div>
+                        <div class="info-item-main">
+                            <span class="info-label-main">Lugar:</span>
+                            <span class="info-value-main">{{ torneoSeleccionado.lugar }}</span>
+                        </div>
+                        <div class="info-item-main">
+                            <span class="info-label-main">Fecha:</span>
+                            <span class="info-value-main">{{ formatearFecha(torneoSeleccionado.fecha) }}</span>
+                        </div>
+                        <div class="info-item-main">
+                            <span class="info-label-main">Hora:</span>
+                            <span class="info-value-main">{{ torneoSeleccionado.hora }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info de la Ronda Actual -->
+            <div class="ronda-info" *ngIf="rondaActualData && categoriaSeleccionada">
+                <div class="info-card">
+                    <div class="info-header">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <h3>Estado de la Ronda {{ rondaSeleccionada }}</h3>
+                    </div>
+                    <div class="info-body">
+                        <div class="info-item">
+                            <span class="info-label">Estado:</span>
+                            <span class="status-badge" [ngClass]="getEstadoRondaClase(rondaActualData.estado)">
+                                <i class="fa-solid fa-circle"></i>
+                                {{ rondaActualData.estado | uppercase }}
+                            </span>
+                        </div>
+                        <div class="info-item" *ngIf="rondaActualData.fecha_inicio">
+                            <span class="info-label">Inicio:</span>
+                            <span>{{ formatearFechaHora(rondaActualData.fecha_inicio) }}</span>
+                        </div>
+                        <div class="info-item" *ngIf="rondaActualData.fecha_fin">
+                            <span class="info-label">Fin:</span>
+                            <span>{{ formatearFechaHora(rondaActualData.fecha_fin) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Mesas:</span>
+                            <span>{{ mesasRonda.length }} totales</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Finalizadas:</span>
+                            <span>{{ getMesasFinalizadas() }} / {{ mesasRonda.length }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Mesas -->
+            <div *ngIf="cargandoMesas" class="loading-mesas">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Cargando mesas...</p>
+            </div>
+
+            <!-- Grid de Mesas -->
+            <div class="mesas-section" *ngIf="!cargandoMesas && mesasRonda.length > 0">
+                <div class="section-header">
+                    <i class="fa-solid fa-chess-board"></i>
+                    <h2>Mesas de la Ronda</h2>
+                    <span class="badge">{{ mesasRonda.length }} mesas</span>
+                </div>
+
+                <div class="mesas-grid">
+                    <div *ngFor="let mesa of mesasRonda" 
+                         [id]="'mesa-' + mesa.idMesa"
+                         class="mesa-card" 
+                         [ngClass]="{
+                             'highlighted': mesaJugadorId === mesa.idMesa,
+                             'mesa-pendiente': mesa.estado === 'pendiente',
+                             'mesa-en_curso': mesa.estado === 'en_curso',
+                             'mesa-finalizada': mesa.estado === 'finalizada'
+                         }">
+
+                        <div class="mesa-header">
+                            <div class="mesa-numero">
+                                <i class="fa-solid fa-chess-board"></i>
+                                <span>Mesa {{ mesa.numeroMesa }}</span>
+                            </div>
+                            <span class="mesa-status" [ngClass]="getMesaEstadoClase(mesa.estado)">
+                                <i class="fa-solid fa-circle"></i>
+                            </span>
+                        </div>
+
+                        <div class="mesa-jugadores">
+                            <!-- Jugador Blanco -->
+                            <div class="jugador-item jugador-blanco" 
+                                 [class.highlighted-player]="esJugadorBuscado(mesa.idJugadorBlanco)">
+                                <div class="jugador-color">
+                                    <i class="fa-solid fa-square"></i>
+                                </div>
+                                <div class="jugador-info">
+                                    <span class="jugador-nombre">
+                                        {{ mesa.jugador_blanco?.nombre }} {{ mesa.jugador_blanco?.apellido1 }}
+                                    </span>
+                                    <span class="jugador-rating" *ngIf="mesa.jugador_blanco?.rating">
+                                        <i class="fa-solid fa-star"></i>
+                                        {{ mesa.jugador_blanco?.rating }}
+                                    </span>
+                                </div>
+                                <div class="jugador-ilegales" *ngIf="mesa.ilegalesBlanco > 0">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    {{ mesa.ilegalesBlanco }}
+                                </div>
+                            </div>
+
+                            <div class="vs-separator">vs</div>
+
+                            <!-- Jugador Negro -->
+                            <div class="jugador-item jugador-negro"
+                                 [class.highlighted-player]="esJugadorBuscado(mesa.idJugadorNegro)">
+                                <div class="jugador-color">
+                                    <i class="fa-solid fa-square"></i>
+                                </div>
+                                <div class="jugador-info">
+                                    <span class="jugador-nombre">
+                                        {{ mesa.jugador_negro?.nombre }} {{ mesa.jugador_negro?.apellido1 }}
+                                    </span>
+                                    <span class="jugador-rating" *ngIf="mesa.jugador_negro?.rating">
+                                        <i class="fa-solid fa-star"></i>
+                                        {{ mesa.jugador_negro?.rating }}
+                                    </span>
+                                </div>
+                                <div class="jugador-ilegales" *ngIf="mesa.ilegalesNegro > 0">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    {{ mesa.ilegalesNegro }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resultado -->
+                        <div class="mesa-resultado" *ngIf="mesa.partida">
+                            <div class="resultado-badge">
+                                <i class="fa-solid fa-trophy"></i>
+                                {{ mesa.partida.resultado }}
+                            </div>
+                            <div class="resultado-tipo" *ngIf="mesa.partida.tipo_finalizacion">
+                                <i class="fa-solid fa-info-circle"></i>
+                                {{ getTipoFinalizacionTexto(mesa.partida.tipo_finalizacion) }}
+                            </div>
+                        </div>
+
+                        <!-- Estado pendiente -->
+                        <div class="mesa-pendiente-info" *ngIf="!mesa.partida && mesa.estado !== 'finalizada'">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>Partida {{ mesa.estado === 'en_curso' ? 'en curso' : 'pendiente' }}</span>
+                        </div>
+
+                        <!-- Notas -->
+                        <div class="mesa-notas" *ngIf="mesa.notas">
+                            <i class="fa-solid fa-note-sticky"></i>
+                            <span>{{ mesa.notas }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado vacío - No hay mesas -->
+            <div class="empty-state" *ngIf="!cargandoMesas && categoriaSeleccionada && rondaActualData && mesasRonda.length === 0">
+                <i class="fa-solid fa-chess-board"></i>
+                <h3>No hay mesas en esta ronda</h3>
+                <p>Esta ronda aún no tiene mesas configuradas</p>
+            </div>
+
+            <!-- Mensaje cuando no hay ronda seleccionada -->
+            <div class="empty-state" *ngIf="categoriaSeleccionada && !rondaActualData && !cargandoRondas">
+                <i class="fa-solid fa-circle-info"></i>
+                <h3>No hay rondas disponibles</h3>
+                <p>Esta categoría aún no tiene rondas creadas</p>
+            </div>
+
+            <!-- Mensaje cuando no hay categoría seleccionada -->
+            <div class="empty-state" *ngIf="torneoSeleccionado && !categoriaSeleccionada && categorias.length > 0 && !cargandoCategorias">
+                <i class="fa-solid fa-layer-group"></i>
+                <h3>Selecciona una categoría</h3>
+                <p>Elige una categoría del menú desplegable para ver sus rondas y mesas</p>
+            </div>
+
+            <!-- Mensaje cuando no hay torneo seleccionado -->
+            <div class="empty-state" *ngIf="!torneoSeleccionado && torneos.length > 0">
+                <i class="fa-solid fa-trophy"></i>
+                <h3>Selecciona un torneo</h3>
+                <p>Elige un torneo del menú desplegable para comenzar</p>
+            </div>
+
+            <!-- Mensaje cuando no hay torneos -->
+            <div class="empty-state" *ngIf="!torneoSeleccionado && torneos.length === 0">
+                <i class="fa-solid fa-inbox"></i>
+                <h3>No hay torneos disponibles</h3>
+                <p>Aún no se han registrado torneos en el sistema</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER - Igual que Landing Page -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fa-solid fa-chess-knight"></i>
+                <span>Comité Municipal de Ajedrez Ahome</span>
+            </div>
+            <p class="footer-text">Promoviendo el ajedrez en la región</p>
+            <div class="footer-social">
+                <a href="#" class="social-link"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+            </div>
+            <p class="footer-copyright">© 2024 Comité Municipal de Ajedrez Ahome. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</div>
+
+<!-- Toast de Notificaciones -->
+<app-toast-noti></app-toast-noti>

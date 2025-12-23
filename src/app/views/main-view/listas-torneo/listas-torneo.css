@@ -541,6 +541,44 @@
     color: #991B1B;
 }
 
+.detalle-coincidencia {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+}
+
+.detalle-nombre-fen {
+    color: #059669;
+    font-weight: 500;
+}
+
+.detalle-no-encontrado {
+    color: #DC2626;
+    font-weight: 500;
+}
+
+.badge-confianza {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.badge-confianza-alta {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-confianza-media {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
 .resumen-section {
     background: var(--color-white);
     padding: 1.5rem;
@@ -709,3 +747,6 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+

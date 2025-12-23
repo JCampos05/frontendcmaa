@@ -145,6 +145,11 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     if (this.esMobile) this.cerrarSidebarMovil();
   }
 
+  verResultadosMesas(): void {
+    this.router.navigate(['/main-view/visualizacion-mesas']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
   verDetalleTorneo(): void {
     const match = this.rutaActual.match(/\/(detalle-torneo|editar-torneo)\/(\d+)/);
     if (match) {
@@ -257,6 +262,10 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if (ruta === '/main-view/resultado-todos-torneos') {
+      return this.rutaActual === ruta;
+    }
+
+    if (ruta === '/main-view/visualizacion-mesas') {
       return this.rutaActual === ruta;
     }
 

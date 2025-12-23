@@ -129,6 +129,14 @@
                     </div>
                 </div>
 
+                <div class="nav-item" (click)="verResultadosMesas()"
+                    [class.active]="esRutaActiva('/main-view/visualizacion-mesas')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-table-cells nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Resultados mesas</span>
+                    </div>
+                </div>
+
                 <div class="nav-item" (click)="nuevoTorneo()" [class.active]="esRutaActiva('/main-view/nuevo-torneo')">
                     <div class="nav-item-content">
                         <i class="fa-solid fa-plus nav-icon"></i>
@@ -194,7 +202,7 @@
     <div class="sidebar-footer" *ngIf="!isCollapsed || esMobile">
         <div class="footer-content">
             <i class="fa-solid fa-chess-knight"></i>
-            <span>v1.3.1</span>
+            <span>v2.0.0</span>
         </div>
     </div>
 </aside>

@@ -11,7 +11,7 @@ import { Torneo } from '../../models/torneo';
 export class TorneoService {
   private apiUrl = `${environment.apiUrl}/torneos`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * GET /api/torneos/activos - Obtener torneos activos (público)
@@ -39,7 +39,7 @@ export class TorneoService {
   getCategoriasByTorneo(torneoId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${torneoId}/categorias`).pipe(
       map(response => {
-        
+
         // El backend devuelve { success: true, categorias: [...], total: N }
         // donde categorias viene de categorias_torneo con through attributes
         if (response.success && response.categorias) {
@@ -47,10 +47,10 @@ export class TorneoService {
             // El backend devuelve:
             // { idCategoria, nombre, costo, torneo_categoria: { rondas, ... } }
             // donde torneo_categoria son los datos de la tabla intermedia
-            
+
             // Extraer datos de la tabla intermedia (puede venir como torneo_categoria)
             const datosIntermedia = cat.torneo_categoria || cat.TorneoCategoria || {};
-            
+
             return {
               idTorneoCat: datosIntermedia.idTorneoCat || null,
               idTorneo: torneoId,
@@ -71,10 +71,10 @@ export class TorneoService {
               }
             };
           });
-          
+
           return { success: true, categorias: categoriasTransformadas };
         }
-        
+
         console.warn('No se encontraron categorías en la respuesta');
         return { success: true, categorias: [] };
       }),
@@ -92,17 +92,17 @@ export class TorneoService {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
       map(response => {
         const torneo = response.data || response;
-        
+
         // Convertir snake_case a camelCase para campos específicos
         if (torneo.cierre_inscripciones && !torneo.cierreInscripciones) {
           torneo.cierreInscripciones = torneo.cierre_inscripciones;
         }
-        
+
         // Normalizar el alias de categorías
         if (torneo.torneo_categorias && !torneo.torneoCategoria) {
           torneo.torneoCategoria = torneo.torneo_categorias;
         }
-        
+
         // Parsear campos JSON si vienen como strings
         if (torneo.torneoCategoria && Array.isArray(torneo.torneoCategoria)) {
           torneo.torneoCategoria = torneo.torneoCategoria.map((tc: any) => {
@@ -143,7 +143,7 @@ export class TorneoService {
             return tc;
           });
         }
-        
+
         return torneo;
       }),
       catchError(this.handleError)
@@ -204,9 +204,19 @@ export class TorneoService {
     );
   }
 
+  /**
+   * GET /api/torneos/todos - Obtener TODOS los torneos (público, incluye pasados)
+   */
+  getTodosPublico(): Observable<Torneo[]> {
+    return this.http.get<any>(`${this.apiUrl}/todos`).pipe(
+      map(response => response.data || response || []),
+      catchError(this.handleError)
+    );
+  }
+
   private handleError(error: any): Observable<never> {
     let errorMessage = 'Ha ocurrido un error desconocido';
-    
+
     if (error.error instanceof ErrorEvent) {
       errorMessage = `Error: ${error.error.message}`;
     } else {
@@ -222,7 +232,7 @@ export class TorneoService {
         errorMessage = error.error?.message || `Error ${error.status}: ${error.statusText}`;
       }
     }
-    
+
     console.error('Error en TorneoService:', error);
     return throwError(() => ({ error: { message: errorMessage }, status: error.status }));
   }
