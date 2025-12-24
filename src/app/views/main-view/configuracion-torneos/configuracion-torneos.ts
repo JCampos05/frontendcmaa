@@ -52,7 +52,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
     private sistemaService: SistemaCompetenciaService,
     private ritmoService: RitmoJuegoService,
     private desempateService: SistemaDesempateService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForms();
@@ -63,6 +63,8 @@ export class ConfiguracionTorneosComponent implements OnInit {
     this.categoriaForm = this.fb.group({
       nombre: ['', Validators.required],
       costo: [0, [Validators.required, Validators.min(0)]],
+      edadMinima: [null, [Validators.min(0), Validators.max(120)]],
+      edadMaxima: [null, [Validators.min(0), Validators.max(120)]],
       nota: ['']
     });
 
@@ -105,7 +107,11 @@ export class ConfiguracionTorneosComponent implements OnInit {
   mostrarFormularioCategoria(): void {
     this.mostrandoFormCategoria = true;
     this.editandoCategoria = null;
-    this.categoriaForm.reset({ costo: 0 });
+    this.categoriaForm.reset({
+      costo: 0,
+      edadMinima: null,
+      edadMaxima: null
+    });
   }
 
   editarCategoria(categoria: Categoria): void {
@@ -114,7 +120,9 @@ export class ConfiguracionTorneosComponent implements OnInit {
     this.categoriaForm.patchValue({
       nombre: categoria.nombre,
       costo: categoria.costo,
-      nota: categoria.nota
+      nota: categoria.nota,
+      edadMinima: categoria.edadMinima,
+      edadMaxima: categoria.edadMaxima
     });
   }
 
@@ -126,26 +134,42 @@ export class ConfiguracionTorneosComponent implements OnInit {
 
     const categoriaData = this.categoriaForm.value;
 
+    // Convertir valores vacíos a null
+    if (categoriaData.edadMinima === '' || categoriaData.edadMinima === undefined) {
+      categoriaData.edadMinima = null;
+    }
+    if (categoriaData.edadMaxima === '' || categoriaData.edadMaxima === undefined) {
+      categoriaData.edadMaxima = null;
+    }
+
+    // Validación: edadMinima no puede ser mayor que edadMaxima
+    if (categoriaData.edadMinima !== null && categoriaData.edadMaxima !== null) {
+      if (categoriaData.edadMinima > categoriaData.edadMaxima) {
+        this.toast.error('Error', 'La edad mínima no puede ser mayor que la edad máxima');
+        return;
+      }
+    }
+
     if (this.editandoCategoria) {
       this.categoriaService.update(this.editandoCategoria.idCategoria!, categoriaData).subscribe({
         next: () => {
+          this.toast.success('Éxito', 'Categoría actualizada correctamente');
           this.cargarCategorias();
           this.cancelarFormCategoria();
         },
         error: (error) => {
           this.toast.error('Error', error.error?.message || 'Error al actualizar categoría');
-          //alert(error.error?.message || 'Error al actualizar categoría');
         }
       });
     } else {
       this.categoriaService.create(categoriaData).subscribe({
         next: () => {
+          this.toast.success('Éxito', 'Categoría creada correctamente');
           this.cargarCategorias();
           this.cancelarFormCategoria();
         },
         error: (error) => {
-          this.toast.error('Error',error.error?.message || 'Error al crear categoría');
-          //alert(error.error?.message || 'Error al crear categoría');
+          this.toast.error('Error', error.error?.message || 'Error al crear categoría');
         }
       });
     }
@@ -154,7 +178,11 @@ export class ConfiguracionTorneosComponent implements OnInit {
   cancelarFormCategoria(): void {
     this.mostrandoFormCategoria = false;
     this.editandoCategoria = null;
-    this.categoriaForm.reset({ costo: 0 });
+    this.categoriaForm.reset({
+      costo: 0,
+      edadMinima: null,
+      edadMaxima: null
+    });
   }
 
   confirmarEliminarCategoria(categoria: Categoria): void {
@@ -170,7 +198,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
       },
       error: (error) => {
         //console.error('Error al cargar sistemas:', error);
-        this.toast.error('Error','Error al cargar sistemas');
+        this.toast.error('Error', 'Error al cargar sistemas');
       }
     });
   }
@@ -205,7 +233,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
           this.cancelarFormSistema();
         },
         error: (error) => {
-          this.toast.error('Error',error.error?.message || 'Error al actualizar sistema');
+          this.toast.error('Error', error.error?.message || 'Error al actualizar sistema');
           //alert(error.error?.message || 'Error al actualizar sistema');
         }
       });
@@ -216,7 +244,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
           this.cancelarFormSistema();
         },
         error: (error) => {
-          this.toast.error('Error',error.error?.message || 'Error al crear el sistema');
+          this.toast.error('Error', error.error?.message || 'Error al crear el sistema');
           //alert(error.error?.message || 'Error al crear sistema');
         }
       });
@@ -242,7 +270,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
       },
       error: (error) => {
         //console.error('Error al cargar ritmos:', error);
-        this.toast.error('Error','Error al cargar los ritmos de juego');
+        this.toast.error('Error', 'Error al cargar los ritmos de juego');
       }
     });
   }
@@ -279,7 +307,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
           this.cancelarFormRitmo();
         },
         error: (error) => {
-          this.toast.error('Error',error.error?.message || 'Error al actualizar ritmo');
+          this.toast.error('Error', error.error?.message || 'Error al actualizar ritmo');
           //alert(error.error?.message || 'Error al actualizar ritmo');
         }
       });
@@ -290,7 +318,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
           this.cancelarFormRitmo();
         },
         error: (error) => {
-          this.toast.error('Error',error.error?.message || 'Error al crear ritmo')
+          this.toast.error('Error', error.error?.message || 'Error al crear ritmo')
           //alert(error.error?.message || 'Error al crear ritmo');
         }
       });
@@ -316,7 +344,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar sistemas de desempate:', error);
-        this.toast.error('Error','Error al cargar sistemas de desempate');
+        this.toast.error('Error', 'Error al cargar sistemas de desempate');
       }
     });
   }
@@ -351,7 +379,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
           this.cancelarFormDesempate();
         },
         error: (error) => {
-          this.toast.error('Error',error.error?.message || 'Error al actualizar sistema de desempate');
+          this.toast.error('Error', error.error?.message || 'Error al actualizar sistema de desempate');
           //alert(error.error?.message || 'Error al actualizar sistema de desempate');
         }
       });
@@ -362,7 +390,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
           this.cancelarFormDesempate();
         },
         error: (error) => {
-          this.toast.error('Error',error.error?.message || 'Error al crear sistema de desempate');
+          this.toast.error('Error', error.error?.message || 'Error al crear sistema de desempate');
           //alert(error.error?.message || 'Error al crear sistema de desempate');
         }
       });
@@ -384,9 +412,9 @@ export class ConfiguracionTorneosComponent implements OnInit {
   eliminarItem(): void {
     if (!this.itemAEliminar) return;
 
-    const id = this.itemAEliminar.idCategoria 
-      || this.itemAEliminar.idSisCompetencia 
-      || this.itemAEliminar.idRitmoJuego 
+    const id = this.itemAEliminar.idCategoria
+      || this.itemAEliminar.idSisCompetencia
+      || this.itemAEliminar.idRitmoJuego
       || this.itemAEliminar.idDesempate;
 
     switch (this.tipoItemAEliminar) {
@@ -397,7 +425,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
             this.cerrarModalEliminar();
           },
           error: (error) => {
-            this.toast.error('Error',error.error?.message || 'Error al eliminar categoría');
+            this.toast.error('Error', error.error?.message || 'Error al eliminar categoría');
             //alert(error.error?.message || 'Error al eliminar categoría');
             this.cerrarModalEliminar();
           }
@@ -411,7 +439,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
             this.cerrarModalEliminar();
           },
           error: (error) => {
-            this.toast.error('Error',error.error?.message || 'Error al eliminar sistema');
+            this.toast.error('Error', error.error?.message || 'Error al eliminar sistema');
             //alert(error.error?.message || 'Error al eliminar sistema');
             this.cerrarModalEliminar();
           }

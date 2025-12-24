@@ -3,4 +3,6 @@ export interface Categoria {
     nombre: string;
     costo: number;
     nota?: string;
+    edadMinima?: number | null;
+    edadMaxima?: number | null;
 }

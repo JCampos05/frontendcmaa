@@ -207,7 +207,7 @@ export class InscripcionService {
       }
     }
     
-    console.error('❌ Error en InscripcionService:', error);
+    //console.error('❌ Error en InscripcionService:', error);
     return throwError(() => ({
       error: {
         message: errorMessage,

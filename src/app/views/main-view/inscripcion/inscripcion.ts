@@ -134,7 +134,7 @@ export class InscripcionComponent implements OnInit {
             const fechaCierre = new Date(cierreInscripciones);
             return ahora < fechaCierre;
           } catch (e) {
-            console.error('Error al verificar cierre de inscripciones:', e);
+            //console.error('Error al verificar cierre de inscripciones:', e);
             return true;
           }
         });
@@ -155,7 +155,7 @@ export class InscripcionComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error al cargar torneos:', error);
+        //console.error('Error al cargar torneos:', error);
         this.errores = ['Error al cargar los torneos disponibles'];
       }
     });
@@ -196,7 +196,7 @@ export class InscripcionComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          console.error('Error al cargar categorías:', error);
+          //console.error('Error al cargar categorías:', error);
           this.categorias = [];
 
           if (error.status === 404) {
@@ -444,7 +444,7 @@ export class InscripcionComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        console.error('Error completo:', error);
+        //console.error('Error completo:', error);
 
         if (error.error && error.error.errores && Array.isArray(error.error.errores)) {
           this.errores = error.error.errores;
@@ -477,7 +477,7 @@ export class InscripcionComponent implements OnInit {
     this.categoriaSeleccionada = null;
     this.sistemaPago = null;
     this.router.navigate(['/'])
-      .catch(error => console.error('Error al navegar:', error));
+      //.catch(error => console.error('Error al navegar:', error));
   }
 
   formularioTieneDatos(): boolean {

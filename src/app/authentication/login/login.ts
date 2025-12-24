@@ -1,17 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth/auth';
+import { ToastNoti } from '../../componentes/modales/toast-noti/toast-noti';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ToastNoti],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
+  @ViewChild(ToastNoti) toast!: ToastNoti;
+
   telefono: string = '';
   password: string = '';
   showPassword: boolean = false;
@@ -24,6 +27,7 @@ export class LoginComponent {
   ) {
     // Si ya está autenticado, redirigir al dashboard
     if (this.authService.isAuthenticated()) {
+      this.toast.success('Éxito', 'Inicio de sesión exitoso');
       this.router.navigate(['./main-view/torneo-actual']);
     }
   }
@@ -44,6 +48,7 @@ export class LoginComponent {
     this.authService.login(this.telefono, this.password).subscribe({
       next: (response) => {
         this.loading = false;
+        this.toast.success('Éxito', 'Inicio de sesión exitoso');
         this.router.navigate(['/main-view/torneo-actual']);
       },
       error: (error) => {

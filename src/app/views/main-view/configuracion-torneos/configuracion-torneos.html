@@ -62,6 +62,30 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fa-solid fa-arrow-down"></i>
+                                Edad Mínima
+                            </label>
+                            <input type="number" formControlName="edadMinima" placeholder="Ej: 50 (opcional)" min="0"
+                                max="120">
+                            <small style="color: var(--color-slate); font-size: 0.85rem; margin-top: 0.25rem;">
+                                Dejar vacío si no hay restricción
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fa-solid fa-arrow-up"></i>
+                                Edad Máxima
+                            </label>
+                            <input type="number" formControlName="edadMaxima" placeholder="Ej: 13 (opcional)" min="0"
+                                max="120">
+                            <small style="color: var(--color-slate); font-size: 0.85rem; margin-top: 0.25rem;">
+                                Dejar vacío si no hay restricción
+                            </small>
+                        </div>
+                    </div>
                     <div class="form-group full-width">
                         <label>Notas</label>
                         <textarea formControlName="nota" rows="3"
@@ -96,6 +120,30 @@
                         <div class="item-info">
                             <span class="label">Costo:</span>
                             <span class="value">${{ categoria.costo }}</span>
+                        </div>
+                        <div class="item-info" *ngIf="categoria.edadMinima !== null || categoria.edadMaxima !== null">
+                            <span class="label">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                Rango de edad:
+                            </span>
+                            <span class="value edad-badge">
+                                <span *ngIf="categoria.edadMinima !== null && categoria.edadMaxima !== null">
+                                    {{ categoria.edadMinima }} - {{ categoria.edadMaxima }} años
+                                </span>
+                                <span *ngIf="categoria.edadMinima !== null && categoria.edadMaxima === null">
+                                    {{ categoria.edadMinima }}+ años
+                                </span>
+                                <span *ngIf="categoria.edadMinima === null && categoria.edadMaxima !== null">
+                                    Hasta {{ categoria.edadMaxima }} años
+                                </span>
+                            </span>
+                        </div>
+                        <div class="item-info" *ngIf="categoria.edadMinima === null && categoria.edadMaxima === null">
+                            <span class="label">
+                                <i class="fa-solid fa-infinity"></i>
+                                Edad:
+                            </span>
+                            <span class="value">Sin restricción</span>
                         </div>
                         <div class="item-info" *ngIf="categoria.nota"
                             style="flex-direction: column; align-items: flex-start;">
