@@ -523,10 +523,9 @@ export class InscripcionComponent implements OnInit {
 
 
   // Reemplaza la función inscripcionesCerradas() existente con esta versión:
-
   inscripcionesCerradas(torneo: Torneo): boolean {
     const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
-    console.log('Cierre inscripciones desde BD:', cierreInscripciones);
+    //console.log('Cierre inscripciones desde BD:', cierreInscripciones);
 
     if (!cierreInscripciones) {
       return false;
@@ -549,13 +548,13 @@ export class InscripcionComponent implements OnInit {
       // Obtener hora actual en zona horaria local
       const ahora = new Date();
 
-      console.log('Fecha cierre (local):', fechaCierre);
-      console.log('Fecha actual (local):', ahora);
-      console.log('¿Inscripciones cerradas?:', ahora >= fechaCierre);
+      //console.log('Fecha cierre (local):', fechaCierre);
+      //console.log('Fecha actual (local):', ahora);
+      //console.log('¿Inscripciones cerradas?:', ahora >= fechaCierre);
 
       return ahora >= fechaCierre;
     } catch (e) {
-      console.error('Error al verificar cierre de inscripciones:', e);
+      //console.error('Error al verificar cierre de inscripciones:', e);
       return false;
     }
   }
