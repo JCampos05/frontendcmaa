@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModul
 import { ActivatedRoute, Router } from '@angular/router';
 import { InscripcionService } from '../../../services/inscripcion/inscripcion';
 import { TorneoService } from '../../../services/torneo/torneo';
+import { Torneo } from '../../../models/torneo'
 
 @Component({
   selector: 'app-inscripcion',
@@ -130,13 +131,7 @@ export class InscripcionComponent implements OnInit {
             return true;
           }
 
-          try {
-            const fechaCierre = new Date(cierreInscripciones);
-            return ahora < fechaCierre;
-          } catch (e) {
-            //console.error('Error al verificar cierre de inscripciones:', e);
-            return true;
-          }
+          return !this.verificarInscripcionesCerradas(cierreInscripciones);
         });
 
         //console.log('Torneos con inscripciones abiertas:', this.torneos);
@@ -384,15 +379,10 @@ export class InscripcionComponent implements OnInit {
     if (torneoSeleccionado) {
       const cierreInscripciones = torneoSeleccionado.cierreInscripciones || torneoSeleccionado.cierre_inscripciones;
 
-      if (cierreInscripciones) {
-        const fechaCierre = new Date(cierreInscripciones);
-        const ahora = new Date();
-
-        if (ahora >= fechaCierre) {
-          this.errores = ['Las inscripciones para este torneo ya han cerrado'];
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          return;
-        }
+      if (this.verificarInscripcionesCerradas(cierreInscripciones)) {
+        this.errores = ['Las inscripciones para este torneo ya han cerrado'];
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
     }
 
@@ -477,7 +467,7 @@ export class InscripcionComponent implements OnInit {
     this.categoriaSeleccionada = null;
     this.sistemaPago = null;
     this.router.navigate(['/'])
-      //.catch(error => console.error('Error al navegar:', error));
+    //.catch(error => console.error('Error al navegar:', error));
   }
 
   formularioTieneDatos(): boolean {
@@ -528,5 +518,69 @@ export class InscripcionComponent implements OnInit {
       return numeros.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
     }
     return telefono;
+  }
+
+
+
+  // Reemplaza la función inscripcionesCerradas() existente con esta versión:
+
+  inscripcionesCerradas(torneo: Torneo): boolean {
+    const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
+    console.log('Cierre inscripciones desde BD:', cierreInscripciones);
+
+    if (!cierreInscripciones) {
+      return false;
+    }
+
+    try {
+      // Crear fecha de cierre interpretándola como hora local de Los Mochis
+      const fechaCierreStr = typeof cierreInscripciones === 'string'
+        ? cierreInscripciones
+        : cierreInscripciones.toISOString();
+
+      // Extraer los componentes de la fecha (año, mes, día, hora, minuto)
+      const [datePart, timePart] = fechaCierreStr.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+
+      // Crear fecha en zona horaria local (Los Mochis)
+      const fechaCierre = new Date(year, month - 1, day, hour, minute);
+
+      // Obtener hora actual en zona horaria local
+      const ahora = new Date();
+
+      console.log('Fecha cierre (local):', fechaCierre);
+      console.log('Fecha actual (local):', ahora);
+      console.log('¿Inscripciones cerradas?:', ahora >= fechaCierre);
+
+      return ahora >= fechaCierre;
+    } catch (e) {
+      console.error('Error al verificar cierre de inscripciones:', e);
+      return false;
+    }
+  }
+
+  // FUNCIÓN AUXILIAR para verificar cierre de inscripciones (reutilizable)
+  private verificarInscripcionesCerradas(cierreInscripciones: any): boolean {
+    if (!cierreInscripciones) {
+      return false;
+    }
+
+    try {
+      const fechaCierreStr = typeof cierreInscripciones === 'string'
+        ? cierreInscripciones
+        : cierreInscripciones.toISOString();
+
+      const [datePart, timePart] = fechaCierreStr.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+
+      const fechaCierre = new Date(year, month - 1, day, hour, minute);
+      const ahora = new Date();
+
+      return ahora >= fechaCierre;
+    } catch (e) {
+      return false;
+    }
   }
 }
