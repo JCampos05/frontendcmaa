@@ -71,7 +71,7 @@ export class LandingComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error al cargar torneos:', error);
+        //console.error('Error al cargar torneos:', error);
         this.loading = false;
       }
     });
@@ -88,13 +88,10 @@ export class LandingComponent implements OnInit {
 
   irAInscripcion(torneoId?: number): void {
     if (torneoId) {
-      console.log('Navegando a inscripción con ID:', torneoId);
-      this.router.navigate(['/inscripcion', torneoId]).then(
-        success => console.log('Navegación exitosa:', success),
-        error => console.error('Error en navegación:', error)
-      );
+      //console.log('Navegando a inscripción con ID:', torneoId);
+      this.router.navigate(['/inscripcion', torneoId]);
     } else {
-      console.error('No se proporcionó ID de torneo');
+      //console.error('No se proporcionó ID de torneo');
     }
   }
 
