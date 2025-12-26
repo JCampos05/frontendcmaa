@@ -30,8 +30,14 @@
     gap: 1.5rem;
 }
 
-.btn-historial {
+.header-actions {
     margin-left: auto;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-historial {
     padding: 0.75rem 1.25rem;
     background-color: #6b4423;
     color: #fff;
@@ -540,6 +546,29 @@
     font-weight: 700;
 }
 
+.col-desempate {
+    min-width: 120px;
+    padding: 0.75rem 0.5rem;
+}
+
+.col-desempate .th-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.col-desempate .th-content span {
+    text-align: center;
+    line-height: 1.2;
+}
+
+.desempate-valor {
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    font-size: 0.875rem;
+}
+
 .cambio-posicion {
     display: inline-flex;
     align-items: center;
@@ -712,4 +741,47 @@
         text-align: center;
         margin: 0.5rem 0 0 0;
     }
+}
+
+
+/* Agregar al final */
+.btn-cargar-ranking {
+    padding: 0.75rem 1.25rem;
+    background-color: #10B981;
+    color: #fff;
+    border: 2px solid #10B981;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-cargar-ranking:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    max-width: 95vw;
+    max-height: 95vh;
+    overflow: auto;
 }

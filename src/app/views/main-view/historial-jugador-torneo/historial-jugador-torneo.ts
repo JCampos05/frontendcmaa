@@ -473,7 +473,7 @@ export class HistorialJugadorComponent implements OnInit {
   }
 
   volver(): void {
-    this.router.navigate(['/main-view/resultados-todos-torneo']);
+    this.router.navigate(['/main-view/resultado-todos-torneos']);
   }
 
   formatearFecha(fecha: Date | string | undefined): string {

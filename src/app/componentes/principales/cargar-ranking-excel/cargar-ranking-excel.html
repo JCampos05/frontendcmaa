@@ -1,0 +1,227 @@
+<div class="cargar-ranking-container">
+    <app-toast-noti></app-toast-noti>
+
+    <!-- Header -->
+    <div class="modal-header">
+        <div class="header-content">
+            <i class="fa-solid fa-file-excel"></i>
+            <h2>Cargar Ranking Final</h2>
+        </div>
+        <button class="btn-cerrar" (click)="cerrar()" *ngIf="!procesando">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Selector de archivo -->
+<!-- Selector de archivo -->
+<div class="upload-section" *ngIf="!mostrarVistaPrevia">
+    <!-- Sistemas de desempate configurados -->
+    <div class="info-sistemas-card">
+        <div class="info-sistemas-header">
+            <i class="fa-solid fa-list-ol"></i>
+            <h3>Sistemas de Desempate Configurados</h3>
+        </div>
+        <div class="sistemas-grid" *ngIf="sistemasDesempate.length > 0">
+            <div class="sistema-item" *ngFor="let sistema of sistemasDesempate; let i = index">
+                <span class="sistema-numero">{{ i + 1 }}</span>
+                <div class="sistema-content">
+                    <span class="sistema-nombre">{{ sistema }}</span>
+                    <span class="sistema-origen" [class.auto]="sistema.toLowerCase().includes('edad')">
+                        <i class="fa-solid" [class.fa-database]="sistema.toLowerCase().includes('edad')"
+                            [class.fa-file-excel]="!sistema.toLowerCase().includes('edad')"></i>
+                        {{ sistema.toLowerCase().includes('edad') ? 'Automático' : 'Desde Excel' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <p class="no-sistemas" *ngIf="sistemasDesempate.length === 0">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            No hay sistemas de desempate configurados para esta categoría
+        </p>
+    </div>
+
+    <!-- Formato del Excel -->
+    <div class="formato-excel-card">
+        <div class="formato-header">
+            <i class="fa-solid fa-table-cells"></i>
+            <h4>Formato Requerido del Excel</h4>
+        </div>
+        <div class="formato-content">
+            <div class="formato-ejemplo">
+                Rank | Name | Rtg | Pts | {{ getSistemasExcel().join(' | ') || '(sin desempates adicionales)' }}
+            </div>
+            <div class="formato-nota">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Las columnas deben estar en el mismo orden mostrado. Los sistemas marcados como "Automático" no deben incluirse en el Excel.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerta importante -->
+    <div class="alert-importante">
+        <div class="alert-header">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h4>Importante antes de cargar</h4>
+        </div>
+        <ul class="alert-list">
+            <li>
+                <i class="fa-solid fa-check"></i>
+                Los nombres de jugadores deben coincidir exactamente con los registrados
+            </li>
+            <li>
+                <i class="fa-solid fa-check"></i>
+                Respetar el orden de las columnas de desempate según la lista de arriba
+            </li>
+            <li>
+                <i class="fa-solid fa-check"></i>
+                Si falta un valor de desempate, se asignará 0
+            </li>
+        </ul>
+    </div>
+
+    <div class="upload-area" [class.disabled]="procesando">
+        <input type="file" id="fileInput" accept=".xlsx,.xls" (change)="onFileSelected($event)"
+            [disabled]="procesando" #fileInput>
+
+        <label for="fileInput" class="upload-label">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p class="upload-text">Selecciona un archivo Excel</p>
+            <p class="upload-hint">Formato: .xlsx o .xls</p>
+        </label>
+    </div>
+
+    <div class="file-info" *ngIf="nombreArchivo && !procesando">
+        <i class="fa-solid fa-file-excel"></i>
+        <span>{{ nombreArchivo }}</span>
+    </div>
+
+    <div class="loading-upload" *ngIf="procesando">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Procesando archivo...</p>
+    </div>
+
+    <!-- Errores -->
+    <div class="errores-section" *ngIf="errores.length > 0">
+        <div class="error-header">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Se encontraron {{ errores.length }} advertencias</span>
+        </div>
+        <ul class="lista-errores">
+            <li *ngFor="let error of errores">{{ error }}</li>
+        </ul>
+    </div>
+</div>
+
+    <!-- Vista previa del ranking -->
+    <div class="ranking-preview" *ngIf="mostrarVistaPrevia && !procesando">
+        <div class="preview-header">
+            <div class="preview-info">
+                <i class="fa-solid fa-ranking-star"></i>
+                <span>{{ ranking.length }} jugadores procesados</span>
+            </div>
+            <div class="preview-actions">
+                <button class="btn-secondary" (click)="limpiar()">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Cargar otro archivo
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de ranking -->
+        <div class="tabla-ranking-container">
+            <table class="tabla-ranking">
+                <thead>
+                    <tr>
+                        <th class="col-drag"></th>
+                        <th class="col-posicion">
+                            <i class="fa-solid fa-hashtag"></i>
+                            Pos
+                        </th>
+                        <th class="col-nombre">
+                            <i class="fa-solid fa-user"></i>
+                            Jugador
+                        </th>
+                        <th class="col-rating">
+                            <i class="fa-solid fa-star"></i>
+                            Rating
+                        </th>
+                        <th class="col-puntos">
+                            <i class="fa-solid fa-trophy"></i>
+                            Puntos
+                        </th>
+                        <th class="col-desempate" *ngFor="let sistema of sistemasDesempate">
+                            {{ sistema }}
+                        </th>
+                        <th class="col-acciones">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+                    <tr *ngFor="let jugador of ranking; let i = index" 
+                        cdkDrag 
+                        [class.top-1]="jugador.posicion === 1"
+                        [class.top-2]="jugador.posicion === 2"
+                        [class.top-3]="jugador.posicion === 3">
+
+                        <td class="col-drag">
+                            <i class="fa-solid fa-grip-vertical drag-handle" cdkDragHandle></i>
+                        </td>
+
+                        <td class="col-posicion">
+                            <div class="posicion-badge" [class.podio]="jugador.posicion <= 3">
+                                <i *ngIf="jugador.posicion === 1" class="fa-solid fa-medal gold"></i>
+                                <i *ngIf="jugador.posicion === 2" class="fa-solid fa-medal silver"></i>
+                                <i *ngIf="jugador.posicion === 3" class="fa-solid fa-medal bronze"></i>
+                                <span *ngIf="jugador.posicion > 3">{{ jugador.posicion }}</span>
+                            </div>
+                        </td>
+
+                        <td class="col-nombre">
+                            <span class="jugador-nombre">{{ jugador.nombre }}</span>
+                        </td>
+
+                        <td class="col-rating">
+                            <input *ngIf="jugador.editando" type="number" class="input-edicion"
+                                [(ngModel)]="jugador.rating" (change)="actualizarValor(jugador, 'rating', $event)">
+                            <span *ngIf="!jugador.editando" class="valor-rating">{{ jugador.rating }}</span>
+                        </td>
+
+                        <td class="col-puntos">
+                            <input *ngIf="jugador.editando" type="number" step="0.5" class="input-edicion"
+                                [(ngModel)]="jugador.puntos" (change)="actualizarValor(jugador, 'puntos', $event)">
+                            <span *ngIf="!jugador.editando" class="valor-puntos">{{ jugador.puntos }}</span>
+                        </td>
+
+                        <td class="col-desempate" *ngFor="let sistema of sistemasDesempate">
+                            <input *ngIf="jugador.editando" type="number" step="0.5" class="input-edicion"
+                                [(ngModel)]="jugador.desempates[sistema]"
+                                (change)="actualizarDesempate(jugador, sistema, $event)">
+                            <span *ngIf="!jugador.editando">
+                                {{ jugador.desempates[sistema] || 0 }}
+                            </span>
+                        </td>
+
+                        <td class="col-acciones">
+                            <button class="btn-accion" [class.editando]="jugador.editando"
+                                (click)="toggleEdicion(jugador)" title="Editar valores">
+                                <i class="fa-solid" [class.fa-pen]="!jugador.editando"
+                                    [class.fa-check]="jugador.editando"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer con acciones -->
+        <div class="modal-footer">
+            <button class="btn-cancelar" (click)="cerrar()">
+                <i class="fa-solid fa-xmark"></i>
+                Cancelar
+            </button>
+            <button class="btn-guardar" (click)="guardarRanking()" [disabled]="!puedeGuardar">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Guardar Ranking Final
+            </button>
+        </div>
+    </div>
+</div>

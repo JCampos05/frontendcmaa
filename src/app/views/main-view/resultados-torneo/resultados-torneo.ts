@@ -10,6 +10,7 @@ import { TorneoService } from '../../../services/torneo/torneo';
 import { RondaService } from '../../../services/ronda/ronda';
 import { EstadisticaTorneoService } from '../../../services/estadistica-torneo/estadistica-torneo';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
+import { CargarRankingExcelComponent } from '../../../componentes/principales/cargar-ranking-excel/cargar-ranking-excel';
 
 import { Torneo } from '../../../models/torneo';
 import { TorneoCategoria } from '../../../models/torneo-categoria';
@@ -29,7 +30,7 @@ interface EstadisticasGenerales {
 @Component({
   selector: 'app-resultados-torneo',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastNoti],
+  imports: [CommonModule, FormsModule, ToastNoti, CargarRankingExcelComponent],
   templateUrl: './resultados-torneo.html',
   styleUrls: ['./resultados-torneo.css']
 })
@@ -48,16 +49,18 @@ export class ResultadosTorneoComponent implements OnInit {
 
   estadisticas: EstadisticaConCambio[] = [];
   estadisticasGenerales: EstadisticasGenerales | null = null;
+  rankingFinalCargado = false;
 
   ordenActual: 'posicion' | 'nombre' = 'posicion';
 
-  // Paginación
   paginaActual: number = 1;
   itemsPorPagina: number = 15;
   totalPaginas: number = 1;
 
   cargando = false;
   error: string | null = null;
+
+  mostrarCargarRanking = false;
 
   constructor(
     private torneoService: TorneoService,
@@ -128,6 +131,7 @@ export class ResultadosTorneoComponent implements OnInit {
     this.estadisticas = [];
     this.rondasDisponibles = [];
     this.paginaActual = 1;
+    this.rankingFinalCargado = false;
 
     if (this.categoriaSeleccionada && this.torneoActual?.idTorneo) {
       this.cargarRondas(this.torneoActual.idTorneo, this.categoriaSeleccionada);
@@ -136,25 +140,40 @@ export class ResultadosTorneoComponent implements OnInit {
   }
 
   cargarRondas(idTorneo: number, idTorneoCat: number): void {
-    this.rondaService.getRondasByTorneo(idTorneo).subscribe({
+    this.rondaService.getRondasByTorneoCategoria(idTorneo, idTorneoCat).subscribe({
       next: (response) => {
-
         const rondasArray = Array.isArray(response) ? response : [];
-        
-        rondasArray.forEach((r: Ronda, index) => {
-
-        });
-
         this.rondasDisponibles = rondasArray.sort((a, b) => a.numeroRonda - b.numeroRonda);
+
+        const todasFinalizadas = this.rondasDisponibles.every(r => r.estado === 'finalizada');
+        if (todasFinalizadas && this.rondasDisponibles.length > 0) {
+          this.verificarSiExisteRankingFinal(idTorneo, idTorneoCat);
+        }
 
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar rondas:', err);
         this.rondasDisponibles = [];
+        this.rankingFinalCargado = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private verificarSiExisteRankingFinal(idTorneo: number, idTorneoCat: number): void {
+    this.estadisticaService.getEstadisticasByTorneoCategoria(idTorneo, idTorneoCat)
+      .subscribe({
+        next: (estadisticas) => {
+          this.rankingFinalCargado = estadisticas.some(
+            est => est.posicion_actual !== null && est.posicion_actual !== undefined
+          );
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.rankingFinalCargado = false;
+        }
+      });
   }
 
   onRondaChange(): void {
@@ -170,6 +189,11 @@ export class ResultadosTorneoComponent implements OnInit {
 
     this.cargando = true;
     this.error = null;
+
+    if (this.rondaSeleccionada === -1) {
+      this.cargarListaFinal();
+      return;
+    }
 
     if (this.rondaSeleccionada === 0) {
       this.cargarListaInicial();
@@ -251,9 +275,61 @@ export class ResultadosTorneoComponent implements OnInit {
     });
   }
 
-  private asignarPosiciones(): void {
-    this.estadisticas.forEach((est, index) => {
-      est.posicion_actual = index + 1;
+  private cargarListaFinal(): void {
+    this.estadisticaService.getRankingFinal(
+      this.torneoActual!.idTorneo!,
+      this.categoriaSeleccionada!
+    ).subscribe({
+      next: (response) => {
+        const estadisticasData = response || [];
+
+        this.estadisticas = (Array.isArray(estadisticasData) ? estadisticasData : [])
+          .map(est => {
+            let desempatesObj = {};
+
+            if (est.desempates) {
+              if (typeof est.desempates === 'string') {
+                try {
+                  desempatesObj = JSON.parse(est.desempates);
+                } catch (e) {
+                  console.warn('Error al parsear desempates:', e);
+                  desempatesObj = {};
+                }
+              } else if (typeof est.desempates === 'object') {
+                desempatesObj = est.desempates;
+              }
+            }
+
+            return {
+              ...est,
+              puntos: Number(est.puntos) || 0,
+              partidas_jugadas: Number(est.partidas_jugadas) || 0,
+              victorias: Number(est.victorias) || 0,
+              empates: Number(est.empates) || 0,
+              derrotas: Number(est.derrotas) || 0,
+              posicion_actual: est.posicion_actual || null,
+              cambioPosicion: 0,
+              desempates: desempatesObj
+            };
+          });
+
+        this.estadisticas.sort((a, b) => {
+          if (a.posicion_actual && b.posicion_actual) {
+            return a.posicion_actual - b.posicion_actual;
+          }
+          return b.puntos - a.puntos;
+        });
+
+        this.calcularPaginacion();
+        this.calcularEstadisticasGenerales();
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar lista final:', err);
+        this.estadisticas = [];
+        this.cargando = false;
+        this.error = 'No se encontró ranking final. Usa el botón "Cargar Ranking Final" para crear uno.';
+      }
     });
   }
 
@@ -341,81 +417,107 @@ export class ResultadosTorneoComponent implements OnInit {
   }
 
   async exportarPDF(): Promise<void> {
-    const doc = new jsPDF();
+    const esListaFinal = this.rondaSeleccionada === -1;
+    const orientacion = esListaFinal ? 'landscape' : 'portrait';
+
+    const doc = new jsPDF({
+      orientation: orientacion as 'portrait' | 'landscape'
+    });
 
     try {
       const logoBase64 = await this.cargarImagenComoBase64('/LogoComite.jpg');
-      
-      // Crear versión con opacidad moderada para marca de agua
       const logoMarcaAgua = await this.aplicarOpacidad(logoBase64, 0.08);
 
-      // NO agregar marca de agua aquí - se agregará con didDrawPage
-      
-      // Agregar logo en el encabezado (lado izquierdo) - sin opacidad
       doc.addImage(logoBase64, 'JPEG', 14, 10, 25, 25);
 
-      // Título y subtítulo con colores café
       doc.setFontSize(18);
       doc.setTextColor(99, 48, 23);
       doc.text(`Resultados - ${this.torneoActual?.nombre}`, 45, 20);
 
       doc.setFontSize(12);
       doc.setTextColor(133, 77, 46);
-      
+
       const categoria = this.categorias.find(c => c.idTorneoCat === Number(this.categoriaSeleccionada));
       const nomCat = categoria?.categoria?.nombre || 'Sin categoría';
-      const textoRonda = this.rondaSeleccionada === 0 ? 'Lista Inicial' : `Ronda ${this.rondaSeleccionada}`;
+      const textoRonda = this.getBadgeTexto();
       doc.text(`Categoría: ${nomCat} - ${textoRonda}`, 45, 28);
 
-      // Preparar datos para la tabla
-      const data = this.getEstadisticasOrdenadas().map((est, index) => [
-        est.posicion_actual || index + 1,
-        `${est.jugador?.nombre} ${est.jugador?.apellido1} ${est.jugador?.apellido2 || ''}`,
-        est.jugador?.rating || 'S/R',
-        est.puntos,
-        est.partidas_jugadas,
-        est.victorias,
-        est.empates,
-        est.derrotas
-      ]);
+      const sistemasDesempate = esListaFinal ? this.getSistemasDesempateActual() : [];
 
-      // Generar tabla con colores café
+      const headers = ['Pos', 'Jugador', 'Rating', 'Pts'];
+      if (esListaFinal) {
+        sistemasDesempate.forEach((sistema, idx) => {
+          headers.push(`${idx + 1}. ${sistema}`);
+        });
+      } else {
+        headers.push('PJ', 'V', 'E', 'D');
+      }
+
+      const data = this.getEstadisticasOrdenadas().map((est, index) => {
+        const baseData = [
+          est.posicion_actual || index + 1,
+          `${est.jugador?.nombre} ${est.jugador?.apellido1} ${est.jugador?.apellido2 || ''}`,
+          est.jugador?.rating || 'S/R',
+          est.puntos
+        ];
+
+        if (esListaFinal) {
+          sistemasDesempate.forEach(sistema => {
+            baseData.push(this.getValorDesempate(est, sistema));
+          });
+        } else {
+          baseData.push(
+            est.partidas_jugadas,
+            est.victorias,
+            est.empates,
+            est.derrotas
+          );
+        }
+
+        return baseData;
+      });
+
       autoTable(doc, {
         startY: 40,
-        head: [['Pos', 'Jugador', 'Rating', 'Pts', 'PJ', 'V', 'E', 'D']],
+        head: [headers],
         body: data,
         theme: 'striped',
-        styles: { 
-          fontSize: 10,
-          textColor: [17, 34, 57]
+        styles: {
+          fontSize: esListaFinal ? 8 : 10,
+          textColor: [17, 34, 57],
+          cellPadding: esListaFinal ? 2 : 3
         },
         headStyles: {
           fillColor: [133, 77, 46],
           textColor: [255, 255, 255],
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          fontSize: esListaFinal ? 8 : 10
         },
         alternateRowStyles: {
           fillColor: [243, 244, 246]
         },
+        columnStyles: esListaFinal ? {
+          0: { cellWidth: 15 },
+          1: { cellWidth: 50 },
+          2: { cellWidth: 20 },
+          3: { cellWidth: 15 }
+        } : undefined,
         didDrawPage: (hookData) => {
-          // Agregar marca de agua en todas las páginas
           const pageWidth = doc.internal.pageSize.getWidth();
           const pageHeight = doc.internal.pageSize.getHeight();
           const logoSize = 120;
           const xCenter = (pageWidth - logoSize) / 2;
           const yCenter = (pageHeight - logoSize) / 2 + 10;
-          
+
           doc.addImage(logoMarcaAgua, 'PNG', xCenter, yCenter, logoSize, logoSize);
         }
       });
 
-      // Guardar PDF
       const nombreCategoria = categoria?.categoria?.nombre || 'sin_categoria';
-      doc.save(`resultados_${nombreCategoria}_ronda${this.rondaSeleccionada}.pdf`);
-      this.toast.success('PDF generado','Archivo PDF creado correctamente');
+      doc.save(`resultados_${nombreCategoria}_${textoRonda.replace(/ /g, '_')}.pdf`);
+      this.toast.success('PDF generado', 'Archivo PDF creado exitosamente');
     } catch (error) {
-      //console.error('Error al generar PDF:', error);
-      this.toast.warning('Error al generar PDF',' Generando PDF de respaldo');
+      this.toast.warning('Error al generar archivo PDF; creando PDF de respaldo');
       this.generarPDFSinLogo();
     }
   }
@@ -423,15 +525,14 @@ export class ResultadosTorneoComponent implements OnInit {
   private aplicarOpacidad(imagenBase64: string, opacidad: number): Promise<string> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      
+
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
-        
+
         if (ctx) {
-          // Limpiar canvas para mantener transparencia
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.globalAlpha = opacidad;
           ctx.drawImage(img, 0, 0);
@@ -441,11 +542,11 @@ export class ResultadosTorneoComponent implements OnInit {
           reject(new Error('No se pudo crear el contexto del canvas'));
         }
       };
-      
+
       img.onerror = () => {
         reject(new Error('Error al aplicar opacidad'));
       };
-      
+
       img.src = imagenBase64;
     });
   }
@@ -454,14 +555,14 @@ export class ResultadosTorneoComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'Anonymous';
-      
+
       img.onload = () => {
         try {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
           const ctx = canvas.getContext('2d');
-          
+
           if (ctx) {
             ctx.drawImage(img, 0, 0);
             const dataURL = canvas.toDataURL('image/jpeg');
@@ -473,17 +574,22 @@ export class ResultadosTorneoComponent implements OnInit {
           reject(error);
         }
       };
-      
+
       img.onerror = (error) => {
         reject(new Error(`Error al cargar la imagen desde ${url}`));
       };
-      
+
       img.src = url + '?t=' + new Date().getTime();
     });
   }
 
   private generarPDFSinLogo(): void {
-    const doc = new jsPDF();
+    const esListaFinal = this.rondaSeleccionada === -1;
+    const orientacion = esListaFinal ? 'landscape' : 'portrait';
+
+    const doc = new jsPDF({
+      orientation: orientacion as 'portrait' | 'landscape'
+    });
 
     doc.setFontSize(18);
     doc.setTextColor(99, 48, 23);
@@ -494,66 +600,112 @@ export class ResultadosTorneoComponent implements OnInit {
 
     const categoria = this.categorias.find(c => c.idTorneoCat === Number(this.categoriaSeleccionada));
     const nomCat = categoria?.categoria?.nombre || 'Sin categoría';
-    const textoRonda = this.rondaSeleccionada === 0 ? 'Lista Inicial' : `Ronda ${this.rondaSeleccionada}`;
+    const textoRonda = this.getBadgeTexto();
     doc.text(`Categoría: ${nomCat} - ${textoRonda}`, 14, 30);
 
-    const data = this.getEstadisticasOrdenadas().map((est, index) => [
-      est.posicion_actual || index + 1,
-      `${est.jugador?.nombre} ${est.jugador?.apellido1} ${est.jugador?.apellido2 || ''}`,
-      est.jugador?.rating || 'S/R',
-      est.puntos,
-      est.partidas_jugadas,
-      est.victorias,
-      est.empates,
-      est.derrotas
-    ]);
+    const sistemasDesempate = esListaFinal ? this.getSistemasDesempateActual() : [];
+
+    const headers = ['Pos', 'Jugador', 'Rating', 'Pts'];
+    if (esListaFinal) {
+      sistemasDesempate.forEach((sistema, idx) => {
+        headers.push(`${idx + 1}. ${sistema}`);
+      });
+    } else {
+      headers.push('PJ', 'V', 'E', 'D');
+    }
+
+    const data = this.getEstadisticasOrdenadas().map((est, index) => {
+      const baseData = [
+        est.posicion_actual || index + 1,
+        `${est.jugador?.nombre} ${est.jugador?.apellido1} ${est.jugador?.apellido2 || ''}`,
+        est.jugador?.rating || 'S/R',
+        est.puntos
+      ];
+
+      if (esListaFinal) {
+        sistemasDesempate.forEach(sistema => {
+          baseData.push(this.getValorDesempate(est, sistema));
+        });
+      } else {
+        baseData.push(
+          est.partidas_jugadas,
+          est.victorias,
+          est.empates,
+          est.derrotas
+        );
+      }
+
+      return baseData;
+    });
 
     autoTable(doc, {
       startY: 40,
-      head: [['Pos', 'Jugador', 'Rating', 'Pts', 'PJ', 'V', 'E', 'D']],
+      head: [headers],
       body: data,
       theme: 'striped',
-      styles: { 
-        fontSize: 10,
-        textColor: [17, 34, 57]
+      styles: {
+        fontSize: esListaFinal ? 8 : 10,
+        textColor: [17, 34, 57],
+        cellPadding: esListaFinal ? 2 : 3
       },
       headStyles: {
         fillColor: [133, 77, 46],
         textColor: [255, 255, 255],
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        fontSize: esListaFinal ? 8 : 10
       },
       alternateRowStyles: {
         fillColor: [243, 244, 246]
-      }
+      },
+      columnStyles: esListaFinal ? {
+        0: { cellWidth: 15 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 15 }
+      } : undefined
     });
 
     const nombreCategoria = categoria?.categoria?.nombre || 'sin_categoria';
-    doc.save(`resultados_${nombreCategoria}_ronda${this.rondaSeleccionada}.pdf`);
-    this.toast.success('PDF generado','PDF de resoaldo creado correctamente');
+    doc.save(`resultados_${nombreCategoria}_${textoRonda.replace(/ /g, '_')}.pdf`);
+    this.toast.success('PDF generado', 'PDF de respaldo creado exitosamente');
   }
 
   exportarExcel(): void {
     const categoria = this.categorias.find(c => c.idTorneoCat === Number(this.categoriaSeleccionada));
+    const esListaFinal = this.rondaSeleccionada === -1;
+    const sistemasDesempate = esListaFinal ? this.getSistemasDesempateActual() : [];
 
-    const data = this.getEstadisticasOrdenadas().map((est, index) => ({
-      'Posición': est.posicion_actual || index + 1,
-      'Nombre': est.jugador?.nombre,
-      'Apellido 1': est.jugador?.apellido1,
-      'Apellido 2': est.jugador?.apellido2 || '',
-      'Rating': est.jugador?.rating || 'S/R',
-      'Puntos': est.puntos,
-      'Partidas Jugadas': est.partidas_jugadas,
-      'Victorias': est.victorias,
-      'Empates': est.empates,
-      'Derrotas': est.derrotas
-    }));
+    const data = this.getEstadisticasOrdenadas().map((est, index) => {
+      const baseData: any = {
+        'Posición': est.posicion_actual || index + 1,
+        'Nombre': est.jugador?.nombre,
+        'Apellido 1': est.jugador?.apellido1,
+        'Apellido 2': est.jugador?.apellido2 || '',
+        'Rating': est.jugador?.rating || 'S/R',
+        'Puntos': est.puntos
+      };
+
+      if (esListaFinal) {
+        sistemasDesempate.forEach((sistema, idx) => {
+          baseData[`${idx + 1}. ${sistema}`] = this.getValorDesempate(est, sistema);
+        });
+      } else {
+        baseData['Partidas Jugadas'] = est.partidas_jugadas;
+        baseData['Victorias'] = est.victorias;
+        baseData['Empates'] = est.empates;
+        baseData['Derrotas'] = est.derrotas;
+      }
+
+      return baseData;
+    });
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Resultados');
 
-    XLSX.writeFile(wb, `resultados_${categoria?.categoria?.nombre}_ronda${this.rondaSeleccionada}.xlsx`);
-    this.toast.success('Excel generado','Archivo Excel creado correctamente');
+    const textoRonda = this.getBadgeTexto();
+    XLSX.writeFile(wb, `resultados_${categoria?.categoria?.nombre}_${textoRonda.replace(/ /g, '_')}.xlsx`);
+    this.toast.success('Excel generado', 'Archivo Excel creado exitosamente');
   }
 
   formatearFecha(fecha: Date | string | undefined): string {
@@ -572,5 +724,131 @@ export class ResultadosTorneoComponent implements OnInit {
 
   irASeleccionHistorial(): void {
     this.router.navigate(['/main-view/historial-jugador-torneo']);
+  }
+
+  abrirCargarRanking(): void {
+    if (!this.categoriaSeleccionada) {
+      this.toast.warning('Advertencia', 'Selecciona una categoría primero');
+      return;
+    }
+    this.mostrarCargarRanking = true;
+  }
+
+  cerrarCargarRanking(): void {
+    this.mostrarCargarRanking = false;
+  }
+
+  onRankingCargadoExitoso(): void {
+    this.mostrarCargarRanking = false;
+    this.rankingFinalCargado = true;
+    this.estadisticas = [];
+    this.rondaSeleccionada = -1;
+    this.cargarEstadisticas();
+    this.toast.success('Éxito', 'Ranking cargado correctamente. Mostrando Lista Final.');
+  }
+
+  getTorneoCategoriaSeleccionada(): TorneoCategoria {
+    return this.categorias.find(c => c.idTorneoCat === this.categoriaSeleccionada) || {} as TorneoCategoria;
+  }
+
+  getJugadoresParaRanking(): any[] {
+    return this.estadisticas.map(e => ({
+      idJugador: e.idJugador,
+      nombre: e.jugador?.nombre || '',
+      apellido1: e.jugador?.apellido1 || '',
+      apellido2: e.jugador?.apellido2 || '',
+      rating: e.jugador?.rating || 0,
+      edad: e.jugador?.edad || 0
+    }));
+  }
+
+  puedeCargarRankingFinal(): boolean {
+    if (!this.categoriaSeleccionada || this.estadisticas.length === 0) {
+      return false;
+    }
+
+    if (this.rondasDisponibles.length === 0) {
+      return false;
+    }
+
+    const todasFinalizadas = this.rondasDisponibles.every(
+      ronda => ronda.estado === 'finalizada'
+    );
+
+    return todasFinalizadas;
+  }
+
+  tieneRankingFinal(): boolean {
+    if (!this.categoriaSeleccionada) {
+      return false;
+    }
+
+    if (this.rondasDisponibles.length === 0) {
+      return false;
+    }
+
+    const todasFinalizadas = this.rondasDisponibles.every(
+      ronda => ronda.estado === 'finalizada'
+    );
+
+    if (!todasFinalizadas) {
+      return false;
+    }
+
+    return this.rankingFinalCargado;
+  }
+
+  getBadgeTexto(): string {
+    if (this.rondaSeleccionada === 0) {
+      return 'Lista Inicial';
+    } else if (this.rondaSeleccionada === -1) {
+      return 'Lista Final';
+    } else {
+      return `Ronda ${this.rondaSeleccionada}`;
+    }
+  }
+
+  getSistemasDesempateActual(): string[] {
+    if (this.rondaSeleccionada !== -1) {
+      return [];
+    }
+
+    if (!this.categoriaSeleccionada) {
+      return [];
+    }
+
+    const categoria = this.categorias.find(c => c.idTorneoCat === this.categoriaSeleccionada);
+
+    if (!categoria || !categoria.desempates || !Array.isArray(categoria.desempates)) {
+      return [];
+    }
+
+    return categoria.desempates;
+  }
+
+  getValorDesempate(estadistica: EstadisticaConCambio, sistema: string): string | number {
+    if (!estadistica.desempates || typeof estadistica.desempates !== 'object') {
+      return '-';
+    }
+
+    const valor = estadistica.desempates[sistema];
+
+    if (valor === null || valor === undefined) {
+      return '-';
+    }
+
+    if (typeof valor === 'number') {
+      return valor % 1 !== 0 ? valor.toFixed(1) : valor;
+    }
+
+    if (typeof valor === 'string') {
+      const num = parseFloat(valor);
+      if (!isNaN(num)) {
+        return num % 1 !== 0 ? num.toFixed(1) : num;
+      }
+      return valor;
+    }
+
+    return valor;
   }
 }

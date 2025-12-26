@@ -3,7 +3,9 @@ export interface EstadisticaTorneo {
     idJugador: number;
     idTorneo: number;
     idTorneoCategoria: number;
+    rating_torneo?: number | null;
     puntos: number;
+    desempates?: { [key: string]: number } | null;
     partidas_jugadas: number;
     victorias: number;
     empates: number;
@@ -34,6 +36,8 @@ export interface CreateEstadisticaDto {
     victorias?: number;
     empates?: number;
     derrotas?: number;
+    rating_torneo?: number;
+    desempates?: { [key: string]: number };
 }
 
 export interface UpdateEstadisticaDto {
@@ -43,9 +47,26 @@ export interface UpdateEstadisticaDto {
     empates?: number;
     derrotas?: number;
     posicion_actual?: number;
+    rating_torneo?: number;
+    desempates?: { [key: string]: number };
 }
 
 // Interface extendida para la vista de resultados
 export interface EstadisticaConCambio extends EstadisticaTorneo {
     cambioPosicion?: number;
+}
+
+// Interface para cargar ranking final desde Excel
+export interface RankingFinalJugador {
+    idJugador: number;
+    posicion: number;
+    puntos: number;
+    rating?: number;
+    desempates?: { [key: string]: number };
+}
+
+export interface CargarRankingFinalDto {
+    idTorneo: number;
+    idTorneoCategoria: number;
+    jugadores: RankingFinalJugador[];
 }

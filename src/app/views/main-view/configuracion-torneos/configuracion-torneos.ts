@@ -229,6 +229,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
     if (this.editandoSistema) {
       this.sistemaService.update(this.editandoSistema.idSisCompetencia!, sistemaData).subscribe({
         next: () => {
+          this.toast.success('Éxito', 'Sistema de competencia creado correctamente');
           this.cargarSistemas();
           this.cancelarFormSistema();
         },
@@ -303,6 +304,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
     if (this.editandoRitmo) {
       this.ritmoService.update(this.editandoRitmo.idRitmoJuego!, ritmoData).subscribe({
         next: () => {
+          this.toast.success('Éxito', 'Ritmo de juego creado correctamente');
           this.cargarRitmos();
           this.cancelarFormRitmo();
         },
@@ -375,6 +377,7 @@ export class ConfiguracionTorneosComponent implements OnInit {
     if (this.editandoDesempate) {
       this.desempateService.update(this.editandoDesempate.idDesempate!, desempateData).subscribe({
         next: () => {
+          this.toast.success('Éxito', 'Sistema de desempate creado correctamente');
           this.cargarDesempates();
           this.cancelarFormDesempate();
         },

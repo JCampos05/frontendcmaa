@@ -9,10 +9,17 @@
             <h1>Resultados del Torneo</h1>
             <p>{{ torneoActual?.nombre || 'Torneo Actual' }} - {{ formatearFecha(torneoActual?.fecha) }}</p>
         </div>
-        <button class="btn-historial" (click)="irASeleccionHistorial()" *ngIf="estadisticas.length > 0">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            Ver Historial
-        </button>
+        <div class="header-actions">
+            <button class="btn-cargar-ranking" (click)="abrirCargarRanking()"
+                *ngIf="categoriaSeleccionada && puedeCargarRankingFinal()">
+                <i class="fa-solid fa-file-import"></i>
+                Cargar Ranking Final
+            </button>
+            <button class="btn-historial" (click)="irASeleccionHistorial()" *ngIf="estadisticas.length > 0">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Ver Historial
+            </button>
+        </div>
     </div>
 
     <!-- Loading -->
@@ -42,8 +49,8 @@
                     Categoría
                 </label>
                 <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaChange()" class="form-control">
-                    <option [value]="null">Seleccionar categoría</option>
-                    <option *ngFor="let cat of categorias" [value]="cat.idTorneoCat">
+                    <option [ngValue]="null">Seleccionar categoría</option>
+                    <option *ngFor="let cat of categorias" [ngValue]="cat.idTorneoCat">
                         {{ cat.categoria?.nombre }} ({{ cat.rondas }} rondas)
                     </option>
                 </select>
@@ -55,11 +62,12 @@
                     Ronda
                 </label>
                 <select [(ngModel)]="rondaSeleccionada" (change)="onRondaChange()" class="form-control">
-                    <option [value]="0">Lista Inicial</option>
+                    <option [ngValue]="0">Lista Inicial</option>
                     <option *ngFor="let ronda of rondasDisponibles" [value]="ronda.numeroRonda">
                         Ronda {{ ronda.numeroRonda }}
                         <ng-container *ngIf="ronda.estado === 'finalizada'"> - Finalizada</ng-container>
                     </option>
+                    <option [ngValue]="-1" *ngIf="tieneRankingFinal()">Lista Final</option>
                 </select>
             </div>
 
@@ -131,11 +139,12 @@
                 <div class="header-left">
                     <i class="fa-solid fa-ranking-star"></i>
                     <h2>Tabla de Posiciones</h2>
-                    <span class="badge">{{ rondaSeleccionada === 0 ? 'Lista Inicial' : 'Ronda ' + rondaSeleccionada }}</span>
+                    <span class="badge">{{ getBadgeTexto() }}</span>
                 </div>
                 <div class="header-right">
                     <button class="btn-ordenar" (click)="toggleOrden()">
-                        <i class="fa-solid" [ngClass]="ordenActual === 'posicion' ? 'fa-sort-numeric-up' : 'fa-sort-alpha-up'"></i>
+                        <i class="fa-solid"
+                            [ngClass]="ordenActual === 'posicion' ? 'fa-sort-numeric-up' : 'fa-sort-alpha-up'"></i>
                         Ordenar por {{ ordenActual === 'posicion' ? 'Posición' : 'Nombre' }}
                     </button>
                 </div>
@@ -169,54 +178,63 @@
                                     <span>Puntos</span>
                                 </div>
                             </th>
-                            <th class="col-partidas center">
+                            <!-- Columnas de desempate solo para Lista Final -->
+                            <th class="col-desempate center"
+                                *ngFor="let sistema of getSistemasDesempateActual(); let idx = index">
                                 <div class="th-content">
-                                    <i class="fa-solid fa-chess"></i>
-                                    <span>PJ</span>
+                                    <i class="fa-solid fa-ranking-star"></i>
+                                    <span>{{ idx + 1 }}. {{ sistema }}</span>
                                 </div>
                             </th>
-                            <th class="col-victorias center">
-                                <div class="th-content">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    <span>V</span>
-                                </div>
-                            </th>
-                            <th class="col-empates center">
-                                <div class="th-content">
-                                    <i class="fa-solid fa-circle-half-stroke"></i>
-                                    <span>E</span>
-                                </div>
-                            </th>
-                            <th class="col-derrotas center">
-                                <div class="th-content">
-                                    <i class="fa-solid fa-circle-xmark"></i>
-                                    <span>D</span>
-                                </div>
-                            </th>
-                            <th class="col-cambio center" *ngIf="rondaSeleccionada && rondaSeleccionada > 0">
-                                <div class="th-content">
-                                    <i class="fa-solid fa-arrow-trend-up"></i>
-                                    <span>Cambio</span>
-                                </div>
-                            </th>
+                            <!-- Columnas normales solo si NO es Lista Final -->
+                            <ng-container *ngIf="rondaSeleccionada !== -1">
+                                <th class="col-partidas center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-chess"></i>
+                                        <span>PJ</span>
+                                    </div>
+                                </th>
+                                <th class="col-victorias center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span>V</span>
+                                    </div>
+                                </th>
+                                <th class="col-empates center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-circle-half-stroke"></i>
+                                        <span>E</span>
+                                    </div>
+                                </th>
+                                <th class="col-derrotas center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-circle-xmark"></i>
+                                        <span>D</span>
+                                    </div>
+                                </th>
+                                <th class="col-cambio center" *ngIf="rondaSeleccionada && rondaSeleccionada > 0">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-arrow-trend-up"></i>
+                                        <span>Cambio</span>
+                                    </div>
+                                </th>
+                            </ng-container>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let est of getEstadisticasPaginadas(); let i = index" 
-                            class="fila-resultado"
-                            [class.top-1]="(paginaActual - 1) * itemsPorPagina + i + 1 === 1"
-                            [class.top-2]="(paginaActual - 1) * itemsPorPagina + i + 1 === 2"
-                            [class.top-3]="(paginaActual - 1) * itemsPorPagina + i + 1 === 3"
-                            [class.top-4]="(paginaActual - 1) * itemsPorPagina + i + 1 === 4"
-                            [class.top-5]="(paginaActual - 1) * itemsPorPagina + i + 1 === 5">
-                            
+                        <tr *ngFor="let est of getEstadisticasPaginadas(); let i = index" class="fila-resultado"
+                            [class.top-1]="est.posicion_actual === 1" [class.top-2]="est.posicion_actual === 2"
+                            [class.top-3]="est.posicion_actual === 3" [class.top-4]="est.posicion_actual === 4"
+                            [class.top-5]="est.posicion_actual === 5">
+
                             <td class="col-posicion">
-                                <div class="posicion-badge" [class.podio]="est.posicion_actual && est.posicion_actual <= 3">
+                                <div class="posicion-badge"
+                                    [class.podio]="est.posicion_actual && est.posicion_actual <= 3">
                                     <i *ngIf="est.posicion_actual === 1" class="fa-solid fa-medal gold"></i>
                                     <i *ngIf="est.posicion_actual === 2" class="fa-solid fa-medal silver"></i>
                                     <i *ngIf="est.posicion_actual === 3" class="fa-solid fa-medal bronze"></i>
                                     <span *ngIf="!est.posicion_actual || est.posicion_actual > 3">
-                                        {{ (paginaActual - 1) * itemsPorPagina + i + 1 }}
+                                        {{ est.posicion_actual || (paginaActual - 1) * itemsPorPagina + i + 1 }}
                                     </span>
                                 </div>
                             </td>
@@ -228,7 +246,8 @@
                                     </div>
                                     <div class="jugador-info-table">
                                         <span class="jugador-nombre-table">
-                                            {{ est.jugador?.nombre }} {{ est.jugador?.apellido1 }} {{ est.jugador?.apellido2 }}
+                                            {{ est.jugador?.nombre }} {{ est.jugador?.apellido1 }} {{
+                                            est.jugador?.apellido2 }}
                                         </span>
                                         <span class="jugador-extra" *ngIf="est.jugador?.edad">
                                             {{ est.jugador?.edad }} años
@@ -252,28 +271,38 @@
                                 </div>
                             </td>
 
-                            <td class="col-partidas center">{{ est.partidas_jugadas }}</td>
-                            <td class="col-victorias center">
-                                <span class="stat-victoria">{{ est.victorias }}</span>
-                            </td>
-                            <td class="col-empates center">
-                                <span class="stat-empate">{{ est.empates }}</span>
-                            </td>
-                            <td class="col-derrotas center">
-                                <span class="stat-derrota">{{ est.derrotas }}</span>
+                            <!-- Valores de desempate solo para Lista Final -->
+                            <td class="col-desempate center" *ngFor="let sistema of getSistemasDesempateActual()">
+                                <span class="desempate-valor">
+                                    {{ getValorDesempate(est, sistema) }}
+                                </span>
                             </td>
 
-                            <td class="col-cambio center" *ngIf="rondaSeleccionada && rondaSeleccionada > 0">
-                                <div class="cambio-posicion" *ngIf="est.cambioPosicion && est.cambioPosicion !== 0">
-                                    <i class="fa-solid" 
-                                       [class.fa-arrow-up]="est.cambioPosicion > 0"
-                                       [class.fa-arrow-down]="est.cambioPosicion < 0"
-                                       [class.subida]="est.cambioPosicion > 0"
-                                       [class.bajada]="est.cambioPosicion < 0"></i>
-                                    <span>{{ Math.abs(est.cambioPosicion) }}</span>
-                                </div>
-                                <span *ngIf="!est.cambioPosicion || est.cambioPosicion === 0" class="sin-cambio">-</span>
-                            </td>
+                            <!-- Columnas normales solo si NO es Lista Final -->
+                            <ng-container *ngIf="rondaSeleccionada !== -1">
+                                <td class="col-partidas center">{{ est.partidas_jugadas }}</td>
+                                <td class="col-victorias center">
+                                    <span class="stat-victoria">{{ est.victorias }}</span>
+                                </td>
+                                <td class="col-empates center">
+                                    <span class="stat-empate">{{ est.empates }}</span>
+                                </td>
+                                <td class="col-derrotas center">
+                                    <span class="stat-derrota">{{ est.derrotas }}</span>
+                                </td>
+
+                                <td class="col-cambio center" *ngIf="rondaSeleccionada && rondaSeleccionada > 0">
+                                    <div class="cambio-posicion" *ngIf="est.cambioPosicion && est.cambioPosicion !== 0">
+                                        <i class="fa-solid" [class.fa-arrow-up]="est.cambioPosicion > 0"
+                                            [class.fa-arrow-down]="est.cambioPosicion < 0"
+                                            [class.subida]="est.cambioPosicion > 0"
+                                            [class.bajada]="est.cambioPosicion < 0"></i>
+                                        <span>{{ Math.abs(est.cambioPosicion) }}</span>
+                                    </div>
+                                    <span *ngIf="!est.cambioPosicion || est.cambioPosicion === 0"
+                                        class="sin-cambio">-</span>
+                                </td>
+                            </ng-container>
                         </tr>
                     </tbody>
                 </table>
@@ -281,27 +310,22 @@
 
             <!-- Paginación -->
             <div class="paginacion" *ngIf="totalPaginas > 1">
-                <button class="btn-pagina" 
-                        [disabled]="paginaActual === 1" 
-                        (click)="cambiarPagina(paginaActual - 1)">
+                <button class="btn-pagina" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
 
-                <button *ngFor="let pagina of paginasArray" 
-                        class="btn-pagina numero" 
-                        [class.activa]="pagina === paginaActual"
-                        (click)="cambiarPagina(pagina)">
+                <button *ngFor="let pagina of paginasArray" class="btn-pagina numero"
+                    [class.activa]="pagina === paginaActual" (click)="cambiarPagina(pagina)">
                     {{ pagina }}
                 </button>
 
-                <button class="btn-pagina" 
-                        [disabled]="paginaActual === totalPaginas" 
-                        (click)="cambiarPagina(paginaActual + 1)">
+                <button class="btn-pagina" [disabled]="paginaActual === totalPaginas"
+                    (click)="cambiarPagina(paginaActual + 1)">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
 
                 <span class="info-pagina">
-                    Página {{ paginaActual }} de {{ totalPaginas }} 
+                    Página {{ paginaActual }} de {{ totalPaginas }}
                     ({{ estadisticas.length }} jugadores)
                 </span>
             </div>
@@ -314,5 +338,15 @@
             <p>Selecciona una categoría con participantes inscritos para ver los resultados</p>
         </div>
 
+    </div>
+
+    <!-- Modal de carga de ranking -->
+    <div class="modal-overlay" *ngIf="mostrarCargarRanking" (click)="cerrarCargarRanking()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <app-cargar-ranking-excel [idTorneo]="torneoActual!.idTorneo!" [idTorneoCategoria]="categoriaSeleccionada!"
+                [torneoCategoria]="getTorneoCategoriaSeleccionada()" [jugadoresInscritos]="getJugadoresParaRanking()"
+                (onRankingCargado)="onRankingCargadoExitoso()" (onCancelar)="cerrarCargarRanking()">
+            </app-cargar-ranking-excel>
+        </div>
     </div>
 </div>

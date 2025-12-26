@@ -174,18 +174,36 @@ export class LandingComponent implements OnInit {
   // NUEVA FUNCIÓN: Verificar si las inscripciones están cerradas
   inscripcionesCerradas(torneo: Torneo): boolean {
     const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
-    
+    //console.log('Cierre inscripciones desde BD:', cierreInscripciones);
+
     if (!cierreInscripciones) {
       return false;
     }
 
     try {
-      const fechaCierre = new Date(cierreInscripciones);
+      // Crear fecha de cierre interpretándola como hora local de Los Mochis
+      const fechaCierreStr = typeof cierreInscripciones === 'string'
+        ? cierreInscripciones
+        : cierreInscripciones.toISOString();
+
+      // Extraer los componentes de la fecha (año, mes, día, hora, minuto)
+      const [datePart, timePart] = fechaCierreStr.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+
+      // Crear fecha en zona horaria local (Los Mochis)
+      const fechaCierre = new Date(year, month - 1, day, hour, minute);
+
+      // Obtener hora actual en zona horaria local
       const ahora = new Date();
-      
+
+      //console.log('Fecha cierre (local):', fechaCierre);
+      //console.log('Fecha actual (local):', ahora);
+      //console.log('¿Inscripciones cerradas?:', ahora >= fechaCierre);
+
       return ahora >= fechaCierre;
     } catch (e) {
-      console.error('Error al verificar cierre de inscripciones:', e);
+      //console.error('Error al verificar cierre de inscripciones:', e);
       return false;
     }
   }

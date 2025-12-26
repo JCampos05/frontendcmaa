@@ -3,13 +3,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../enviroment/enviroment';
-import { EstadisticaTorneo } from '../../models/estadistica-torneo';
+import { EstadisticaTorneo, CargarRankingFinalDto } from '../../models/estadistica-torneo';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EstadisticaTorneoService {
-  // Corregido: La ruta del backend es /api/estadisticas
   private apiUrl = `${environment.apiUrl}/estadisticas`;
 
   constructor(private http: HttpClient) { }
@@ -25,13 +24,11 @@ export class EstadisticaTorneoService {
   getAllEstadisticas(): Observable<EstadisticaTorneo[]> {
     return this.http.get<any>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       map(response => {
-        //console.log('getAllEstadisticas response:', response);
         if (response.data) return response.data;
         if (Array.isArray(response)) return response;
         return [];
       }),
       catchError(error => {
-        //console.error('Error en getAllEstadisticas:', error);
         return of([]);
       })
     );
@@ -42,14 +39,12 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        //console.log('getEstadisticasByTorneo response:', response);
         if (response.data) return response.data;
         if (response.estadisticas) return response.estadisticas;
         if (Array.isArray(response)) return response;
         return [];
       }),
       catchError(error => {
-        //console.error('Error en getEstadisticasByTorneo:', error);
         return of([]);
       })
     );
@@ -57,13 +52,9 @@ export class EstadisticaTorneoService {
 
   getEstadisticasByTorneoCategoria(idTorneo: number, idTorneoCategoria: number): Observable<EstadisticaTorneo[]> {
     const url = `${this.apiUrl}/torneo/${idTorneo}/categoria/${idTorneoCategoria}`;
-    //console.log('Llamando a URL:', url);
 
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       map(response => {
-        //console.log('getEstadisticasByTorneoCategoria response:', response);
-
-        // El backend retorna { success: true, data: [...] }
         if (response.success && response.data) {
           return response.data;
         }
@@ -88,12 +79,9 @@ export class EstadisticaTorneoService {
     numeroRonda: number
   ): Observable<EstadisticaTorneo[]> {
     const url = `${this.apiUrl}/torneo/${idTorneo}/categoria/${idTorneoCategoria}/ronda/${numeroRonda}`;
-    //console.log('Llamando a URL (hasta ronda):', url);
 
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       map(response => {
-        //console.log('getEstadisticasByTorneoCategoriaHastaRonda response:', response);
-
         if (response.success && response.data) {
           return response.data;
         }
@@ -115,13 +103,11 @@ export class EstadisticaTorneoService {
       { headers: this.getHeaders() }
     ).pipe(
       map(response => {
-        //console.log('getEstadisticaByJugador response:', response);
         if (response.data) return response.data;
         if (response.success && response.estadistica) return response.estadistica;
         return response;
       }),
       catchError(error => {
-        //console.error('Error en getEstadisticaByJugador:', error);
         return of(null);
       })
     );
@@ -132,7 +118,6 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        //console.log('createEstadistica response:', response);
         if (response.data) return response.data;
         if (response.success && response.estadistica) return response.estadistica;
         return response;
@@ -149,13 +134,11 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        //console.log('updateEstadistica response:', response);
         if (response.data) return response.data;
         if (response.success && response.estadistica) return response.estadistica;
         return response;
       }),
       catchError(error => {
-        //console.error('Error en updateEstadistica:', error);
         return of(null);
       })
     );
@@ -166,11 +149,9 @@ export class EstadisticaTorneoService {
       headers: this.getHeaders()
     }).pipe(
       map(response => {
-        //console.log('deleteEstadistica response:', response);
         return response.success || true;
       }),
       catchError(error => {
-        //console.error('Error en deleteEstadistica:', error);
         return of(false);
       })
     );
@@ -183,15 +164,50 @@ export class EstadisticaTorneoService {
       { headers: this.getHeaders() }
     ).pipe(
       map(response => {
-        //console.log('recalcularPosiciones response:', response);
         if (response.data) return response.data;
         if (response.estadisticas) return response.estadisticas;
         if (Array.isArray(response)) return response;
         return [];
       }),
       catchError(error => {
-        //console.error('Error en recalcularPosiciones:', error);
         return of([]);
+      })
+    );
+  }
+
+  cargarRankingFinal(data: CargarRankingFinalDto): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/cargar-ranking`, data, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Error en cargarRankingFinal:', error);
+        throw error;
+      })
+    );
+  }
+
+  getRankingFinal(idTorneo: number, idTorneoCategoria: number): Observable<EstadisticaTorneo[]> {
+    const url = `${this.apiUrl}/ranking-final/${idTorneo}/${idTorneoCategoria}`;
+    console.log('=== SERVICE getRankingFinal ===');
+    console.log('URL que se llamará:', url);
+
+    return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
+      map(response => {
+        console.log('Respuesta cruda del servidor:', response);
+        if (response.success && response.data) {
+          return response.data;
+        }
+        if (response.data) return response.data;
+        if (Array.isArray(response)) return response;
+        return [];
+      }),
+      catchError(error => {
+        console.error('✗ Error HTTP en getRankingFinal:');
+        console.error('Status:', error.status);
+        console.error('URL llamada:', url);
+        console.error('Error completo:', error);
+        throw error; // Re-lanzar el error para que lo capture el componente
       })
     );
   }
