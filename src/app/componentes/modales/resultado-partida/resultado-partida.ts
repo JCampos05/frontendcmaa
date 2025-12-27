@@ -17,6 +17,7 @@ import { CreatePartidaDto, TipoFinalizacion } from '../../../models/partida';
 export class ModalResultadoPartidaComponent implements OnInit, OnDestroy, OnChanges {
   @Input() visible = false;
   @Input() mesa: Mesa | null = null;
+  @Input() modoEdicion = false;
 
   @Output() cerrar = new EventEmitter<void>();
   @Output() resultadoGuardado = new EventEmitter<void>();
@@ -65,6 +66,7 @@ export class ModalResultadoPartidaComponent implements OnInit, OnDestroy, OnChan
           : new Date(this.mesa.timestampEdicion).toISOString())
         : null;
 
+      // SIEMPRE intentar bloquear, tanto en modo edición como en registro normal
       this.intentarBloquearMesa();
     } else if (changes['visible'] && !this.visible) {
       this.detenerVerificacionConcurrencia();
@@ -89,10 +91,25 @@ export class ModalResultadoPartidaComponent implements OnInit, OnDestroy, OnChan
     }
   }
 
+  cargarDatosExistentes(): void {
+    if (!this.mesa?.partida) return;
+
+    this.resultado = this.mesa.partida.resultado || '';
+    this.tipoFinalizacion = this.mesa.partida.tipo_finalizacion || null;
+    this.duracionMinutos = this.mesa.partida.duracion_minutos || null;
+    this.descripcionFinalizacion = this.mesa.partida.descripcion_finalizacion || this.mesa.notas || '';
+  }
+
   intentarBloquearMesa(): void {
     if (!this.mesa?.idMesa) return;
 
-    this.mesaService.bloquearMesa(this.mesa.idMesa).subscribe({
+    // Si estamos en modo edición, cargar datos existentes antes de bloquear
+    if (this.modoEdicion && this.mesa.partida) {
+      this.cargarDatosExistentes();
+    }
+
+    // Bloquear la mesa (indicando si es modo edición)
+    this.mesaService.bloquearMesa(this.mesa.idMesa, this.modoEdicion).subscribe({
       next: (response) => {
         if (response.success) {
           this.mesaBloqueada = false;
@@ -306,6 +323,73 @@ export class ModalResultadoPartidaComponent implements OnInit, OnDestroy, OnChan
     return Boolean(this.resultado && this.tipoFinalizacion && !this.mesaBloqueada);
   }
 
+
+  actualizarMesaEdicion(): void {
+    if (!this.mesa?.idMesa) return;
+
+    const mesaDto: UpdateMesaDto = {
+      ilegalesBlanco: this.ilegalesBlanco,
+      ilegalesNegro: this.ilegalesNegro,
+      notas: this.descripcionFinalizacion,
+      timestampEdicion: this.timestampInicial || new Date().toISOString()
+      // NO incluir estado para que el backend libere el bloqueo
+    };
+
+    this.mesaService.updateMesa(this.mesa.idMesa, mesaDto).subscribe({
+      next: () => {
+        this.detenerVerificacionConcurrencia();
+        this.liberarBloqueoMesa();
+        this.mostrarMensaje('Resultado actualizado correctamente', 'success', 2000);
+
+        setTimeout(() => {
+          this.resultadoGuardado.emit();
+          this.resetForm();
+        }, 2000);
+      },
+      error: (err) => {
+        console.error('Error al actualizar mesa:', err);
+
+        if (err.status === 423) {
+          this.mesaBloqueada = true;
+          this.mostrarMensaje('Otro usuario ha tomado el control de esta mesa', 'error', 0);
+        } else if (err.status === 409) {
+          this.mostrarMensaje('Los datos han sido modificados, actualizando...', 'warning');
+          this.verificarEstadoMesa();
+        } else {
+          this.mostrarMensaje('Error al actualizar la mesa.', 'error');
+        }
+
+        this.guardando = false;
+      }
+    });
+  }
+
+  actualizarPartidaExistente(): void {
+    if (!this.mesa?.partida?.idPartida) return;
+
+    const idJugadorGanador = this.obtenerIdJugadorGanador();
+
+    const updatePartidaDto = {
+      resultado: this.resultado,
+      tipo_finalizacion: this.tipoFinalizacion!,
+      descripcion_finalizacion: this.descripcionFinalizacion || undefined,
+      duracion_minutos: this.duracionMinutos || undefined,
+      idJugadorGanador: idJugadorGanador || undefined
+    };
+
+    this.partidaService.updatePartida(this.mesa.partida.idPartida, updatePartidaDto).subscribe({
+      next: () => {
+        this.actualizarMesaEdicion();
+      },
+      error: (err) => {
+        console.error('Error al actualizar partida:', err);
+        this.mostrarMensaje('Error al actualizar el resultado. Intenta nuevamente.', 'error');
+        this.guardando = false;
+      }
+    });
+  }
+
+
   guardarResultado(): void {
     if (!this.formularioValido() || !this.mesa?.idMesa || this.mesaBloqueada) return;
 
@@ -313,6 +397,13 @@ export class ModalResultadoPartidaComponent implements OnInit, OnDestroy, OnChan
     this.mensajeValidacion = '';
     this.tipoMensaje = '';
 
+    // Si estamos en modo edición, actualizar la partida existente
+    if (this.modoEdicion && this.mesa.partida?.idPartida) {
+      this.actualizarPartidaExistente();
+      return;
+    }
+
+    // Si no, crear una nueva partida
     const idJugadorGanador = this.obtenerIdJugadorGanador();
 
     const partidaDto: CreatePartidaDto = {

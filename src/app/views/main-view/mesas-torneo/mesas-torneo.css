@@ -417,6 +417,53 @@
     border-bottom: 2px solid var(--color-light-gray);
 }
 
+.mesa-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-editar-mesa {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: #3B82F6;
+    color: var(--color-white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+}
+
+/* En desktop: mostrar solo en hover */
+@media (min-width: 769px) {
+    .mesa-card:hover .btn-editar-mesa {
+        opacity: 1;
+    }
+}
+
+/* En móvil: siempre visible */
+@media (max-width: 768px) {
+    .btn-editar-mesa {
+        opacity: 1;
+    }
+}
+.mesa-card:hover .btn-editar-mesa {
+    opacity: 1;
+}
+
+.btn-editar-mesa:hover {
+    background: #2563EB;
+    transform: scale(1.1);
+}
+
+.btn-editar-mesa i {
+    font-size: 0.875rem;
+}
+
 .mesa-numero {
     display: flex;
     align-items: center;

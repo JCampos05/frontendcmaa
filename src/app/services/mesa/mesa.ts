@@ -143,10 +143,12 @@ export class MesaService {
     );
   }
 
-  bloquearMesa(id: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/${id}/bloquear`, {}, {
-      headers: this.getHeaders()
-    }).pipe(
+
+bloquearMesa(id: number, modoEdicion: boolean = false): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${id}/bloquear`, 
+      { modoEdicion }, 
+      { headers: this.getHeaders() }
+    ).pipe(
       catchError(error => {
         //-> OJO daba error en cuanto se actualizaba PERO si se guarda correctamente (Pool constante con seccion critica)
         //console.error('Error al bloquear mesa:', error);

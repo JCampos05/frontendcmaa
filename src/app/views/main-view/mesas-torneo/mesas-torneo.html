@@ -148,8 +148,8 @@
                 </button>
 
                 <!-- Mensaje cuando se completaron todas las rondas -->
-                <div *ngIf="rondaActualData.estado === 'finalizada' && !puedeCrearSiguienteRonda()" 
-                     class="ronda-completada-mensaje">
+                <div *ngIf="rondaActualData.estado === 'finalizada' && !puedeCrearSiguienteRonda()"
+                    class="ronda-completada-mensaje">
                     <i class="fa-solid fa-trophy"></i>
                     <span>¡Todas las rondas completadas! El torneo para esta categoría ha finalizado.</span>
                 </div>
@@ -173,9 +173,15 @@
                             <i class="fa-solid fa-chess-board"></i>
                             <span>Mesa {{ mesa.numeroMesa }}</span>
                         </div>
-                        <span class="mesa-status" [ngClass]="getMesaEstadoClase(mesa.estado)">
-                            <i class="fa-solid fa-circle"></i>
-                        </span>
+                        <div class="mesa-header-actions">
+                            <span class="mesa-status" [ngClass]="getMesaEstadoClase(mesa.estado)">
+                                <i class="fa-solid fa-circle"></i>
+                            </span>
+                            <button *ngIf="mesa.estado === 'finalizada'" class="btn-editar-mesa"
+                                (click)="abrirModalEdicionMesa(mesa, $event)" title="Editar resultado">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="mesa-jugadores">
@@ -271,31 +277,23 @@
 
 
 <!-- Modal Carga de Archivo -->
-<app-modal-carga-emparejamiento
-    *ngIf="modalCargaArchivoVisible"
-    [visible]="modalCargaArchivoVisible"
-    [idRonda]="rondaActualData?.idRonda"
-    [numeroRonda]="rondaActualData?.numeroRonda"
-    [idTorneo]="torneoActual?.idTorneo"
-    [idCategoria]="categoriaSeleccionada?.idCategoria"
-    (cerrar)="cerrarModalCargaArchivo()"
-    (cargaExitosa)="onCargaExitosa()">
+<app-modal-carga-emparejamiento *ngIf="modalCargaArchivoVisible" [visible]="modalCargaArchivoVisible"
+    [idRonda]="rondaActualData?.idRonda" [numeroRonda]="rondaActualData?.numeroRonda"
+    [idTorneo]="torneoActual?.idTorneo" [idCategoria]="categoriaSeleccionada?.idCategoria"
+    (cerrar)="cerrarModalCargaArchivo()" (cargaExitosa)="onCargaExitosa()">
 </app-modal-carga-emparejamiento>
 
 <!-- Modal Emparejamiento Manual -->
-<app-modal-emparejamiento-manual
-    *ngIf="modalEmparejamientoVisible"
-    [visible]="modalEmparejamientoVisible"
-    [idRonda]="rondaActualData?.idRonda"
-    [idTorneo]="torneoActual?.idTorneo"
-    [idCategoria]="categoriaSeleccionada?.idCategoria"
-    (cerrar)="cerrarModalEmparejamiento()"
+<app-modal-emparejamiento-manual *ngIf="modalEmparejamientoVisible" [visible]="modalEmparejamientoVisible"
+    [idRonda]="rondaActualData?.idRonda" [idTorneo]="torneoActual?.idTorneo"
+    [idCategoria]="categoriaSeleccionada?.idCategoria" (cerrar)="cerrarModalEmparejamiento()"
     (emparejamientoCreado)="onEmparejamientoCreado()">
 </app-modal-emparejamiento-manual>
 
 <!-- Modal Registro de Resultado -->
 <app-modal-resultado-partida *ngIf="modalResultadoVisible" [visible]="modalResultadoVisible" [mesa]="mesaSeleccionada"
-    (cerrar)="cerrarModalResultado()" (resultadoGuardado)="onResultadoGuardado()">
+    [modoEdicion]="mesaSeleccionada?.estado === 'finalizada'" (cerrar)="cerrarModalResultado()"
+    (resultadoGuardado)="onResultadoGuardado()">
 </app-modal-resultado-partida>
 
 <!-- Modal de Confirmación -->
@@ -303,6 +301,14 @@
     [mensaje]="confirmacionMensaje" [textoConfirmar]="confirmacionTextoConfirmar" [tipoBotonPrimario]="confirmacionTipo"
     (confirmar)="ejecutarAccionConfirmada()" (cancelar)="cerrarModalConfirmacion()">
 </app-modal-confirmacion>
+
+<!-- Modal de Advertencia de Edición -->
+<app-modal-advertencia-edicion [visible]="modalAdvertenciaEdicionVisible" [numeroMesa]="mesaSeleccionada?.numeroMesa"
+    [jugadorBlanco]="mesaSeleccionada?.jugador_blanco?.nombre + ' ' + mesaSeleccionada?.jugador_blanco?.apellido1"
+    [jugadorNegro]="mesaSeleccionada?.jugador_negro?.nombre + ' ' + mesaSeleccionada?.jugador_negro?.apellido1"
+    [resultadoActual]="mesaSeleccionada?.partida?.resultado" (confirmar)="confirmarEdicionMesa()"
+    (cancelar)="cancelarEdicionMesa()">
+</app-modal-advertencia-edicion>
 
 <!-- Toast de Notificaciones -->
 <app-toast-noti></app-toast-noti>

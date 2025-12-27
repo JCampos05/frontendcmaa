@@ -1,0 +1,109 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onOverlayClick($event)">
+    <div class="modal-container">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="header-icon warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="header-text">
+                <h2>Advertencia: Edición de Resultado</h2>
+                <p>Esta acción requiere precaución y notificación al árbitro</p>
+            </div>
+            <button class="btn-close" (click)="onCancelar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Información de la mesa -->
+        <div class="mesa-info-section">
+            <div class="info-header">
+                <i class="fa-solid fa-chess-board"></i>
+                <span>Mesa {{ numeroMesa }}</span>
+            </div>
+            <div class="jugadores-info">
+                <div class="jugador-item">
+                    <i class="fa-solid fa-square"></i>
+                    <span>{{ jugadorBlanco }}</span>
+                </div>
+                <div class="vs">vs</div>
+                <div class="jugador-item negro">
+                    <i class="fa-solid fa-square"></i>
+                    <span>{{ jugadorNegro }}</span>
+                </div>
+            </div>
+            <div class="resultado-actual" *ngIf="resultadoActual">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Resultado actual: <strong>{{ resultadoActual }}</strong></span>
+            </div>
+        </div>
+
+        <!-- Advertencias críticas -->
+        <div class="advertencias-section">
+            <div class="advertencia-card critica">
+                <div class="advertencia-icon">
+                    <i class="fa-solid fa-exclamation-circle"></i>
+                </div>
+                <div class="advertencia-content">
+                    <h3>Notificación Obligatoria</h3>
+                    <p>Debes <strong>notificar inmediatamente al árbitro principal</strong> antes de realizar cualquier modificación al resultado de esta mesa.</p>
+                </div>
+            </div>
+
+            <div class="advertencia-card importante">
+                <div class="advertencia-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="advertencia-content">
+                    <h3>Impacto en Estadísticas</h3>
+                    <p>Esta modificación afectará <strong>automáticamente</strong>:</p>
+                    <ul>
+                        <li>Puntuaciones acumuladas de ambos jugadores</li>
+                        <li>Posiciones en la tabla general</li>
+                        <li>Estadísticas de victorias/empates/derrotas</li>
+                        <li>Sistemas de desempate aplicados</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="advertencia-card atencion">
+                <div class="advertencia-icon">
+                    <i class="fa-solid fa-list-ol"></i>
+                </div>
+                <div class="advertencia-content">
+                    <h3>Efecto en Rondas Posteriores</h3>
+                    <p>Si existen rondas posteriores a esta, los emparejamientos <strong>no se recalcularán automáticamente</strong>. El árbitro deberá evaluar si es necesario ajustar manualmente los enfrentamientos futuros.</p>
+                </div>
+            </div>
+
+            <div class="advertencia-card info">
+                <div class="advertencia-icon">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div class="advertencia-content">
+                    <h3>Registro de Cambios</h3>
+                    <p>Esta modificación quedará registrada en el sistema con fecha, hora y usuario que realizó el cambio para mantener la trazabilidad del torneo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmación -->
+        <div class="confirmacion-section">
+            <div class="confirmacion-text">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <p>Al continuar, confirmas que has notificado al árbitro y comprendes las implicaciones de esta modificación.</p>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="onCancelar()">
+                <i class="fa-solid fa-xmark"></i>
+                Cancelar
+            </button>
+            <button class="btn-danger" (click)="onConfirmar()">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Entiendo, Continuar con la Edición
+            </button>
+        </div>
+    </div>
+</div>

@@ -3,7 +3,7 @@
         <div class="modal-header">
             <div class="modal-title">
                 <i class="fa-solid fa-chess"></i>
-                <h2>Registrar Resultado</h2>
+                <h2>{{ modoEdicion ? 'Editar Resultado' : 'Registrar Resultado' }}</h2>
             </div>
             <button class="btn-close-modal" (click)="cerrarModal()">
                 <i class="fa-solid fa-times"></i>
@@ -63,24 +63,18 @@
                         Resultado
                     </label>
                     <div class="resultado-opciones">
-                        <button class="btn-resultado" 
-                                [class.selected]="resultado === '1-0'"
-                                [disabled]="mesaBloqueada"
-                                (click)="seleccionarResultado('1-0')">
+                        <button class="btn-resultado" [class.selected]="resultado === '1-0'" [disabled]="mesaBloqueada"
+                            (click)="seleccionarResultado('1-0')">
                             <i class="fa-solid fa-crown"></i>
                             Ganan Blancas
                         </button>
-                        <button class="btn-resultado" 
-                                [class.selected]="resultado === '0.5-0.5'"
-                                [disabled]="mesaBloqueada"
-                                (click)="seleccionarResultado('0.5-0.5')">
+                        <button class="btn-resultado" [class.selected]="resultado === '0.5-0.5'"
+                            [disabled]="mesaBloqueada" (click)="seleccionarResultado('0.5-0.5')">
                             <i class="fa-solid fa-handshake"></i>
                             Empate
                         </button>
-                        <button class="btn-resultado" 
-                                [class.selected]="resultado === '0-1'"
-                                [disabled]="mesaBloqueada"
-                                (click)="seleccionarResultado('0-1')">
+                        <button class="btn-resultado" [class.selected]="resultado === '0-1'" [disabled]="mesaBloqueada"
+                            (click)="seleccionarResultado('0-1')">
                             <i class="fa-solid fa-crown"></i>
                             Ganan Negras
                         </button>
@@ -92,9 +86,7 @@
                         <i class="fa-solid fa-flag-checkered"></i>
                         Tipo de Finalización
                     </label>
-                    <select [(ngModel)]="tipoFinalizacion" 
-                            class="form-control"
-                            [disabled]="mesaBloqueada">
+                    <select [(ngModel)]="tipoFinalizacion" class="form-control" [disabled]="mesaBloqueada">
                         <option [value]="null">Seleccionar tipo</option>
                         <option value="jaquemate">Jaque Mate</option>
                         <option value="tiempo">Por Tiempo</option>
@@ -114,12 +106,8 @@
                         <i class="fa-solid fa-clock"></i>
                         Duración (minutos)
                     </label>
-                    <input type="number" 
-                           [(ngModel)]="duracionMinutos" 
-                           class="form-control" 
-                           placeholder="Ej: 45"
-                           [disabled]="mesaBloqueada"
-                           min="1">
+                    <input type="number" [(ngModel)]="duracionMinutos" class="form-control" placeholder="Ej: 45"
+                        [disabled]="mesaBloqueada" min="1">
                 </div>
 
                 <div class="ilegales-section">
@@ -129,15 +117,13 @@
                             Jugadas Ilegales - Blancas
                         </label>
                         <div class="counter-control">
-                            <button class="btn-counter" 
-                                    (click)="decrementarIlegales('blanco')"
-                                    [disabled]="ilegalesBlanco <= 0 || mesaBloqueada">
+                            <button class="btn-counter" (click)="decrementarIlegales('blanco')"
+                                [disabled]="ilegalesBlanco <= 0 || mesaBloqueada">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
                             <span class="counter-value">{{ ilegalesBlanco }}</span>
-                            <button class="btn-counter" 
-                                    (click)="incrementarIlegales('blanco')"
-                                    [disabled]="mesaBloqueada">
+                            <button class="btn-counter" (click)="incrementarIlegales('blanco')"
+                                [disabled]="mesaBloqueada">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -149,27 +135,22 @@
                             Jugadas Ilegales - Negras
                         </label>
                         <div class="counter-control">
-                            <button class="btn-counter" 
-                                    (click)="decrementarIlegales('negro')"
-                                    [disabled]="ilegalesNegro <= 0 || mesaBloqueada">
+                            <button class="btn-counter" (click)="decrementarIlegales('negro')"
+                                [disabled]="ilegalesNegro <= 0 || mesaBloqueada">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
                             <span class="counter-value">{{ ilegalesNegro }}</span>
-                            <button class="btn-counter" 
-                                    (click)="incrementarIlegales('negro')"
-                                    [disabled]="mesaBloqueada">
+                            <button class="btn-counter" (click)="incrementarIlegales('negro')"
+                                [disabled]="mesaBloqueada">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button class="btn-guardar-ilegales" 
-                            (click)="guardarIlegales()" 
-                            [disabled]="guardandoIlegales || mesaBloqueada">
-                        <i class="fa-solid" 
-                           [class.fa-spinner]="guardandoIlegales" 
-                           [class.fa-spin]="guardandoIlegales"
-                           [class.fa-save]="!guardandoIlegales"></i>
+                    <button class="btn-guardar-ilegales" (click)="guardarIlegales()"
+                        [disabled]="guardandoIlegales || mesaBloqueada">
+                        <i class="fa-solid" [class.fa-spinner]="guardandoIlegales" [class.fa-spin]="guardandoIlegales"
+                            [class.fa-save]="!guardandoIlegales"></i>
                         {{ guardandoIlegales ? 'Guardando...' : 'Guardar Ilegales' }}
                     </button>
                 </div>
@@ -179,32 +160,24 @@
                         <i class="fa-solid fa-note-sticky"></i>
                         Observaciones (Opcional)
                     </label>
-                    <textarea [(ngModel)]="descripcionFinalizacion" 
-                              class="form-control" 
-                              placeholder="Notas adicionales sobre la partida..."
-                              [disabled]="mesaBloqueada"
-                              rows="3"></textarea>
-                    <button class="btn-guardar-notas" 
-                            (click)="guardarNotas()" 
-                            [disabled]="guardandoNotas || mesaBloqueada">
-                        <i class="fa-solid" 
-                           [class.fa-spinner]="guardandoNotas" 
-                           [class.fa-spin]="guardandoNotas"
-                           [class.fa-save]="!guardandoNotas"></i>
+                    <textarea [(ngModel)]="descripcionFinalizacion" class="form-control"
+                        placeholder="Notas adicionales sobre la partida..." [disabled]="mesaBloqueada"
+                        rows="3"></textarea>
+                    <button class="btn-guardar-notas" (click)="guardarNotas()"
+                        [disabled]="guardandoNotas || mesaBloqueada">
+                        <i class="fa-solid" [class.fa-spinner]="guardandoNotas" [class.fa-spin]="guardandoNotas"
+                            [class.fa-save]="!guardandoNotas"></i>
                         {{ guardandoNotas ? 'Guardando...' : 'Guardar Notas' }}
                     </button>
                 </div>
             </div>
 
-            <div class="mensaje-validacion" 
-                 *ngIf="mensajeValidacion && !mesaBloqueada"
-                 [ngClass]="{
+            <div class="mensaje-validacion" *ngIf="mensajeValidacion && !mesaBloqueada" [ngClass]="{
                    'mensaje-success': tipoMensaje === 'success',
                    'mensaje-error': tipoMensaje === 'error',
                    'mensaje-warning': tipoMensaje === 'warning'
                  }">
-                <i class="fa-solid" 
-                   [ngClass]="{
+                <i class="fa-solid" [ngClass]="{
                      'fa-circle-check': tipoMensaje === 'success',
                      'fa-circle-exclamation': tipoMensaje === 'error',
                      'fa-triangle-exclamation': tipoMensaje === 'warning'
@@ -218,14 +191,11 @@
                 <i class="fa-solid fa-times"></i>
                 Cancelar
             </button>
-            <button class="btn-modal btn-confirm" 
-                    [disabled]="!formularioValido() || guardando"
-                    (click)="guardarResultado()">
-                <i class="fa-solid" 
-                   [class.fa-spinner]="guardando" 
-                   [class.fa-spin]="guardando"
-                   [class.fa-check]="!guardando"></i>
-                {{ guardando ? 'Guardando...' : 'Guardar Resultado' }}
+            <button class="btn-modal btn-confirm" [disabled]="!formularioValido() || guardando"
+                (click)="guardarResultado()">
+                <i class="fa-solid" [class.fa-spinner]="guardando" [class.fa-spin]="guardando"
+                    [class.fa-check]="!guardando"></i>
+                {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar Resultado' : 'Guardar Resultado') }}
             </button>
         </div>
     </div>

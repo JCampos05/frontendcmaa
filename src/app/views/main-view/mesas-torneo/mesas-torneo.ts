@@ -16,7 +16,7 @@ import { ModalCargaEmparejamientoComponent } from '../../../componentes/principa
 import { ModalEmparejamientoManualComponent } from '../../../componentes/modales/emparejamiento-manual/emparejamiento-manual';
 import { ModalResultadoPartidaComponent } from '../../../componentes/modales/resultado-partida/resultado-partida';
 import { ModalConfirmacionComponent } from '../../../componentes/modales/modal-confirmacion/modal-confirmacion';
-
+import { ModalAdvertenciaEdicionComponent } from '../../../componentes/modales/advertencia-edicion-mesa/advertencia-edicion-mesa';
 @Component({
   selector: 'app-mesas-torneo',
   standalone: true,
@@ -27,6 +27,7 @@ import { ModalConfirmacionComponent } from '../../../componentes/modales/modal-c
     ModalEmparejamientoManualComponent,
     ModalResultadoPartidaComponent,
     ModalConfirmacionComponent,
+    ModalAdvertenciaEdicionComponent,
     ToastNoti
   ],
   templateUrl: './mesas-torneo.html',
@@ -53,6 +54,7 @@ export class MesasTorneoComponent implements OnInit {
   modalEmparejamientoVisible = false;
   modalResultadoVisible = false;
   modalConfirmacionVisible = false;
+  modalAdvertenciaEdicionVisible = false;
 
   confirmacionTitulo = '';
   confirmacionMensaje = '';
@@ -227,7 +229,7 @@ export class MesasTorneoComponent implements OnInit {
         if (this.rondasDisponibles.length > 0) {
           // Si había una ronda seleccionada, mantenerla si sigue existiendo
           const rondaActualNumero = this.rondaSeleccionada;
-          
+
           if (rondaActualNumero) {
             const rondaExistente = this.rondasDisponibles.find(r => r.numeroRonda === rondaActualNumero);
             if (rondaExistente) {
@@ -371,7 +373,7 @@ export class MesasTorneoComponent implements OnInit {
           this.rondaActualData.estado = 'finalizada';
           this.rondaActualData.fecha_fin = new Date().toISOString();
         }
-        
+
         // Recargar rondas para actualizar la lista
         if (this.torneoActual?.idTorneo && this.categoriaSeleccionada?.idCategoria) {
           this.cargarRondas(this.torneoActual.idTorneo, this.categoriaSeleccionada.idCategoria);
@@ -384,29 +386,29 @@ export class MesasTorneoComponent implements OnInit {
     });
   }
 
-puedeCrearSiguienteRonda(): boolean {
+  puedeCrearSiguienteRonda(): boolean {
     if (!this.categoriaSeleccionada || !this.rondaActualData) return false;
-    
+
     const rondasTotales = this.categoriaSeleccionada.rondas || 0;
     const rondaActual = this.rondaActualData.numeroRonda;
-    
+
     // Solo puede crear la siguiente si la actual está finalizada y no se alcanzó el máximo
     return this.rondaActualData.estado === 'finalizada' && rondaActual < rondasTotales;
   }
 
   siguienteRondaYaExiste(): boolean {
     if (!this.rondaActualData) return false;
-    
+
     const siguienteNumero = this.rondaActualData.numeroRonda + 1;
     return this.rondasDisponibles.some(r => r.numeroRonda === siguienteNumero);
   }
 
   irASiguienteRonda(): void {
     if (!this.rondaActualData) return;
-    
+
     const siguienteNumero = this.rondaActualData.numeroRonda + 1;
     const siguienteRonda = this.rondasDisponibles.find(r => r.numeroRonda === siguienteNumero);
-    
+
     if (siguienteRonda) {
       this.rondaSeleccionada = siguienteRonda.numeroRonda;
       this.rondaActualData = siguienteRonda;
@@ -417,9 +419,9 @@ puedeCrearSiguienteRonda(): boolean {
 
   confirmarCrearSiguienteRonda(): void {
     if (!this.rondaActualData) return;
-    
+
     const siguienteNumero = this.rondaActualData.numeroRonda + 1;
-    
+
     this.confirmacionTitulo = 'Crear Siguiente Ronda';
     this.confirmacionMensaje = `¿Deseas crear la Ronda ${siguienteNumero}? Podrás configurar los emparejamientos después.`;
     this.confirmacionTextoConfirmar = 'Crear Ronda';
@@ -448,7 +450,7 @@ puedeCrearSiguienteRonda(): boolean {
     this.rondaService.createRonda(rondaDto).subscribe({
       next: (ronda) => {
         this.mostrarToast('success', 'Ronda Creada', `La Ronda ${siguienteNumero} ha sido creada exitosamente`);
-        
+
         // Recargar rondas y seleccionar la nueva
         if (this.torneoActual?.idTorneo && this.categoriaSeleccionada?.idCategoria) {
           this.cargarRondas(this.torneoActual.idTorneo, this.categoriaSeleccionada.idCategoria);
@@ -511,6 +513,105 @@ puedeCrearSiguienteRonda(): boolean {
     this.verificarYAbrirModal(mesa);
   }
 
+  abrirModalEdicionMesa(mesa: Mesa, event: Event): void {
+    event.stopPropagation();
+
+    if (mesa.estado !== 'finalizada' || !mesa.partida) {
+      this.mostrarToast('warning', 'Mesa no disponible', 'Solo puedes editar mesas finalizadas con resultado');
+      return;
+    }
+
+    // NO establecer mesaSeleccionada aquí todavía
+    // PRIMERO verificar disponibilidad
+    this.verificarDisponibilidadParaEdicion(mesa);
+  }
+
+  private verificarDisponibilidadParaEdicion(mesa: Mesa): void {
+    if (!mesa.idMesa) return;
+
+    this.cargando = true;
+
+    this.mesaService.verificarDisponibilidadMesa(mesa.idMesa).subscribe({
+      next: (disponibilidad) => {
+        this.cargando = false;
+
+        // Si NO está disponible (otro usuario editando)
+        if (!disponibilidad.disponible && !disponibilidad.yaFinalizada) {
+          const usuario = disponibilidad.usuarioEditando || 'Otro usuario';
+          const tiempoRestante = disponibilidad.tiempoRestante
+            ? Math.ceil(disponibilidad.tiempoRestante / 60)
+            : 0;
+
+          this.mostrarToast(
+            'warning',
+            'Mesa ocupada',
+            `${usuario} está registrando el resultado de esta mesa. Tiempo restante: ${tiempoRestante} min`
+          );
+          // NO establecer mesaSeleccionada si está bloqueada
+          return;
+        }
+
+        // SOLO si está disponible, establecer mesaSeleccionada y mostrar modal
+        this.mesaSeleccionada = mesa;
+        this.modalAdvertenciaEdicionVisible = true;
+      },
+      error: (err) => {
+        this.cargando = false;
+        console.error('Error al verificar disponibilidad:', err);
+        this.mostrarToast('error', 'Error', 'No se pudo verificar el estado de la mesa');
+      }
+    });
+  }
+
+  confirmarEdicionMesa(): void {
+    this.modalAdvertenciaEdicionVisible = false;
+
+    if (!this.mesaSeleccionada?.idMesa) return;
+
+    // Abrir el modal de resultado
+    // El bloqueo se hará dentro del modal al inicializarse
+    this.modalResultadoVisible = true;
+  }
+
+  cancelarEdicionMesa(): void {
+    this.modalAdvertenciaEdicionVisible = false;
+    this.mesaSeleccionada = null;
+  }
+
+  private verificarYAbrirModalEdicion(mesa: Mesa): void {
+    if (!mesa.idMesa) return;
+
+    this.cargando = true;
+
+    this.mesaService.verificarDisponibilidadMesa(mesa.idMesa).subscribe({
+      next: (disponibilidad) => {
+        this.cargando = false;
+
+        if (!disponibilidad.disponible && !disponibilidad.yaFinalizada) {
+          const usuario = disponibilidad.usuarioEditando || 'Otro usuario';
+          const tiempoRestante = disponibilidad.tiempoRestante
+            ? Math.ceil(disponibilidad.tiempoRestante / 60)
+            : 0;
+
+          this.mostrarToast(
+            'warning',
+            'Mesa ocupada',
+            `${usuario} está registrando el resultado de esta mesa. Tiempo restante: ${tiempoRestante} min`
+          );
+          return;
+        }
+
+        this.mesaSeleccionada = mesa;
+        this.modalResultadoVisible = true;
+      },
+      error: (err) => {
+        this.cargando = false;
+        console.error('Error al verificar disponibilidad:', err);
+        this.mostrarToast('error', 'Error', 'No se pudo verificar el estado de la mesa');
+      }
+    });
+  }
+
   private verificarYAbrirModal(mesa: Mesa): void {
     if (!mesa.idMesa) return;
 
@@ -524,13 +625,13 @@ puedeCrearSiguienteRonda(): boolean {
         if (!disponibilidad.disponible) {
           // Mesa bloqueada por otro usuario
           const usuario = disponibilidad.usuarioEditando || 'Otro usuario';
-          const tiempoRestante = disponibilidad.tiempoRestante 
-            ? Math.ceil(disponibilidad.tiempoRestante / 60) 
+          const tiempoRestante = disponibilidad.tiempoRestante
+            ? Math.ceil(disponibilidad.tiempoRestante / 60)
             : 0;
-          
+
           this.mostrarToast(
-            'warning', 
-            'Mesa ocupada', 
+            'warning',
+            'Mesa ocupada',
             `${usuario} está registrando el resultado de esta mesa. Tiempo restante: ${tiempoRestante} min`
           );
           return;
