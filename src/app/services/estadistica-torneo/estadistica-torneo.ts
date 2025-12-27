@@ -244,7 +244,7 @@ export class EstadisticaTorneoService {
         return [];
       }),
       catchError(error => {
-        console.error('Error en getRankingFinalPublic:', error);
+        //console.error('Error en getRankingFinalPublic:', error);
         throw error;
       })
     );

@@ -100,7 +100,7 @@ export class JugadorResultadoComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Error al cargar los torneos';
-        console.error('Error:', err);
+        //console.error('Error:', err);
         this.cargandoTorneos = false;
         this.mostrarToast('error', 'Error', 'No se pudieron cargar los torneos');
       }
@@ -134,7 +134,7 @@ export class JugadorResultadoComponent implements OnInit {
         this.cargandoCategorias = false;
       },
       error: (err) => {
-        console.error('Error al cargar categorías:', err);
+        //console.error('Error al cargar categorías:', err);
         this.cargandoCategorias = false;
         this.mostrarToast('error', 'Error', 'No se pudieron cargar las categorías');
       }
@@ -171,7 +171,7 @@ export class JugadorResultadoComponent implements OnInit {
         const idTorneoCat = this.categoriaSeleccionada?.idTorneoCat;
 
         if (!idTorneoCat) {
-          console.error('No se encontró idTorneoCat');
+          //console.error('No se encontró idTorneoCat');
           this.cargandoRondas = false;
           return;
         }
@@ -191,7 +191,7 @@ export class JugadorResultadoComponent implements OnInit {
         this.cargandoRondas = false;
       },
       error: (err) => {
-        console.error('Error al cargar rondas:', err);
+        //console.error('Error al cargar rondas:', err);
         this.rondasDisponibles = [];
         this.cargandoRondas = false;
         this.mostrarToast('error', 'Error', 'No se pudieron cargar las rondas');
@@ -200,7 +200,7 @@ export class JugadorResultadoComponent implements OnInit {
   }
 
   onRondaChange(): void {
-  console.log('TEST');
+  //console.log('TEST');
 
     this.resetearBusqueda();
     this.mesasRonda = [];
@@ -208,10 +208,10 @@ export class JugadorResultadoComponent implements OnInit {
     this.listaInicial = [];
     this.listaFinal = [];
 
-  console.log('TEST');
+  //console.log('TEST');
 
     if (this.rondaSeleccionada === 0) {
-      console.log('LISTA INICIAL');
+      //console.log('LISTA INICIAL');
       this.cargarListaInicial();
       return;
     }
@@ -247,7 +247,7 @@ export class JugadorResultadoComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error al cargar mesas:', err);
+        //console.error('Error al cargar mesas:', err);
         this.mesasRonda = [];
         this.cargandoMesas = false;
         this.cargandoRondas = false;
@@ -431,7 +431,7 @@ cargarListaInicial(): void {
       this.cargandoMesas = false;
     },
     error: (err) => {
-      console.error('Error al cargar lista inicial:', err);
+      //console.error('Error al cargar lista inicial:', err);
       this.listaInicial = [];
       this.cargandoMesas = false;
       this.mostrarToast('error', 'Error', 'No se pudo cargar la lista inicial');
@@ -506,7 +506,7 @@ cargarListaInicial(): void {
                 try {
                   desempatesObj = JSON.parse(est.desempates);
                 } catch (e) {
-                  console.warn('Error al parsear desempates:', e);
+                  //console.warn('Error al parsear desempates:', e);
                   desempatesObj = {};
                 }
               } else if (typeof est.desempates === 'object') {
@@ -529,7 +529,7 @@ cargarListaInicial(): void {
         this.cargandoMesas = false;
       },
       error: (err) => {
-        console.error('Error al cargar lista final:', err);
+        //console.error('Error al cargar lista final:', err);
         this.listaFinal = [];
         this.cargandoMesas = false;
         this.mostrarToast('error', 'Error', 'No se encontró ranking final para esta categoría');

@@ -176,7 +176,7 @@ export class MesaService {
         return [];
       }),
       catchError(error => {
-        console.error('Error en getMesasByRondaPublico:', error);
+        //console.error('Error en getMesasByRondaPublico:', error);
         return of([]);
       })
     );
