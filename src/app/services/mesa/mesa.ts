@@ -165,4 +165,20 @@ export class MesaService {
       })
     );
   }
+
+  // Método público para obtener mesas por ronda SIN autenticación
+  getMesasByRondaPublico(idRonda: number): Observable<Mesa[]> {
+    return this.http.get<any>(`${this.apiUrl}/public/ronda/${idRonda}`).pipe(
+      map(response => {
+        if (response.data) return response.data;
+        if (response.mesas) return response.mesas;
+        if (Array.isArray(response)) return response;
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error en getMesasByRondaPublico:', error);
+        return of([]);
+      })
+    );
+  }
 }

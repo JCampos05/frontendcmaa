@@ -129,4 +129,10 @@ export class RondaService {
       })
     );
   }
+
+  getRondasByTorneoPublico(idTorneo: number): Observable<Ronda[]> {
+    return this.http.get<any>(`${this.apiUrl}/public/torneo/${idTorneo}`).pipe(
+      map(response => response.data || response || [])
+    );
+  }
 }

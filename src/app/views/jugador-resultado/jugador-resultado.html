@@ -35,12 +35,8 @@
                 <div class="search-input-group">
                     <div class="search-input-wrapper">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input 
-                            type="text" 
-                            class="search-input" 
-                            [(ngModel)]="nombreJugadorBusqueda"
-                            (keyup.enter)="buscarJugador()"
-                            placeholder="Ingresa tu nombre o apellido...">
+                        <input type="text" class="search-input" [(ngModel)]="nombreJugadorBusqueda"
+                            (keyup.enter)="buscarJugador()" placeholder="Ingresa tu nombre o apellido...">
                     </div>
                     <button class="btn-search" (click)="buscarJugador()">
                         <i class="fa-solid fa-search"></i>
@@ -56,7 +52,8 @@
                     <i class="fa-solid fa-circle-check"></i>
                     <span>Jugador encontrado en esta ronda</span>
                 </div>
-                <div class="player-status not-found" *ngIf="!jugadorEncontrado && nombreJugadorBusqueda && !cargandoMesas && mesasRonda.length > 0">
+                <div class="player-status not-found"
+                    *ngIf="!jugadorEncontrado && nombreJugadorBusqueda && !cargandoMesas && mesasRonda.length > 0">
                     <i class="fa-solid fa-circle-info"></i>
                     <span>El jugador no está participando en esta ronda</span>
                 </div>
@@ -108,9 +105,7 @@
                         <i class="fa-solid fa-layer-group"></i>
                         Categoría
                     </label>
-                    <select 
-                        [(ngModel)]="categoriaSeleccionada" 
-                        (ngModelChange)="onCategoriaChange()" 
+                    <select [(ngModel)]="categoriaSeleccionada" (ngModelChange)="onCategoriaChange()"
                         class="form-control"
                         [disabled]="!torneoSeleccionado || cargandoCategorias || categorias.length === 0">
                         <option [ngValue]="null">Seleccionar categoría</option>
@@ -124,27 +119,19 @@
                 </div>
 
                 <!-- Selector de Ronda -->
-                <div class="selector-group">
+                <div class="selector-group" *ngIf="categoriaSeleccionada">
                     <label>
                         <i class="fa-solid fa-list-ol"></i>
                         Ronda
                     </label>
-                    <select 
-                        [(ngModel)]="rondaSeleccionada" 
-                        (ngModelChange)="onRondaChange()" 
-                        class="form-control"
-                        [disabled]="!categoriaSeleccionada || cargandoRondas || rondasDisponibles.length === 0">
-                        <option [ngValue]="null">Seleccionar ronda</option>
+                    <select [(ngModel)]="rondaSeleccionada" (ngModelChange)="onRondaChange()" class="form-control">
+                        <option [ngValue]="0">Lista Inicial</option>
                         <option *ngFor="let ronda of rondasDisponibles" [ngValue]="ronda.numeroRonda">
                             Ronda {{ ronda.numeroRonda }}
-                            <span *ngIf="ronda.estado === 'finalizada'"> - Finalizada</span>
-                            <span *ngIf="ronda.estado === 'en_curso'"> - En curso</span>
-                            <span *ngIf="ronda.estado === 'pendiente'"> - Pendiente</span>
+                            <ng-container *ngIf="ronda.estado === 'finalizada'"> - Finalizada</ng-container>
                         </option>
+                        <option [ngValue]="-1" *ngIf="tieneRankingFinal()">Lista Final</option>
                     </select>
-                    <span *ngIf="cargandoRondas" class="loading-mini">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                    </span>
                 </div>
             </div>
 
@@ -211,6 +198,187 @@
                 </div>
             </div>
 
+            <!-- LISTA INICIAL -->
+            <div class="tabla-posiciones-section" *ngIf="rondaSeleccionada === 0 && listaInicial.length > 0">
+                <div class="section-header">
+                    <div class="header-left">
+                        <i class="fa-solid fa-list"></i>
+                        <h2>Lista Inicial de Jugadores</h2>
+                        <span class="badge">{{ listaInicial.length }} jugadores</span>
+                    </div>
+                </div>
+
+                <div class="tabla-responsive">
+                    <table class="tabla-resultados">
+                        <thead>
+                            <tr>
+                                <th class="col-posicion center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-hashtag"></i>
+                                        <span>N°</span>
+                                    </div>
+                                </th>
+                                <th class="col-jugador">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-user"></i>
+                                        <span>Nombre Completo</span>
+                                    </div>
+                                </th>
+                                <th class="col-rating center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-star"></i>
+                                        <span>Rating Inicial</span>
+                                    </div>
+                                </th>
+                                <th class="col-edad center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-calendar"></i>
+                                        <span>Edad</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let jugador of listaInicial; let i = index">
+                                <td class="col-posicion center">
+                                    <span class="posicion-badge">{{ i + 1 }}</span>
+                                </td>
+                                <td class="col-jugador">
+                                    <div class="jugador-cell">
+                                        <div class="avatar">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <div class="jugador-info-table">
+                                            <span class="jugador-nombre-table">
+                                                {{ jugador.nombre }} {{ jugador.apellido1 }} {{ jugador.apellido2 }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="col-rating center">
+                                    <span class="rating-badge" *ngIf="jugador.rating && jugador.rating > 0">
+                                        {{ jugador.rating }}
+                                    </span>
+                                    <span class="sin-rating" *ngIf="!jugador.rating || jugador.rating === 0">
+                                        S/R
+                                    </span>
+                                </td>
+                                <td class="col-edad center">
+                                    <span *ngIf="jugador.edad">{{ jugador.edad }} años</span>
+                                    <span *ngIf="!jugador.edad" class="sin-rating">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- LISTA FINAL -->
+            <div class="tabla-posiciones-section" *ngIf="rondaSeleccionada === -1 && listaFinal.length > 0">
+                <div class="section-header">
+                    <div class="header-left">
+                        <i class="fa-solid fa-trophy"></i>
+                        <h2>Lista Final - Clasificación</h2>
+                        <span class="badge">{{ listaFinal.length }} jugadores</span>
+                    </div>
+                </div>
+
+                <div class="tabla-responsive">
+                    <table class="tabla-resultados">
+                        <thead>
+                            <tr>
+                                <th class="col-posicion">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-hashtag"></i>
+                                        <span>Pos</span>
+                                    </div>
+                                </th>
+                                <th class="col-jugador">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-user"></i>
+                                        <span>Jugador</span>
+                                    </div>
+                                </th>
+                                <th class="col-rating center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-star"></i>
+                                        <span>Rating</span>
+                                    </div>
+                                </th>
+                                <th class="col-puntos center">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-trophy"></i>
+                                        <span>Puntos</span>
+                                    </div>
+                                </th>
+                                <th class="col-desempate center"
+                                    *ngFor="let sistema of sistemasDesempateActual; let idx = index">
+                                    <div class="th-content">
+                                        <i class="fa-solid fa-ranking-star"></i>
+                                        <span>{{ idx + 1 }}. {{ sistema }}</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let est of listaFinal" [class.top-1]="est.posicion_actual === 1"
+                                [class.top-2]="est.posicion_actual === 2" [class.top-3]="est.posicion_actual === 3">
+
+                                <td class="col-posicion">
+                                    <div class="posicion-badge"
+                                        [class.podio]="est.posicion_actual && est.posicion_actual <= 3">
+                                        <i *ngIf="est.posicion_actual === 1" class="fa-solid fa-medal gold"></i>
+                                        <i *ngIf="est.posicion_actual === 2" class="fa-solid fa-medal silver"></i>
+                                        <i *ngIf="est.posicion_actual === 3" class="fa-solid fa-medal bronze"></i>
+                                        <span *ngIf="!est.posicion_actual || est.posicion_actual > 3">
+                                            {{ est.posicion_actual }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td class="col-jugador">
+                                    <div class="jugador-cell">
+                                        <div class="avatar">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <div class="jugador-info-table">
+                                            <span class="jugador-nombre-table">
+                                                {{ est.jugador?.nombre }} {{ est.jugador?.apellido1 }} {{
+                                                est.jugador?.apellido2 || '' }}
+                                            </span>
+                                            <span class="jugador-extra" *ngIf="est.jugador?.edad">
+                                                {{ est.jugador?.edad }} años
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="col-rating center">
+                                    <span class="rating-badge" *ngIf="est.jugador?.rating && est.jugador?.rating">
+                                        {{ est.jugador?.rating }}
+                                    </span>
+                                    <span class="sin-rating" *ngIf="!est.jugador?.rating || est.jugador?.rating === 0">
+                                        S/R
+                                    </span>
+                                </td>
+
+                                <td class="col-puntos center">
+                                    <div class="puntos-cell">
+                                        <span class="puntos-valor">{{ est.puntos }}</span>
+                                    </div>
+                                </td>
+
+                                <td class="col-desempate center" *ngFor="let sistema of sistemasDesempateActual">
+                                    <span class="desempate-valor">
+                                        {{ getValorDesempate(est, sistema) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Loading Mesas -->
             <div *ngIf="cargandoMesas" class="loading-mesas">
                 <i class="fa-solid fa-spinner fa-spin"></i>
@@ -226,10 +394,7 @@
                 </div>
 
                 <div class="mesas-grid">
-                    <div *ngFor="let mesa of mesasRonda" 
-                         [id]="'mesa-' + mesa.idMesa"
-                         class="mesa-card" 
-                         [ngClass]="{
+                    <div *ngFor="let mesa of mesasRonda" [id]="'mesa-' + mesa.idMesa" class="mesa-card" [ngClass]="{
                              'highlighted': mesaJugadorId === mesa.idMesa,
                              'mesa-pendiente': mesa.estado === 'pendiente',
                              'mesa-en_curso': mesa.estado === 'en_curso',
@@ -248,8 +413,8 @@
 
                         <div class="mesa-jugadores">
                             <!-- Jugador Blanco -->
-                            <div class="jugador-item jugador-blanco" 
-                                 [class.highlighted-player]="esJugadorBuscado(mesa.idJugadorBlanco)">
+                            <div class="jugador-item jugador-blanco"
+                                [class.highlighted-player]="esJugadorBuscado(mesa.idJugadorBlanco)">
                                 <div class="jugador-color">
                                     <i class="fa-solid fa-square"></i>
                                 </div>
@@ -272,7 +437,7 @@
 
                             <!-- Jugador Negro -->
                             <div class="jugador-item jugador-negro"
-                                 [class.highlighted-player]="esJugadorBuscado(mesa.idJugadorNegro)">
+                                [class.highlighted-player]="esJugadorBuscado(mesa.idJugadorNegro)">
                                 <div class="jugador-color">
                                     <i class="fa-solid fa-square"></i>
                                 </div>
@@ -320,21 +485,24 @@
             </div>
 
             <!-- Estado vacío - No hay mesas -->
-            <div class="empty-state" *ngIf="!cargandoMesas && categoriaSeleccionada && rondaActualData && mesasRonda.length === 0">
+            <div class="empty-state"
+                *ngIf="!cargandoMesas && categoriaSeleccionada && rondaActualData && mesasRonda.length === 0">
                 <i class="fa-solid fa-chess-board"></i>
                 <h3>No hay mesas en esta ronda</h3>
                 <p>Esta ronda aún no tiene mesas configuradas</p>
             </div>
 
             <!-- Mensaje cuando no hay ronda seleccionada -->
-            <div class="empty-state" *ngIf="categoriaSeleccionada && !rondaActualData && !cargandoRondas">
-                <i class="fa-solid fa-circle-info"></i>
-                <h3>No hay rondas disponibles</h3>
-                <p>Esta categoría aún no tiene rondas creadas</p>
-            </div>
+<!-- Mensaje cuando no hay ronda seleccionada -->
+<div class="empty-state" *ngIf="categoriaSeleccionada && !rondaActualData && !cargandoRondas && rondaSeleccionada !== -1">
+    <i class="fa-solid fa-circle-info"></i>
+    <h3>No hay rondas disponibles</h3>
+    <p>Esta categoría aún no tiene rondas creadas</p>
+</div>
 
             <!-- Mensaje cuando no hay categoría seleccionada -->
-            <div class="empty-state" *ngIf="torneoSeleccionado && !categoriaSeleccionada && categorias.length > 0 && !cargandoCategorias">
+            <div class="empty-state"
+                *ngIf="torneoSeleccionado && !categoriaSeleccionada && categorias.length > 0 && !cargandoCategorias">
                 <i class="fa-solid fa-layer-group"></i>
                 <h3>Selecciona una categoría</h3>
                 <p>Elige una categoría del menú desplegable para ver sus rondas y mesas</p>

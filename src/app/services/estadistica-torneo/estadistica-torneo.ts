@@ -211,4 +211,42 @@ export class EstadisticaTorneoService {
       })
     );
   }
+
+  getEstadisticasByTorneoCategoriaPublic(idTorneo: number, idTorneoCategoria: number): Observable<EstadisticaTorneo[]> {
+    const url = `${this.apiUrl}/lista-inicial/${idTorneo}/${idTorneoCategoria}`;
+
+    return this.http.get<any>(url).pipe(
+      map(response => {
+        if (response.success && response.data) {
+          return response.data;
+        }
+        if (response.data) return response.data;
+        if (Array.isArray(response)) return response;
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error en getEstadisticasByTorneoCategoriaPublic:', error);
+        return of([]);
+      })
+    );
+  }
+
+  getRankingFinalPublic(idTorneo: number, idTorneoCategoria: number): Observable<EstadisticaTorneo[]> {
+    const url = `${this.apiUrl}/ranking-final/${idTorneo}/${idTorneoCategoria}`;
+
+    return this.http.get<any>(url).pipe(
+      map(response => {
+        if (response.success && response.data) {
+          return response.data;
+        }
+        if (response.data) return response.data;
+        if (Array.isArray(response)) return response;
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error en getRankingFinalPublic:', error);
+        throw error;
+      })
+    );
+  }
 }
