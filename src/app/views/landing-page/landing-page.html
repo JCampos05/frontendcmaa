@@ -8,10 +8,26 @@
         <h1 class="logo-text">Comité Municipal de Ajedrez Ahome</h1>
       </div>
       <nav class="nav-menu">
-        <a routerLink="/players-stats" class="nav-link">Jugadores</a>
-        <a (click)="scrollToSection('torneos')" class="nav-link">Torneos</a>
-        <a routerLink="/jugador-resultado" class="nav-link">Resultados</a>
-        <a (click)="scrollToSection('contacto')" class="nav-link">Contacto</a>
+        <a routerLink="/players-stats" class="nav-link">
+          <i class="fa-solid fa-user-group"></i>
+          Jugadores
+        </a>
+        <a (click)="scrollToSection('torneos')" class="nav-link">
+          <i class="fa-solid fa-trophy"></i>
+          Torneos
+        </a>
+        <a routerLink="/jugador-resultado" class="nav-link">
+          <i class="fa-solid fa-chess-board"></i>
+          Resultados
+        </a>
+        <a routerLink="/reloj-section" class="nav-link">
+          <i class="fa-solid fa-clock"></i>
+          Reloj
+        </a>
+        <a (click)="scrollToSection('contacto')" class="nav-link">
+          <i class="fa-solid fa-envelope"></i>
+          Contacto
+        </a>
         <a routerLink="/login" class="btn-login">
           <i class="fa-solid fa-right-to-bracket"></i>
           Iniciar Sesión
@@ -108,13 +124,11 @@
         </div>
       </div>
 
-      <button 
-        (click)="irAInscripcion(torneoDestacado.idTorneo)" 
-        class="btn-inscribirse"
+      <button (click)="irAInscripcion(torneoDestacado.idTorneo)" class="btn-inscribirse"
         [disabled]="inscripcionesCerradas(torneoDestacado)"
         [class.btn-disabled]="inscripcionesCerradas(torneoDestacado)">
-        <i class="fa-solid" [class.fa-arrow-right]="!inscripcionesCerradas(torneoDestacado)" 
-           [class.fa-lock]="inscripcionesCerradas(torneoDestacado)"></i>
+        <i class="fa-solid" [class.fa-arrow-right]="!inscripcionesCerradas(torneoDestacado)"
+          [class.fa-lock]="inscripcionesCerradas(torneoDestacado)"></i>
         {{ getMensajeInscripcion(torneoDestacado) }}
       </button>
 
@@ -160,11 +174,8 @@
             {{ getSistemaCompetencia(torneo) }}
           </p>
         </div>
-        <button 
-          (click)="irAInscripcion(torneo.idTorneo)" 
-          class="btn-card-inscripcion"
-          [disabled]="inscripcionesCerradas(torneo)"
-          [class.btn-disabled]="inscripcionesCerradas(torneo)">
+        <button (click)="irAInscripcion(torneo.idTorneo)" class="btn-card-inscripcion"
+          [disabled]="inscripcionesCerradas(torneo)" [class.btn-disabled]="inscripcionesCerradas(torneo)">
           <i class="fa-solid" [class.fa-lock]="inscripcionesCerradas(torneo)"></i>
           {{ inscripcionesCerradas(torneo) ? 'Cerrado' : 'Inscribirse' }}
         </button>

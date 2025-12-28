@@ -3,7 +3,7 @@
     overflow-x: hidden;
 }
 
-/* ===== HEADER ===== */
+/* ===== AJUSTES AL HEADER ===== */
 .header {
     background: linear-gradient(135deg, var(--color-dark-navy) 0%, var(--color-slate) 100%);
     padding: 1.5rem 0;
@@ -16,16 +16,18 @@
 .header-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1.5rem;  /* Reducido de 2rem para más espacio horizontal */
+    padding: 0 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
 }
 
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 0.65rem;  /* Reducido de 1rem para acercar icono y texto */
+    gap: 0.65rem;
+    flex-shrink: 0;
 }
 
 .logo-icon {
@@ -34,27 +36,38 @@
 }
 
 .logo-text {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: var(--color-white);
     font-weight: 400;
+    white-space: nowrap;
 }
 
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 1.25rem;  /* Reducido de 2rem para acercar enlaces */
+    gap: 1.5rem;
+    flex: 1;
+    justify-content: flex-end;
 }
 
 .nav-link {
     color: var(--color-light-gray);
     text-decoration: none;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     transition: color 0.3s;
     cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .nav-link:hover {
     color: var(--color-tan);
+}
+
+.nav-link i {
+    font-size: 1rem;
 }
 
 .btn-login {
@@ -68,12 +81,23 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.3s;
+    white-space: nowrap;
 }
 
 .btn-login:hover {
     background: #d63b4d;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(234, 71, 89, 0.3);
+}
+
+.nav-link-reloj {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.nav-link-reloj i {
+    font-size: 1rem;
 }
 
 /* ===== HERO SECTION ===== */
@@ -886,6 +910,21 @@
     margin-bottom: 0.5rem;
 }
 
+/* ===== RESPONSIVE MÓVIL ===== */
+@media (max-width: 968px) {
+    .logo-text {
+        font-size: 1.3rem;
+    }
+    
+    .nav-menu {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        font-size: 0.95rem;
+    }
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     /* Header */
@@ -931,6 +970,7 @@
         background: rgba(255, 255, 255, 0.05);
         border-radius: 8px;
         transition: all 0.3s;
+        justify-content: center;
     }
 
     .nav-link:hover {
@@ -1269,6 +1309,10 @@
     .no-tournaments p,
     .loading-spinner p {
         font-size: 1.1rem;
+    }
+
+    .nav-link-reloj {
+        justify-content: center;
     }
 }
 

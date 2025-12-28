@@ -1,0 +1,302 @@
+<div class="reloj-container">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <i class="fa-solid fa-chess-knight logo-icon"></i>
+        <h1 class="logo-text">Comité Municipal de Ajedrez Ahome</h1>
+      </div>
+      <nav class="nav-menu">
+        <a routerLink="/" class="nav-link">
+          <i class="fa-solid fa-house"></i>
+          Inicio
+        </a>
+        <a routerLink="/players-stats" class="nav-link">
+          <i class="fa-solid fa-user-group"></i>
+          Jugadores
+        </a>
+        <a routerLink="/jugador-resultado" class="nav-link">
+          <i class="fa-solid fa-chess-board"></i>
+          Resultados
+        </a>
+        <a routerLink="/reloj-section" class="nav-link active">
+          <i class="fa-solid fa-clock"></i>
+          Reloj
+        </a>
+        <a routerLink="/login" class="btn-login">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          Iniciar Sesión
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-content-reloj">
+      <div class="hero-text">
+        <h2 class="hero-title">Reloj de Ajedrez</h2>
+        <p class="hero-subtitle">Configura y gestiona el tiempo de tus partidas</p>
+      </div>
+    </div>
+    <div class="chess-board-bg"></div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="main-content">
+    <div class="configuracion-section">
+      <div class="config-header">
+        <i class="fa-solid fa-gear"></i>
+        <h3>Configurar Tiempo</h3>
+      </div>
+
+      <div class="config-grid">
+        <!-- Configuración Blancas -->
+        <div class="config-card">
+          <div class="card-header blancas">
+            <i class="fa-solid fa-chess-king"></i>
+            <h4>Blancas</h4>
+          </div>
+          <div class="card-body">
+            <div class="input-group">
+              <label>
+                <i class="fa-solid fa-clock"></i>
+                Tiempo Inicial
+              </label>
+              <div class="tiempo-inputs">
+                <div class="tiempo-input">
+                  <input type="number" [(ngModel)]="minutosBlancas" min="0" max="180" class="form-control">
+                  <span class="input-label">min</span>
+                </div>
+                <span class="separador">:</span>
+                <div class="tiempo-input">
+                  <input type="number" [(ngModel)]="segundosBlancas" min="0" max="59" class="form-control">
+                  <span class="input-label">seg</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>
+                <i class="fa-solid fa-plus"></i>
+                Incremento por Jugada
+              </label>
+              <div class="incremento-input">
+                <input type="number" [(ngModel)]="incrementoBlancas" min="0" max="60" class="form-control">
+                <span class="input-label">segundos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuración Negras -->
+        <div class="config-card">
+          <div class="card-header negras">
+            <i class="fa-solid fa-chess-king"></i>
+            <h4>Negras</h4>
+          </div>
+          <div class="card-body">
+            <div class="input-group">
+              <label>
+                <i class="fa-solid fa-clock"></i>
+                Tiempo Inicial
+              </label>
+              <div class="tiempo-inputs">
+                <div class="tiempo-input">
+                  <input type="number" [(ngModel)]="minutosNegras" min="0" max="180" class="form-control">
+                  <span class="input-label">min</span>
+                </div>
+                <span class="separador">:</span>
+                <div class="tiempo-input">
+                  <input type="number" [(ngModel)]="segundosNegras" min="0" max="59" class="form-control">
+                  <span class="input-label">seg</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>
+                <i class="fa-solid fa-plus"></i>
+                Incremento por Jugada
+              </label>
+              <div class="incremento-input">
+                <input type="number" [(ngModel)]="incrementoNegras" min="0" max="60" class="form-control">
+                <span class="input-label">segundos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-iniciar" (click)="iniciarReloj()">
+        <i class="fa-solid fa-play"></i>
+        Iniciar Reloj
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DEL RELOJ -->
+  <div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
+    <div class="modal-reloj" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>
+          <i class="fa-solid fa-clock"></i>
+          Reloj de Ajedrez
+        </h3>
+        <button class="btn-close-modal" (click)="cerrarModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="relojes-container">
+        <!-- Reloj Blancas -->
+        <div class="reloj-jugador blancas" [class.turno-activo]="turnoActual === 'blancas' && !enPausa" 
+             (click)="cambiarTurno()">
+          <div class="jugador-info">
+            <i class="fa-solid fa-chess-king"></i>
+            <span>Blancas</span>
+          </div>
+          <div [class]="obtenerClaseReloj('blancas')">
+            {{ formatearTiempo(tiempoBlancas) }}
+          </div>
+          <div class="incremento-info" *ngIf="incrementoBlancas > 0">
+            <i class="fa-solid fa-plus"></i>
+            {{ incrementoBlancas }}s
+          </div>
+        </div>
+
+        <!-- Reloj Negras -->
+        <div class="reloj-jugador negras" [class.turno-activo]="turnoActual === 'negras' && !enPausa"
+             (click)="cambiarTurno()">
+          <div class="jugador-info">
+            <i class="fa-solid fa-chess-king"></i>
+            <span>Negras</span>
+          </div>
+          <div [class]="obtenerClaseReloj('negras')">
+            {{ formatearTiempo(tiempoNegras) }}
+          </div>
+          <div class="incremento-info" *ngIf="incrementoNegras > 0">
+            <i class="fa-solid fa-plus"></i>
+            {{ incrementoNegras }}s
+          </div>
+        </div>
+      </div>
+
+      <!-- Controles -->
+      <div class="controles-reloj">
+        <button class="btn-control" (click)="pausarReanudar()">
+          <i class="fa-solid" [class.fa-pause]="!enPausa" [class.fa-play]="enPausa"></i>
+          {{ enPausa ? 'Reanudar' : 'Pausar' }}
+        </button>
+
+        <button class="btn-control" (click)="reiniciarReloj()">
+          <i class="fa-solid fa-rotate-right"></i>
+          Reiniciar
+        </button>
+
+        <button class="btn-control" (click)="abrirEdicion()">
+          <i class="fa-solid fa-pen-to-square"></i>
+          Modificar
+        </button>
+      </div>
+
+      <!-- Modal de Edición -->
+      <div class="edicion-overlay" *ngIf="editandoTiempo" (click)="cancelarEdicion()">
+        <div class="edicion-modal" (click)="$event.stopPropagation()">
+          <h4>
+            <i class="fa-solid fa-pen-to-square"></i>
+            Modificar Tiempo
+          </h4>
+
+          <div class="edicion-grid">
+            <!-- Edición Blancas -->
+            <div class="edicion-grupo">
+              <h5>
+                <i class="fa-solid fa-chess-king"></i>
+                Blancas
+              </h5>
+              <div class="input-group-edit">
+                <label>Tiempo</label>
+                <div class="tiempo-inputs">
+                  <div class="tiempo-input">
+                    <input type="number" [(ngModel)]="minutosEditBlancas" min="0" max="180" class="form-control-small">
+                    <span class="input-label">min</span>
+                  </div>
+                  <span class="separador">:</span>
+                  <div class="tiempo-input">
+                    <input type="number" [(ngModel)]="segundosEditBlancas" min="0" max="59" class="form-control-small">
+                    <span class="input-label">seg</span>
+                  </div>
+                </div>
+              </div>
+              <div class="input-group-edit">
+                <label>Incremento</label>
+                <div class="incremento-input">
+                  <input type="number" [(ngModel)]="incrementoEditBlancas" min="0" max="60" class="form-control-small">
+                  <span class="input-label">seg</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edición Negras -->
+            <div class="edicion-grupo">
+              <h5>
+                <i class="fa-solid fa-chess-king"></i>
+                Negras
+              </h5>
+              <div class="input-group-edit">
+                <label>Tiempo</label>
+                <div class="tiempo-inputs">
+                  <div class="tiempo-input">
+                    <input type="number" [(ngModel)]="minutosEditNegras" min="0" max="180" class="form-control-small">
+                    <span class="input-label">min</span>
+                  </div>
+                  <span class="separador">:</span>
+                  <div class="tiempo-input">
+                    <input type="number" [(ngModel)]="segundosEditNegras" min="0" max="59" class="form-control-small">
+                    <span class="input-label">seg</span>
+                  </div>
+                </div>
+              </div>
+              <div class="input-group-edit">
+                <label>Incremento</label>
+                <div class="incremento-input">
+                  <input type="number" [(ngModel)]="incrementoEditNegras" min="0" max="60" class="form-control-small">
+                  <span class="input-label">seg</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="edicion-botones">
+            <button class="btn-cancelar" (click)="cancelarEdicion()">
+              <i class="fa-solid fa-xmark"></i>
+              Cancelar
+            </button>
+            <button class="btn-guardar" (click)="guardarEdicion()">
+              <i class="fa-solid fa-check"></i>
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <i class="fa-solid fa-chess-knight"></i>
+        <span>Comité Municipal de Ajedrez Ahome</span>
+      </div>
+      <p class="footer-text">Promoviendo el ajedrez en la región</p>
+      <div class="footer-social">
+        <a href="#" class="social-link"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+      </div>
+      <p class="footer-copyright">© 2024 Comité Municipal de Ajedrez Ahome. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>

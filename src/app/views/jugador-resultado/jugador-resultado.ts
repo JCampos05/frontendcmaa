@@ -52,6 +52,9 @@ export class JugadorResultadoComponent implements OnInit {
   nombreJugadorBusqueda: string = '';
   jugadorEncontrado: boolean = false;
   mesaJugadorId: number | null = null;
+  jugadorEncontradoLista: boolean = false;
+  jugadorIdEncontrado: number | null = null;
+  busquedaRealizada: boolean = false;
 
   // Estados
   cargandoTorneos = false;
@@ -200,7 +203,7 @@ export class JugadorResultadoComponent implements OnInit {
   }
 
   onRondaChange(): void {
-  //console.log('TEST');
+    //console.log('TEST');
 
     this.resetearBusqueda();
     this.mesasRonda = [];
@@ -208,7 +211,7 @@ export class JugadorResultadoComponent implements OnInit {
     this.listaInicial = [];
     this.listaFinal = [];
 
-  //console.log('TEST');
+    //console.log('TEST');
 
     if (this.rondaSeleccionada === 0) {
       //console.log('LISTA INICIAL');
@@ -264,6 +267,63 @@ export class JugadorResultadoComponent implements OnInit {
       return;
     }
 
+    this.busquedaRealizada = true;
+
+    // Búsqueda en Lista Inicial
+    if (this.rondaSeleccionada === 0 && this.listaInicial.length > 0) {
+      const jugadorEncontrado = this.listaInicial.find(jugador => {
+        const nombreCompleto = `${jugador.nombre || ''} ${jugador.apellido1 || ''} ${jugador.apellido2 || ''}`.toLowerCase();
+        return nombreCompleto.includes(nombreBusqueda);
+      });
+
+      if (jugadorEncontrado) {
+        this.jugadorEncontradoLista = true;
+        this.jugadorIdEncontrado = jugadorEncontrado.idJugador;
+
+        setTimeout(() => {
+          const elemento = document.getElementById(`jugador-${jugadorEncontrado.idJugador}`);
+          if (elemento) {
+            elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+
+        this.mostrarToast('success', 'Jugador encontrado', 'El jugador está en la lista inicial');
+      } else {
+        this.jugadorEncontradoLista = false;
+        this.jugadorIdEncontrado = null;
+        this.mostrarToast('info', 'Jugador no encontrado', 'El jugador no está en la lista inicial');
+      }
+      return;
+    }
+
+    // Búsqueda en Lista Final
+    if (this.rondaSeleccionada === -1 && this.listaFinal.length > 0) {
+      const estadisticaEncontrada = this.listaFinal.find(est => {
+        const nombreCompleto = `${est.jugador?.nombre || ''} ${est.jugador?.apellido1 || ''} ${est.jugador?.apellido2 || ''}`.toLowerCase();
+        return nombreCompleto.includes(nombreBusqueda);
+      });
+
+      if (estadisticaEncontrada) {
+        this.jugadorEncontradoLista = true;
+        this.jugadorIdEncontrado = estadisticaEncontrada.jugador?.idJugador || null;
+
+        setTimeout(() => {
+          const elemento = document.getElementById(`jugador-${estadisticaEncontrada.jugador?.idJugador}`);
+          if (elemento) {
+            elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+
+        this.mostrarToast('success', 'Jugador encontrado', 'El jugador está en la lista final');
+      } else {
+        this.jugadorEncontradoLista = false;
+        this.jugadorIdEncontrado = null;
+        this.mostrarToast('info', 'Jugador no encontrado', 'El jugador no está en la lista final');
+      }
+      return;
+    }
+
+    // Búsqueda en Mesas de Ronda (código original)
     if (this.mesasRonda.length === 0) {
       this.jugadorEncontrado = false;
       this.mesaJugadorId = null;
@@ -300,11 +360,21 @@ export class JugadorResultadoComponent implements OnInit {
   resetearBusqueda(): void {
     this.jugadorEncontrado = false;
     this.mesaJugadorId = null;
+    this.jugadorEncontradoLista = false;
+    this.jugadorIdEncontrado = null;
+    this.busquedaRealizada = false;
   }
 
   limpiarBusqueda(): void {
     this.nombreJugadorBusqueda = '';
     this.resetearBusqueda();
+  }
+
+  esJugadorBuscadoLista(idJugador: number | undefined): boolean {
+    if (!idJugador || !this.nombreJugadorBusqueda.trim()) {
+      return false;
+    }
+    return this.jugadorIdEncontrado === idJugador;
   }
 
   esJugadorBuscado(idJugador: number | undefined): boolean {
@@ -414,30 +484,30 @@ export class JugadorResultadoComponent implements OnInit {
 
   // ========== FUNCIONES PARA LISTA INICIAL ==========
 
-cargarListaInicial(): void {
-  if (!this.torneoSeleccionado?.idTorneo || !this.categoriaSeleccionada?.idTorneoCat) {
-    return;
-  }
-
-  this.cargandoMesas = true;
-
-  this.estadisticaService.getEstadisticasByTorneoCategoriaPublic(
-    this.torneoSeleccionado.idTorneo,
-    this.categoriaSeleccionada.idTorneoCat
-  ).subscribe({
-    next: (estadisticas) => {
-      // NO mapear - usar directamente los datos que ya vienen formateados del backend
-      this.listaInicial = estadisticas.sort((a, b) => (b.rating_torneo || 0) - (a.rating_torneo || 0));
-      this.cargandoMesas = false;
-    },
-    error: (err) => {
-      //console.error('Error al cargar lista inicial:', err);
-      this.listaInicial = [];
-      this.cargandoMesas = false;
-      this.mostrarToast('error', 'Error', 'No se pudo cargar la lista inicial');
+  cargarListaInicial(): void {
+    if (!this.torneoSeleccionado?.idTorneo || !this.categoriaSeleccionada?.idTorneoCat) {
+      return;
     }
-  });
-}
+
+    this.cargandoMesas = true;
+
+    this.estadisticaService.getEstadisticasByTorneoCategoriaPublic(
+      this.torneoSeleccionado.idTorneo,
+      this.categoriaSeleccionada.idTorneoCat
+    ).subscribe({
+      next: (estadisticas) => {
+        // NO mapear - usar directamente los datos que ya vienen formateados del backend
+        this.listaInicial = estadisticas.sort((a, b) => (b.rating_torneo || 0) - (a.rating_torneo || 0));
+        this.cargandoMesas = false;
+      },
+      error: (err) => {
+        //console.error('Error al cargar lista inicial:', err);
+        this.listaInicial = [];
+        this.cargandoMesas = false;
+        this.mostrarToast('error', 'Error', 'No se pudo cargar la lista inicial');
+      }
+    });
+  }
 
   // ========== FUNCIONES PARA LISTA FINAL ==========
 

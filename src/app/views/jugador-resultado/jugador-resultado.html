@@ -48,14 +48,17 @@
                 </div>
 
                 <!-- Indicador de resultado de búsqueda -->
-                <div class="player-status found" *ngIf="jugadorEncontrado && nombreJugadorBusqueda">
+                <div class="player-status found"
+                    *ngIf="busquedaRealizada && (jugadorEncontrado || jugadorEncontradoLista) && nombreJugadorBusqueda">
                     <i class="fa-solid fa-circle-check"></i>
-                    <span>Jugador encontrado en esta ronda</span>
+                    <span>Jugador encontrado</span>
                 </div>
-                <div class="player-status not-found"
-                    *ngIf="!jugadorEncontrado && nombreJugadorBusqueda && !cargandoMesas && mesasRonda.length > 0">
+                <div class="player-status not-found" *ngIf="busquedaRealizada && !jugadorEncontrado && !jugadorEncontradoLista && nombreJugadorBusqueda && 
+                           ((rondaSeleccionada !== 0 && rondaSeleccionada !== -1 && mesasRonda.length > 0) ||
+                            (rondaSeleccionada === 0 && listaInicial.length > 0) ||
+                            (rondaSeleccionada === -1 && listaFinal.length > 0))">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span>El jugador no está participando en esta ronda</span>
+                    <span>El jugador no está en esta lista</span>
                 </div>
             </div>
         </div>
@@ -239,7 +242,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let jugador of listaInicial; let i = index">
+                            <tr *ngFor="let jugador of listaInicial; let i = index"
+                                [id]="'jugador-' + jugador.idJugador"
+                                [class.jugador-resaltado]="esJugadorBuscadoLista(jugador.idJugador)">
                                 <td class="col-posicion center">
                                     <span class="posicion-badge">{{ i + 1 }}</span>
                                 </td>
@@ -321,8 +326,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let est of listaFinal" [class.top-1]="est.posicion_actual === 1"
-                                [class.top-2]="est.posicion_actual === 2" [class.top-3]="est.posicion_actual === 3">
+                            <tr *ngFor="let est of listaFinal" [id]="'jugador-' + est.jugador?.idJugador"
+                                [class.top-1]="est.posicion_actual === 1" [class.top-2]="est.posicion_actual === 2"
+                                [class.top-3]="est.posicion_actual === 3"
+                                [class.jugador-resaltado]="esJugadorBuscadoLista(est.jugador?.idJugador)">
 
                                 <td class="col-posicion">
                                     <div class="posicion-badge"
@@ -493,12 +500,13 @@
             </div>
 
             <!-- Mensaje cuando no hay ronda seleccionada -->
-<!-- Mensaje cuando no hay ronda seleccionada -->
-<div class="empty-state" *ngIf="categoriaSeleccionada && !rondaActualData && !cargandoRondas && rondaSeleccionada !== -1">
-    <i class="fa-solid fa-circle-info"></i>
-    <h3>No hay rondas disponibles</h3>
-    <p>Esta categoría aún no tiene rondas creadas</p>
-</div>
+            <!-- Mensaje cuando no hay ronda seleccionada -->
+            <div class="empty-state"
+                *ngIf="categoriaSeleccionada && !rondaActualData && !cargandoRondas && rondaSeleccionada !== -1">
+                <i class="fa-solid fa-circle-info"></i>
+                <h3>No hay rondas disponibles</h3>
+                <p>Esta categoría aún no tiene rondas creadas</p>
+            </div>
 
             <!-- Mensaje cuando no hay categoría seleccionada -->
             <div class="empty-state"

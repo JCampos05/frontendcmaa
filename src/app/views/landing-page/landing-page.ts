@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { TorneoService } from '../../services/torneo/torneo';
 import { Torneo } from '../../models/torneo';
 import { TorneoDetalleModalComponent } from '../../componentes/modales/torneo-detalle/torneo-detalle';
+import { RelojSectionComponent } from '../../views/reloj-section/reloj-section';
 
 @Component({
   selector: 'app-landing',

@@ -8,6 +8,7 @@ export const routes: Routes = [
     {path: 'inscripcion/:id' , loadComponent: () => import('./views/main-view/inscripcion/inscripcion').then(m => m.InscripcionComponent)},
     {path: 'players-stats' , loadComponent: () => import('./views/player-stats/player-stats').then(m => m.PlayerStatsComponent)},
     {path: 'jugador-resultado' , loadComponent: () => import('./views/jugador-resultado/jugador-resultado').then(m => m.JugadorResultadoComponent)},
+    {path: 'reloj-section' , loadComponent: () => import('./views/reloj-section/reloj-section').then(m => m.RelojSectionComponent)},
     {path: 'main-view', loadComponent: () => import('./views/main-view/main-view').then(m => m.MainView),
     
         canActivate: [authGuard],

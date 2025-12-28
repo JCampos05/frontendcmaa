@@ -1044,6 +1044,30 @@
     border-left: 4px solid #854D2E;
 }
 
+/* === RESALTADO DE JUGADOR EN TABLAS === */
+.tabla-resultados tbody tr.jugador-resaltado {
+    background: linear-gradient(90deg, rgba(133, 77, 46, 0.2) 0%, rgba(133, 77, 46, 0.05) 100%);
+    border: 3px solid var(--color-brown);
+    box-shadow: 0 0 0 4px rgba(133, 77, 46, 0.15);
+    animation: pulseRow 2s ease infinite;
+}
+
+.tabla-resultados tbody tr.jugador-resaltado:hover {
+    background: linear-gradient(90deg, rgba(133, 77, 46, 0.25) 0%, rgba(133, 77, 46, 0.08) 100%);
+}
+
+@keyframes pulseRow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 4px rgba(133, 77, 46, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgba(133, 77, 46, 0.3);
+    }
+}
+
 .tabla-resultados td {
     padding: 1rem;
     font-size: 0.875rem;
@@ -1066,6 +1090,7 @@
     width: 90px;
     text-align: center;
 }
+
 .col-edad {
     width: 100px;
     text-align: center;
@@ -1549,6 +1574,7 @@
         font-size: 0.8125rem;
         padding: 0.75rem;
     }
+
     .col-posicion {
         width: 50px;
     }
