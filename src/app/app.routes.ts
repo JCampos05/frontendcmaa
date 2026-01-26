@@ -34,10 +34,15 @@ export const routes: Routes = [
             {path: 'detalle-torneo/:id', loadComponent: () => import('./views/main-view/torneo-detalles/torneo-detalles').then(m => m.TorneoDetalleComponent)},
             {path: 'sistemas-pago' , loadComponent: () => import('./views/main-view/sistemas-pago/sistemas-pago').then(m => m.SistemasPagoComponent)},
             //{path: 'resultados-torneo/:id', loadComponent: () => import('./views/main-view/resultados-torneo/resultados-torneo').then(m => m.ResultadosTorneoComponent)},
-            
+            // Gestión Liga
+            {path: 'ligas', loadComponent: () => import('./views/main-view/ligas/ligas').then(m => m.LigasComponent)},
+            {path: 'detalle-liga/:id', loadComponent: () => import('./views/main-view/detalles-liga/detalles-liga').then(m => m.DetalleLigaComponent)},
+            {path: 'editar-liga/:id', loadComponent: () => import('./views/main-view/editar-liga/editar-liga').then(m => m.EditarLigaComponent)},
+            {path: 'nueva-liga' , loadComponent: () => import('./views/main-view/nueva-liga/nueva-liga').then(m => m.NuevaLigaComponent)},
+            {path: 'inscripciones-liga' ,loadComponent: () => import('./views/main-view/inscripciones-liga/inscripciones-liga').then(m => m.InscripcionesLigaComponent)},
+            {path: 'mesas-liga' , loadComponent: () => import('./views/main-view/mesas-liga/mesas-liga').then(m => m.MesasLigaComponent)},
             // Gestión de Jugadores
             {path: 'gestion-jugadores', loadComponent: () => import('./views/main-view/gestion-jugadores/gestion-jugadores').then(m => m.GestionJugadoresComponent)},
-            
             // Sistema
             {path: 'configuracion', loadComponent: () => import('./views/main-view/configuracion/configuracion').then(m => m.Configuracion)}
         ]

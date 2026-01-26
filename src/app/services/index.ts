@@ -18,3 +18,9 @@ export * from './historial-acceso/historial-acceso';
 export * from './logs-sistema/logs-sistema';
 export * from './sesiones-activas/sesiones-activas';
 export * from './sistema-pago/sistema-pago';
+// Liga
+export * from './infoLiga/info-liga';
+export * from './grupoLiga/grupo-liga';
+export * from './jugadorLiga/jugador-liga';
+export * from './rondaLiga/ronda-liga';
+export * from './mesaLiga/mesa-liga';

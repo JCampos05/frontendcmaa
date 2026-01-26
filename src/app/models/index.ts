@@ -17,3 +17,10 @@ export * from './historial-acceso';
 export * from './log-sistema';
 export * from './sesion-activa';
 export * from './sistema-pago';
+// Liga
+export * from './grupoLiga';
+export * from './infoLiga';
+export * from './jugadorLiga';
+export * from './mesaLiga';
+export * from './partidaLiga';
+export * from './rondaLiga';

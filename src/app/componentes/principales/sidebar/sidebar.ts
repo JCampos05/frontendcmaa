@@ -21,6 +21,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   submenuTorneosExpandido = false;
   submenuTorneoActualExpandido = false;
   submenuInscripcionesExpandido = false;
+  submenuLigasExpandido = false;
   private routerSubscription?: Subscription;
 
   ngOnChanges(): void {
@@ -74,6 +75,11 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     if (this.rutaActual.includes('/jugadores-torneo') ||
       this.rutaActual.includes('/estadisticas-pago')) {
       this.submenuInscripcionesExpandido = true;
+    }
+    // Expandir submenu Ligas
+    if (this.rutaActual.includes('/detalle-liga') ||
+      this.rutaActual.includes('/editar-liga')) {
+      this.submenuLigasExpandido = true;
     }
   }
 
@@ -168,6 +174,57 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       this.router.navigate(['/main-view/torneos']);
     }
     if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  // === GESTIÓN LIGA ===
+  cargarLigas(): void {
+    this.router.navigate(['/main-view/ligas']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  nuevaLiga(): void {
+    this.router.navigate(['/main-view/nueva-liga']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  verResultadosLigas(): void {
+    this.router.navigate(['/main-view/resultado-todas-ligas']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  cargarInscripcionesLiga(): void {
+    this.router.navigate(['/main-view/inscripciones-liga']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  verResultadosMesasLiga(): void {
+    this.router.navigate(['/main-view/mesas-liga']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  verDetalleLiga(): void {
+    const match = this.rutaActual.match(/\/(detalle-liga|editar-liga)\/(\d+)/);
+    if (match) {
+      this.router.navigate(['/main-view/detalle-liga', match[2]]);
+    } else {
+      this.router.navigate(['/main-view/ligas']);
+    }
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  editarLigaActual(): void {
+    const match = this.rutaActual.match(/\/(detalle-liga|editar-liga)\/(\d+)/);
+    if (match) {
+      this.router.navigate(['/main-view/editar-liga', match[2]]);
+    } else {
+      this.router.navigate(['/main-view/ligas']);
+    }
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
+  toggleSubmenuLigas(event: Event): void {
+    event.stopPropagation();
+    this.submenuLigasExpandido = !this.submenuLigasExpandido;
   }
 
   // === GESTIÓN JUGADORES ===
@@ -278,6 +335,32 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if (ruta === '/main-view/sistemas-pago') {
+      return this.rutaActual === ruta;
+    }
+
+    // Gestión Ligas
+    if (ruta === '/main-view/ligas') {
+      return this.rutaActual === ruta ||
+        this.rutaActual.startsWith('/main-view/ligas/');
+    }
+
+    if (ruta === '/main-view/detalle-liga') {
+      return this.rutaActual.startsWith('/main-view/detalle-liga/');
+    }
+
+    if (ruta === '/main-view/editar-liga') {
+      return this.rutaActual.startsWith('/main-view/editar-liga/');
+    }
+
+    if (ruta === '/main-view/resultado-todas-ligas') {
+      return this.rutaActual === ruta;
+    }
+
+    if (ruta === '/main-view/visualizacion-mesas-liga') {
+      return this.rutaActual === ruta;
+    }
+
+    if (ruta === '/main-view/nueva-liga') {
       return this.rutaActual === ruta;
     }
 

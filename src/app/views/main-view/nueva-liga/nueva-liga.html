@@ -1,0 +1,348 @@
+<div class="container">
+    <div class="header">
+        <button class="btn-back" type="button" (click)="cancelar()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1>Nueva Liga</h1>
+            <p>Complete la información para crear una nueva liga de ajedrez</p>
+        </div>
+    </div>
+
+    <form [formGroup]="ligaForm" (ngSubmit)="guardarLiga()">
+        <!-- Información General -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('informacionGeneral')">
+                <i class="fas fa-info-circle"></i>
+                <h2>Información General</h2>
+                <i class="fas" [ngClass]="{
+                    'fa-chevron-up': seccionesAbiertas.informacionGeneral,
+                    'fa-chevron-down': !seccionesAbiertas.informacionGeneral
+                }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.informacionGeneral">
+                <div class="form-group full-width">
+                    <label>
+                        <i class="fas fa-trophy"></i>
+                        Nombre de la Liga
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" formControlName="nombre" placeholder="Ej: Liga de Ajedrez Los Mochis 2025"
+                        class="form-control" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label>
+                        <i class="fas fa-align-left"></i>
+                        Descripción
+                    </label>
+                    <textarea formControlName="descripcion" rows="3"
+                        placeholder="Descripción general de la liga..."
+                        class="form-control"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-calendar-check"></i>
+                            Fecha de Inicio
+                            <span class="required">*</span>
+                        </label>
+                        <input type="date" formControlName="fecha_inicio" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-calendar-times"></i>
+                            Fecha de Finalización
+                        </label>
+                        <input type="date" formControlName="fecha_fin" class="form-control" />
+                        <small class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Opcional: Fecha estimada de finalización
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-user-clock"></i>
+                            Cierre de Inscripciones
+                        </label>
+                        <input type="datetime-local" formControlName="cierre_inscripciones" class="form-control" />
+                        <small class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Fecha y hora límite para inscribirse
+                        </small>
+                        <div class="validation-error" *ngIf="errorCierreInscripciones">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            {{ errorCierreInscripciones }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-map-marker-alt"></i>
+                            Sede Principal
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" formControlName="lugar" placeholder="Ej: Club de Ajedrez Los Mochis"
+                            class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <i class="fas fa-building"></i>
+                        <label>
+                            Dirección Completa
+                        </label>
+                        <input type="text" formControlName="direccion"
+                            placeholder="Ej: Blvd. Rosales #123, Col. Centro" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-project-diagram"></i>
+                            Sistema de la Liga
+                            <span class="required">*</span>
+                        </label>
+                        <select formControlName="tipo_sistema" class="form-control">
+                            <option *ngFor="let tipo of tiposSistema" [value]="tipo.value">
+                                {{ tipo.label }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-users"></i>
+                            Número de Grupos
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" formControlName="num_grupos" min="1" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-trophy"></i>
+                            Clasifican por Grupo
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" formControlName="clasifican_por_grupo" min="1" class="form-control" />
+                        <small class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Cuántos jugadores pasan a la siguiente fase
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-clock"></i>
+                            Ritmo de Juego
+                        </label>
+                        <select formControlName="idRitmoJuego" class="form-control">
+                            <option [value]="null">Seleccione un ritmo...</option>
+                            <option *ngFor="let ritmo of ritmosJuego" [value]="ritmo.idRitmoJuego">
+                                {{ ritmo.nombre }} - {{ ritmo.descripcion }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-dollar-sign"></i>
+                            Costo de Inscripción
+                        </label>
+                        <input type="number" formControlName="costo_inscripcion" min="0" step="0.01"
+                            class="form-control" placeholder="0.00" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-user-friends"></i>
+                            Máximo de Jugadores
+                        </label>
+                        <input type="number" formControlName="max_jugadores" min="1" class="form-control"
+                            placeholder="Ilimitado" />
+                        <small class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Dejar vacío para ilimitado
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración de Grupos -->
+        <div class="section" *ngIf="grupos.length > 0">
+            <div class="section-header" (click)="toggleSeccion('grupos')">
+                <i class="fas fa-layer-group"></i>
+                <h2>Configuración de Grupos</h2>
+                <i class="fas" [ngClass]="{
+                    'fa-chevron-up': seccionesAbiertas.grupos,
+                    'fa-chevron-down': !seccionesAbiertas.grupos
+                }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.grupos">
+                <div formArrayName="grupos">
+                    <ng-container *ngFor="let grupo of grupos.controls; let i = index">
+                        <div class="grupo-config" [formGroupName]="i">
+                            <h3 class="grupo-titulo">
+                                <i class="fas fa-users"></i>
+                                {{ grupo.get('nombre')?.value }}
+                            </h3>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        Nombre del Grupo
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" formControlName="nombre" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        Máximo de Jugadores
+                                    </label>
+                                    <input type="number" formControlName="max_jugadores" min="1" class="form-control"
+                                        placeholder="Ilimitado" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        Número de Rondas
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" formControlName="rondas" min="1" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>
+                                    Descripción del Grupo
+                                </label>
+                                <textarea formControlName="descripcion" rows="2"
+                                    placeholder="Descripción opcional..." class="form-control"></textarea>
+                            </div>
+
+                            <!-- Premios del Grupo -->
+                            <div class="subsection">
+                                <h3>
+                                    <i class="fas fa-award"></i>
+                                    Premios del Grupo
+                                </h3>
+
+                                <div formArrayName="premios" class="premios-content">
+                                    <ng-container *ngFor="let premio of getPremios(i).controls; let j = index">
+                                        <div class="premio-lugar" [formGroupName]="j">
+                                            <div class="lugar-header">
+                                                <label>
+                                                    <i class="fas fa-medal" [ngClass]="{
+                                                        'medal-gold': j === 0,
+                                                        'medal-silver': j === 1,
+                                                        'medal-bronze': j === 2,
+                                                        'medal-other': j > 2
+                                                    }"></i>
+                                                    {{ premio.get('descripcion')?.value || 'Lugar ' + (j + 1) }}
+                                                </label>
+                                                <button type="button" class="btn-delete-small"
+                                                    (click)="eliminarPremio(i, j)" [disabled]="getPremios(i).length === 1"
+                                                    *ngIf="getPremios(i).length > 1">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" formControlName="monto" placeholder="$1500 o Trofeo"
+                                                class="form-control" />
+                                        </div>
+                                    </ng-container>
+                                </div>
+
+                                <button type="button" class="btn-add-lugar" (click)="agregarPremio(i)">
+                                    <i class="fas fa-plus"></i>
+                                    Agregar Lugar
+                                </button>
+                            </div>
+
+                            <!-- Sistemas de Desempate -->
+                            <div class="subsection desempates-section">
+                                <h3>
+                                    <i class="fas fa-balance-scale"></i>
+                                    Sistemas de Desempate
+                                    <span class="required">*</span>
+                                </h3>
+                                <p class="help-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Seleccione al menos dos sistemas en orden de prioridad
+                                </p>
+
+                                <div class="desempates-grid">
+                                    <div *ngFor="let sistema of sistemasDesempate" class="desempate-card"
+                                        [ngClass]="{'selected': isDesempateSeleccionado(i, sistema.idDesempate!)}"
+                                        (click)="toggleDesempate(i, sistema.idDesempate!)">
+
+                                        <div class="prioridad-badge" *ngIf="isDesempateSeleccionado(i, sistema.idDesempate!)">
+                                            {{ getPrioridadDesempate(i, sistema.idDesempate!) }}
+                                        </div>
+
+                                        <div class="checkbox-icon">
+                                            <i class="fas" [ngClass]="{
+                                                'fa-square-check': isDesempateSeleccionado(i, sistema.idDesempate!),
+                                                'fa-square': !isDesempateSeleccionado(i, sistema.idDesempate!)
+                                            }"></i>
+                                        </div>
+                                        <div class="desempate-info">
+                                            <h4>{{ sistema.nombre }}</h4>
+                                            <p>{{ sistema.descripcion }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notas Adicionales -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('notas')">
+                <i class="fas fa-sticky-note"></i>
+                <h2>Notas Adicionales</h2>
+                <i class="fas" [ngClass]="{
+                    'fa-chevron-up': seccionesAbiertas.notas,
+                    'fa-chevron-down': !seccionesAbiertas.notas
+                }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.notas">
+                <textarea formControlName="notas" rows="4"
+                    placeholder="Ingrese información adicional sobre la liga, reglas especiales, información de contacto, etc."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelar()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button type="submit" class="btn-submit" [disabled]="loading || ligaForm.invalid">
+                <i class="fas" [ngClass]="{ 'fa-check': !loading, 'fa-spinner fa-spin': loading }"></i>
+                {{ loading ? 'Guardando...' : 'Crear Liga' }}
+            </button>
+        </div>
+
+        <div class="error-message" *ngIf="error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error }}
+        </div>
+    </form>
+</div>

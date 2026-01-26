@@ -160,6 +160,72 @@
                 </div>
             </div>
 
+            <!-- GESTIÓN LIGA -->
+            <div class="menu-section">
+                <div class="section-title" *ngIf="!isCollapsed || esMobile">GESTIÓN LIGA</div>
+                <div class="section-divider" *ngIf="isCollapsed && !esMobile"></div>
+
+                <div class="nav-item" (click)="cargarLigas()" [class.active]="esRutaActiva('/main-view/ligas')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-layer-group nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Ligas</span>
+                    </div>
+                    <button type="button" class="btn-submenu-toggle" *ngIf="!isCollapsed || esMobile"
+                        (click)="toggleSubmenuLigas($event)" [class.expanded]="submenuLigasExpandido">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- Submenu de Ligas -->
+                <div class="submenu" *ngIf="!isCollapsed || esMobile" [class.submenu-visible]="submenuLigasExpandido">
+                    <div class="nav-item submenu-item" (click)="verDetalleLiga()"
+                        [class.active]="esRutaActiva('/main-view/detalle-liga')">
+                        <div class="nav-item-content">
+                            <i class="fa-solid fa-eye nav-icon"></i>
+                            <span class="nav-label">Ver Detalles</span>
+                        </div>
+                    </div>
+                    <div class="nav-item submenu-item" (click)="editarLigaActual()"
+                        [class.active]="esRutaActiva('/main-view/editar-liga')">
+                        <div class="nav-item-content">
+                            <i class="fa-solid fa-pen-to-square nav-icon"></i>
+                            <span class="nav-label">Editar Liga</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-item" (click)="nuevaLiga()" [class.active]="esRutaActiva('/main-view/nueva-liga')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-plus nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Agregar Liga</span>
+                    </div>
+                </div>
+
+                <div class="nav-item" (click)="cargarInscripcionesLiga()"
+                    [class.active]="esRutaActiva('/main-view/inscripciones-liga')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-user-plus nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Inscripciones por Liga</span>
+                    </div>
+                </div>
+
+                <div class="nav-item" (click)="verResultadosMesasLiga()"
+                    [class.active]="esRutaActiva('/main-view/mesas-liga')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-table-cells nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Resultados Mesas</span>
+                    </div>
+                </div>
+
+                <div class="nav-item" (click)="verResultadosLigas()"
+                    [class.active]="esRutaActiva('/main-view/resultado-todas-ligas')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-chart-column nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Resultados Ligas</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- GESTIÓN JUGADORES -->
             <div class="menu-section">
                 <div class="section-title" *ngIf="!isCollapsed || esMobile">GESTIÓN JUGADORES</div>
@@ -202,7 +268,7 @@
     <div class="sidebar-footer" *ngIf="!isCollapsed || esMobile">
         <div class="footer-content">
             <i class="fa-solid fa-chess-knight"></i>
-            <span>v2.2.0</span>
+            <span>v3.0.0</span>
         </div>
     </div>
 </aside>
