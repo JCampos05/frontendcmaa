@@ -239,6 +239,14 @@
                     </div>
                 </div>
 
+                <div class="nav-item" (click)="cargarInscripcionesAdmin()"
+                    [class.active]="esRutaActiva('/main-view/inscripcion-admin')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-user-plus nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Inscripciones Generales</span>
+                    </div>
+                </div>
+
                 <div class="nav-item" (click)="cargarHistorialJugador()"
                     [class.active]="esRutaActiva('/main-view/historial-jugador-torneo')">
                     <div class="nav-item-content">

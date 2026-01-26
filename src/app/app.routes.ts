@@ -9,6 +9,7 @@ export const routes: Routes = [
     {path: 'players-stats' , loadComponent: () => import('./views/player-stats/player-stats').then(m => m.PlayerStatsComponent)},
     {path: 'jugador-resultado' , loadComponent: () => import('./views/jugador-resultado/jugador-resultado').then(m => m.JugadorResultadoComponent)},
     {path: 'reloj-section' , loadComponent: () => import('./views/reloj-section/reloj-section').then(m => m.RelojSectionComponent)},
+    {path: 'jugador-liga' , loadComponent: () => import('./views/jugador-liga/jugador-liga').then(m => m.JugadorLigaComponent)},
     {path: 'main-view', loadComponent: () => import('./views/main-view/main-view').then(m => m.MainView),
     
         canActivate: [authGuard],
@@ -43,6 +44,7 @@ export const routes: Routes = [
             {path: 'mesas-liga' , loadComponent: () => import('./views/main-view/mesas-liga/mesas-liga').then(m => m.MesasLigaComponent)},
             // Gestión de Jugadores
             {path: 'gestion-jugadores', loadComponent: () => import('./views/main-view/gestion-jugadores/gestion-jugadores').then(m => m.GestionJugadoresComponent)},
+            {path: 'inscripcion-admin', loadComponent: () => import('./views/main-view/inscripciones-admin/inscripciones-admin').then(m => m.InscripcionesAdminComponent)},
             // Sistema
             {path: 'configuracion', loadComponent: () => import('./views/main-view/configuracion/configuracion').then(m => m.Configuracion)}
         ]

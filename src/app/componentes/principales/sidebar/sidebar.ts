@@ -233,6 +233,11 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     if (this.esMobile) this.cerrarSidebarMovil();
   }
 
+  cargarInscripcionesAdmin(): void {
+    this.router.navigate(['/main-view/inscripcion-admin']);
+    if (this.esMobile) this.cerrarSidebarMovil();
+  }
+
   cargarHistorialJugador(): void {
     this.router.navigate(['/main-view/historial-jugador-torneo']);
     if (this.esMobile) this.cerrarSidebarMovil();

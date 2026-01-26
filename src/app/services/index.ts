@@ -24,3 +24,5 @@ export * from './grupoLiga/grupo-liga';
 export * from './jugadorLiga/jugador-liga';
 export * from './rondaLiga/ronda-liga';
 export * from './mesaLiga/mesa-liga';
+
+export *from './inscripcion-admin/inscripcion-admin';

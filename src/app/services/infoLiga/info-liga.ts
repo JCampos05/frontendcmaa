@@ -18,13 +18,13 @@ export class InfoLigaService {
    */
   private normalizarFecha(fecha: string | Date | null | undefined): Date | null {
     if (!fecha) return null;
-    
+
     if (typeof fecha === 'string') {
       const fechaSolo = fecha.split('T')[0];
       const [year, month, day] = fechaSolo.split('-').map(Number);
       return new Date(year, month - 1, day);
     }
-    
+
     return new Date(fecha);
   }
 
@@ -33,7 +33,7 @@ export class InfoLigaService {
    */
   private transformarLiga(liga: any): any {
     if (!liga) return null;
-    
+
     return {
       ...liga,
       fecha_inicio: this.normalizarFecha(liga.fecha_inicio),
@@ -115,6 +115,42 @@ export class InfoLigaService {
   delete(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
       map(response => response.data || response)
+    );
+  }
+
+  /**
+ * GET /api/liga/info/activas - Obtener ligas activas (público)
+ */
+  getActivas(): Observable<InfoLiga[]> {
+    return this.http.get<any>(`${this.apiUrl}/activas`).pipe(
+      map(response => {
+        const data = response.data || response || [];
+        return data.map((liga: any) => this.transformarLiga(liga));
+      })
+    );
+  }
+
+  /**
+   * GET /api/liga/info/todas - Obtener todas las ligas (público)
+   */
+  getTodasPublico(): Observable<InfoLiga[]> {
+    return this.http.get<any>(`${this.apiUrl}/todas`).pipe(
+      map(response => {
+        const data = response.data || response || [];
+        return data.map((liga: any) => this.transformarLiga(liga));
+      })
+    );
+  }
+
+  /**
+   * GET /api/liga/info/:id/publico - Obtener liga por ID (público)
+   */
+  getByIdPublico(id: number): Observable<InfoLiga> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/publico`).pipe(
+      map(response => {
+        const data = response.data || response;
+        return this.transformarLiga(data);
+      })
     );
   }
 }

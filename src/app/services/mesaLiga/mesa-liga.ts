@@ -18,13 +18,13 @@ export class MesaLigaService {
    */
   private normalizarFecha(fecha: string | Date | null | undefined): Date | null {
     if (!fecha) return null;
-    
+
     if (typeof fecha === 'string') {
       const fechaSolo = fecha.split('T')[0];
       const [year, month, day] = fechaSolo.split('-').map(Number);
       return new Date(year, month - 1, day);
     }
-    
+
     return new Date(fecha);
   }
 
@@ -33,7 +33,7 @@ export class MesaLigaService {
    */
   private transformarMesa(mesa: any): any {
     if (!mesa) return null;
-    
+
     return {
       ...mesa,
       fecha_creacion: this.normalizarFecha(mesa.fecha_creacion),
@@ -129,6 +129,18 @@ export class MesaLigaService {
   delete(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
       map(response => response.data || response)
+    );
+  }
+
+  /**
+ * GET /api/liga/mesas/ronda/:idRonda/publico - Obtener mesas por ronda (público)
+ */
+  getByRondaPublico(idRonda: number): Observable<MesaLiga[]> {
+    return this.http.get<any>(`${this.apiUrl}/ronda/${idRonda}/publico`).pipe(
+      map(response => {
+        const data = response.data || response || [];
+        return data.map((mesa: any) => this.transformarMesa(mesa));
+      })
     );
   }
 }

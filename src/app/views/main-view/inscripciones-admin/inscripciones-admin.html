@@ -1,0 +1,394 @@
+<div class="container">
+    <div class="header">
+        <button class="btn-back" type="button" (click)="cancelar()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1>Nueva Inscripción Administrativa</h1>
+            <p>Inscribir jugadores a torneos o ligas</p>
+        </div>
+    </div>
+
+    <!-- Mensaje de éxito -->
+    <div class="mensaje-exito" *ngIf="mensajeExito">
+        <i class="fas fa-check-circle"></i>
+        <div class="mensaje-contenido">
+            <strong>{{ mensajeExito }}</strong>
+        </div>
+        <button class="btn-cerrar-mensaje" (click)="cerrarMensajeExito()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div class="mensaje-error" *ngIf="error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="mensaje-contenido">
+            <strong>{{ error }}</strong>
+        </div>
+    </div>
+
+    <form [formGroup]="inscripcionForm" (ngSubmit)="guardarInscripcion()">
+
+        <!-- Tipo de Inscripción -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('tipoInscripcion')">
+                <i class="fas fa-clipboard-list"></i>
+                <h2>Tipo de Inscripción</h2>
+                <i class="fas" [ngClass]="{
+          'fa-chevron-up': seccionesAbiertas.tipoInscripcion,
+          'fa-chevron-down': !seccionesAbiertas.tipoInscripcion
+        }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.tipoInscripcion">
+                <div class="tipo-seleccion">
+                    <div class="tipo-card" [class.selected]="tipoInscripcion === 'torneo'"
+                        (click)="inscripcionForm.patchValue({ tipo: 'torneo' })">
+                        <i class="fas fa-chess"></i>
+                        <h3>Torneo</h3>
+                        <p>Inscribir a un torneo específico</p>
+                    </div>
+
+                    <div class="tipo-card" [class.selected]="tipoInscripcion === 'liga'"
+                        (click)="inscripcionForm.patchValue({ tipo: 'liga' })">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Liga</h3>
+                        <p>Inscribir a una liga por grupos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos del Jugador -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('datosJugador')">
+                <i class="fas fa-user"></i>
+                <h2>Datos del Jugador</h2>
+                <i class="fas" [ngClass]="{
+          'fa-chevron-up': seccionesAbiertas.datosJugador,
+          'fa-chevron-down': !seccionesAbiertas.datosJugador
+        }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.datosJugador">
+
+                <!-- Selector de modo -->
+                <div class="modo-jugador">
+                    <label class="radio-card" [class.selected]="modoJugador === 'existente'">
+                        <input type="radio" formControlName="modoJugador" value="existente">
+                        <div class="radio-content">
+                            <i class="fas fa-user-check"></i>
+                            <span>Jugador Existente</span>
+                        </div>
+                    </label>
+
+                    <label class="radio-card" [class.selected]="modoJugador === 'nuevo'">
+                        <input type="radio" formControlName="modoJugador" value="nuevo">
+                        <div class="radio-content">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Nuevo Jugador</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Jugador Existente -->
+                <div *ngIf="modoJugador === 'existente'" class="busqueda-jugador">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-search"></i>
+                            Buscar Jugador
+                            <span class="required">*</span>
+                        </label>
+                        <div class="search-container">
+                            <input type="text" [value]="busquedaJugador"
+                                (input)="busquedaJugador = $any($event.target).value; buscarJugador()"
+                                (focus)="mostrarListaJugadores = jugadoresFiltrados.length > 0"
+                                placeholder="Nombre, apellido o teléfono" class="form-control">
+
+                            <button type="button" class="btn-limpiar-busqueda" *ngIf="jugadorSeleccionado"
+                                (click)="limpiarSeleccionJugador()">
+                                <i class="fas fa-times"></i>
+                            </button>
+
+                            <!-- Lista de resultados -->
+                            <div class="lista-jugadores" *ngIf="mostrarListaJugadores && jugadoresFiltrados.length > 0">
+                                <div class="jugador-item" *ngFor="let jugador of jugadoresFiltrados"
+                                    (click)="seleccionarJugador(jugador)">
+                                    <div class="jugador-info">
+                                        <strong>{{ jugador.nombre }} {{ jugador.apellido1 }} {{ jugador.apellido2
+                                            }}</strong>
+                                        <small>{{ jugador.telefono }}</small>
+                                    </div>
+                                    <i class="fas fa-check"
+                                        *ngIf="jugadorSeleccionado?.idJugador === jugador.idJugador"></i>
+                                </div>
+                            </div>
+
+                            <div class="lista-jugadores vacia"
+                                *ngIf="mostrarListaJugadores && jugadoresFiltrados.length === 0">
+                                <p>No se encontraron jugadores</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Jugador seleccionado -->
+                    <div class="jugador-seleccionado" *ngIf="jugadorSeleccionado">
+                        <div class="jugador-card">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="jugador-datos">
+                                <h4>{{ jugadorSeleccionado.nombre }} {{ jugadorSeleccionado.apellido1 }} {{
+                                    jugadorSeleccionado.apellido2 }}</h4>
+                                <p><i class="fas fa-phone"></i> {{ jugadorSeleccionado.telefono }}</p>
+                                <p *ngIf="jugadorSeleccionado.rating"><i class="fas fa-star"></i> Rating: {{
+                                    jugadorSeleccionado.rating }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nuevo Jugador -->
+                <div *ngIf="modoJugador === 'nuevo'">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i>
+                                Nombre
+                                <span class="required">*</span>
+                            </label>
+                            <input type="text" formControlName="nombre" placeholder="Nombre del jugador"
+                                class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i>
+                                Primer Apellido
+                                <span class="required">*</span>
+                            </label>
+                            <input type="text" formControlName="apellido1" placeholder="Primer apellido"
+                                class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i>
+                                Segundo Apellido
+                            </label>
+                            <input type="text" formControlName="apellido2" placeholder="Segundo apellido (opcional)"
+                                class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-phone"></i>
+                                Teléfono
+                                <span class="required">*</span>
+                            </label>
+                            <input type="tel" formControlName="telefono" placeholder="10 dígitos" maxlength="10"
+                                class="form-control">
+                        </div>
+
+                        <div class="form-group fecha-nacimiento">
+                            <label>
+                                <i class="fas fa-calendar-alt"></i>
+                                Fecha de Nacimiento
+                                <span class="required">*</span>
+                            </label>
+                            <div class="fecha-grid">
+                                <select formControlName="dia_nacimiento" class="form-control">
+                                    <option value="">Día</option>
+                                    <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
+                                </select>
+
+                                <select formControlName="mes_nacimiento" class="form-control">
+                                    <option value="">Mes</option>
+                                    <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
+                                </select>
+
+                                <select formControlName="anio_nacimiento" class="form-control">
+                                    <option value="">Año</option>
+                                    <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selección de Evento -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('seleccionEvento')">
+                <i class="fas" [ngClass]="tipoInscripcion === 'torneo' ? 'fa-chess' : 'fa-trophy'"></i>
+                <h2>Selección de {{ tipoInscripcion === 'torneo' ? 'Torneo' : 'Liga' }}</h2>
+                <i class="fas" [ngClass]="{
+          'fa-chevron-up': seccionesAbiertas.seleccionEvento,
+          'fa-chevron-down': !seccionesAbiertas.seleccionEvento
+        }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.seleccionEvento">
+
+                <!-- Torneo -->
+                <div *ngIf="tipoInscripcion === 'torneo'">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-chess"></i>
+                                Torneo
+                                <span class="required">*</span>
+                            </label>
+                            <select formControlName="idTorneo" (change)="onTorneoChange($event)" class="form-control">
+                                <option value="">Seleccione un torneo...</option>
+                                <option *ngFor="let torneo of torneos" [value]="torneo.id">
+                                    {{ torneo.nombre }} - {{ torneo.lugar }} ({{ torneo.fecha | date:'dd/MM/yyyy' }})
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" *ngIf="categorias.length > 0">
+                            <label>
+                                <i class="fas fa-layer-group"></i>
+                                Categoría
+                                <span class="required">*</span>
+                            </label>
+                            <select formControlName="idCategoria" class="form-control">
+                                <option value="">Seleccione una categoría...</option>
+                                <option *ngFor="let cat of categorias" [value]="cat.idCategoria">
+                                    {{ cat.nombre }} - ${{ cat.costo }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liga -->
+                <div *ngIf="tipoInscripcion === 'liga'">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-trophy"></i>
+                                Liga
+                                <span class="required">*</span>
+                            </label>
+                            <select formControlName="idLiga" (change)="onLigaChange($event)" class="form-control">
+                                <option value="">Seleccione una liga...</option>
+                                <option *ngFor="let liga of ligas" [value]="liga.id">
+                                    {{ liga.nombre }} - {{ liga.lugar }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" *ngIf="grupos.length > 0">
+                            <label>
+                                <i class="fas fa-users"></i>
+                                Grupo
+                                <span class="required">*</span>
+                            </label>
+                            <select formControlName="idGrupoLiga" class="form-control">
+                                <option value="">Seleccione un grupo...</option>
+                                <option *ngFor="let grupo of grupos" [value]="grupo.idGrupoLiga">
+                                    {{ grupo.nombre }}
+                                    <span *ngIf="grupo.max_jugadores">({{ grupo.max_jugadores }} jugadores máx.)</span>
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Configuración adicional para liga -->
+                    <div class="form-row" *ngIf="grupos.length > 0">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-star"></i>
+                                Rating Inicial
+                            </label>
+                            <input type="number" formControlName="rating_inicial" min="0" placeholder="0"
+                                class="form-control">
+                            <small class="help-text">
+                                <i class="fas fa-info-circle"></i>
+                                Dejar en 0 si no tiene rating previo
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-hashtag"></i>
+                                Número de Jugador
+                            </label>
+                            <input type="number" formControlName="numero_jugador" min="1" placeholder="Opcional"
+                                class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-sort-numeric-down"></i>
+                                Posición/Seed
+                            </label>
+                            <input type="number" formControlName="posicion" min="1" placeholder="Opcional"
+                                class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración Adicional -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('configuracionAdicional')">
+                <i class="fas fa-cog"></i>
+                <h2>Configuración Adicional</h2>
+                <i class="fas" [ngClass]="{
+          'fa-chevron-up': seccionesAbiertas.configuracionAdicional,
+          'fa-chevron-down': !seccionesAbiertas.configuracionAdicional
+        }"></i>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.configuracionAdicional">
+                <div class="form-row">
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" formControlName="pago_confirmado">
+                            <span>
+                                <i class="fas fa-credit-card"></i>
+                                Pago Confirmado
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-dollar-sign"></i>
+                            Monto Pagado
+                        </label>
+                        <input type="number" formControlName="monto_pagado" min="0" step="0.01" placeholder="0.00"
+                            class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>
+                        <i class="fas fa-sticky-note"></i>
+                        Notas
+                    </label>
+                    <textarea formControlName="notas" rows="4" placeholder="Información adicional (opcional)"
+                        class="form-control"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelar()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button type="submit" class="btn-submit" [disabled]="loading || inscripcionForm.invalid">
+                <i class="fas" [ngClass]="{ 'fa-check': !loading, 'fa-spinner fa-spin': loading }"></i>
+                {{ loading ? 'Guardando...' : 'Crear Inscripción' }}
+            </button>
+        </div>
+    </form>
+</div>

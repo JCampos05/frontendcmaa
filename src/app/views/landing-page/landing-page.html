@@ -16,6 +16,10 @@
           <i class="fa-solid fa-trophy"></i>
           Torneos
         </a>
+        <a routerLink="/jugador-liga" class="nav-link">
+          <i class="fa-solid fa-ranking-star"></i>
+          Ligas
+        </a>
         <a routerLink="/jugador-resultado" class="nav-link">
           <i class="fa-solid fa-chess-board"></i>
           Resultados
@@ -42,10 +46,16 @@
       <div class="hero-text">
         <h2 class="hero-title">Juega, Compite, Domina</h2>
         <p class="hero-subtitle">Únete a la comunidad de ajedrez más activa de la región</p>
-        <button (click)="scrollToSection('torneos')" class="btn-primary">
-          Ver Torneos
-          <i class="fa-solid fa-arrow-down"></i>
-        </button>
+        <div class="hero-buttons">
+          <button (click)="scrollToSection('torneos')" class="btn-primary">
+            Ver Torneos
+            <i class="fa-solid fa-arrow-down"></i>
+          </button>
+          <button routerLink="/jugador-liga" class="btn-secondary">
+            Ver Ligas
+            <i class="fa-solid fa-ranking-star"></i>
+          </button>
+        </div>
       </div>
       <div class="hero-chess-pieces">
         <i class="fa-solid fa-chess-king piece-1"></i>

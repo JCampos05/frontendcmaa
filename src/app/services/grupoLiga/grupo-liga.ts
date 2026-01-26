@@ -18,13 +18,13 @@ export class GrupoLigaService {
    */
   private normalizarFecha(fecha: string | Date | null | undefined): Date | null {
     if (!fecha) return null;
-    
+
     if (typeof fecha === 'string') {
       const fechaSolo = fecha.split('T')[0];
       const [year, month, day] = fechaSolo.split('-').map(Number);
       return new Date(year, month - 1, day);
     }
-    
+
     return new Date(fecha);
   }
 
@@ -33,7 +33,7 @@ export class GrupoLigaService {
    */
   private transformarGrupo(grupo: any): any {
     if (!grupo) return null;
-    
+
     return {
       ...grupo,
       fecha_creacion: this.normalizarFecha(grupo.fecha_creacion),
@@ -123,6 +123,27 @@ export class GrupoLigaService {
    */
   delete(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
+      map(response => response.data || response)
+    );
+  }
+
+  /**
+ * GET /api/liga/grupos/liga/:idLiga/publico - Obtener grupos por liga (público)
+ */
+  getByLigaPublico(idLiga: number): Observable<GrupoLiga[]> {
+    return this.http.get<any>(`${this.apiUrl}/liga/${idLiga}/publico`).pipe(
+      map(response => {
+        const data = response.data || response || [];
+        return data.map((grupo: any) => this.transformarGrupo(grupo));
+      })
+    );
+  }
+
+  /**
+   * GET /api/liga/grupos/:id/tabla/publico - Obtener tabla de posiciones (público)
+   */
+  getTablaPublico(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/tabla/publico`).pipe(
       map(response => response.data || response)
     );
   }

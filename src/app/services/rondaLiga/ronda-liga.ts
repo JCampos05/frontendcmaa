@@ -18,13 +18,13 @@ export class RondaLigaService {
    */
   private normalizarFecha(fecha: string | Date | null | undefined): Date | null {
     if (!fecha) return null;
-    
+
     if (typeof fecha === 'string') {
       const fechaSolo = fecha.split('T')[0];
       const [year, month, day] = fechaSolo.split('-').map(Number);
       return new Date(year, month - 1, day);
     }
-    
+
     return new Date(fecha);
   }
 
@@ -33,7 +33,7 @@ export class RondaLigaService {
    */
   private transformarRonda(ronda: any): any {
     if (!ronda) return null;
-    
+
     return {
       ...ronda,
       fecha_programada: this.normalizarFecha(ronda.fecha_programada),
@@ -154,6 +154,30 @@ export class RondaLigaService {
   delete(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
       map(response => response.data || response)
+    );
+  }
+
+  /**
+ * GET /api/liga/rondas/liga/:idLiga/publico - Obtener rondas por liga (público)
+ */
+  getByLigaPublico(idLiga: number): Observable<RondaLiga[]> {
+    return this.http.get<any>(`${this.apiUrl}/liga/${idLiga}/publico`).pipe(
+      map(response => {
+        const data = response.data || response || [];
+        return data.map((ronda: any) => this.transformarRonda(ronda));
+      })
+    );
+  }
+
+  /**
+   * GET /api/liga/rondas/grupo/:idGrupo/publico - Obtener rondas por grupo (público)
+   */
+  getByGrupoPublico(idGrupo: number): Observable<RondaLiga[]> {
+    return this.http.get<any>(`${this.apiUrl}/grupo/${idGrupo}/publico`).pipe(
+      map(response => {
+        const data = response.data || response || [];
+        return data.map((ronda: any) => this.transformarRonda(ronda));
+      })
     );
   }
 }
