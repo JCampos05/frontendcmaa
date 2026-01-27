@@ -60,6 +60,41 @@ export class JugadorService {
   }
 
   /**
+   * Función auxiliar para transformar datos de liga
+   */
+  private transformarLiga(liga: any): any {
+    if (!liga) return null;
+    
+    return {
+      ...liga,
+      fecha_inicio: this.normalizarFecha(liga.fecha_inicio),
+      fecha_fin: this.normalizarFecha(liga.fecha_fin),
+      cierre_inscripciones: this.normalizarFecha(liga.cierre_inscripciones),
+      fecha_creacion: this.normalizarFecha(liga.fecha_creacion),
+      fecha_actualizacion: this.normalizarFecha(liga.fecha_actualizacion)
+    };
+  }
+
+  /**
+   * Función auxiliar para transformar inscripción de liga con datos relacionados
+   */
+  private transformarInscripcionLiga(inscripcionLiga: any): any {
+    if (!inscripcionLiga) return null;
+    
+    return {
+      ...inscripcionLiga,
+      fecha_inscripcion: this.normalizarFecha(inscripcionLiga.fecha_inscripcion),
+      fecha_actualizacion: this.normalizarFecha(inscripcionLiga.fecha_actualizacion),
+      liga: this.transformarLiga(inscripcionLiga.liga),
+      grupo: inscripcionLiga.grupo ? {
+        ...inscripcionLiga.grupo,
+        fecha_creacion: this.normalizarFecha(inscripcionLiga.grupo.fecha_creacion),
+        fecha_actualizacion: this.normalizarFecha(inscripcionLiga.grupo.fecha_actualizacion)
+      } : null
+    };
+  }
+
+  /**
    * GET /api/jugadores - Obtener todos los jugadores (protegido)
    * Acepta parámetros de filtrado opcionales
    */
@@ -156,6 +191,13 @@ export class JugadorService {
         if (data.historial && Array.isArray(data.historial)) {
           data.historial = data.historial.map((inscripcion: any) => 
             this.transformarInscripcion(inscripcion)
+          );
+        }
+        
+        // Transformar ligas si existen
+        if (data.ligas && Array.isArray(data.ligas)) {
+          data.ligas = data.ligas.map((inscripcionLiga: any) => 
+            this.transformarInscripcionLiga(inscripcionLiga)
           );
         }
         

@@ -183,6 +183,10 @@
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     Historial Completo
                 </button>
+                <button class="tab-button" [class.active]="tabActivo === 'ligas'" (click)="cambiarTab('ligas')">
+                    <i class="fa-solid fa-ranking-star"></i>
+                    Ligas
+                </button>
             </div>
 
             <!-- TAB: ÚLTIMO TORNEO -->
@@ -350,6 +354,253 @@
                     <i class="fa-solid fa-calendar-xmark"></i>
                     <h4>Sin historial de torneos</h4>
                     <p>Este jugador aún no tiene participaciones confirmadas en torneos.</p>
+                </div>
+            </div>
+
+            <!-- TAB: LIGAS -->
+            <div class="tab-content" *ngIf="tabActivo === 'ligas'">
+                <div class="ligas-section" *ngIf="ligasActivas.length > 0 || ligasPasadas.length > 0 || ligasFuturas.length > 0">
+                    
+                    <!-- LIGAS ACTIVAS -->
+                    <div class="ligas-subseccion" *ngIf="ligasActivas.length > 0">
+                        <div class="subseccion-header activas">
+                            <div class="subseccion-icon">
+                                <i class="fa-solid fa-circle-play"></i>
+                            </div>
+                            <div class="subseccion-info">
+                                <h3 class="subseccion-title">Ligas en Curso</h3>
+                                <span class="subseccion-count">{{ ligasActivas.length }} liga{{ ligasActivas.length !== 1 ? 's' : '' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="ligas-grid">
+                            <div class="liga-card activa" *ngFor="let participacion of ligasActivas">
+                                <div class="liga-status activa">
+                                    <i class="fa-solid fa-circle-play"></i>
+                                    En Curso
+                                </div>
+                                <h4 class="liga-nombre">{{ participacion.liga.nombre }}</h4>
+                                <p class="liga-descripcion" *ngIf="participacion.liga.descripcion">
+                                    {{ participacion.liga.descripcion }}
+                                </p>
+
+                                <div class="liga-info-grid">
+                                    <div class="liga-info-item">
+                                        <i class="fa-solid fa-calendar"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Periodo</span>
+                                            <span class="info-value">{{ formatearRangoFechas(participacion.liga.fecha_inicio, participacion.liga.fecha_fin) }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item" *ngIf="participacion.liga.lugar">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Sede</span>
+                                            <span class="info-value">{{ participacion.liga.lugar }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item" *ngIf="participacion.grupo">
+                                        <i class="fa-solid fa-layer-group"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Grupo</span>
+                                            <span class="info-value">{{ participacion.grupo.nombre }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item">
+                                        <i class="fa-solid fa-star"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Puntos</span>
+                                            <span class="info-value puntos-destacado">{{ participacion.puntos || 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="liga-stats">
+                                    <div class="stat-box">
+                                        <span class="stat-value">{{ participacion.partidas_jugadas || 0 }}</span>
+                                        <span class="stat-label">Partidas</span>
+                                    </div>
+                                    <div class="stat-box victoria">
+                                        <span class="stat-value">{{ participacion.victorias || 0 }}</span>
+                                        <span class="stat-label">Victorias</span>
+                                    </div>
+                                    <div class="stat-box empate">
+                                        <span class="stat-value">{{ participacion.empates || 0 }}</span>
+                                        <span class="stat-label">Empates</span>
+                                    </div>
+                                    <div class="stat-box derrota">
+                                        <span class="stat-value">{{ participacion.derrotas || 0 }}</span>
+                                        <span class="stat-label">Derrotas</span>
+                                    </div>
+                                </div>
+
+                                <div class="liga-footer" *ngIf="participacion.posicion_grupo">
+                                    <i class="fa-solid fa-medal"></i>
+                                    Posición en el grupo: <strong>{{ participacion.posicion_grupo }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEPARADOR -->
+                    <div class="historial-divider" *ngIf="ligasActivas.length > 0 && (ligasFuturas.length > 0 || ligasPasadas.length > 0)">
+                        <span class="divider-line"></span>
+                        <span class="divider-text">
+                            <i class="fa-solid fa-clock"></i>
+                            Otras Ligas
+                        </span>
+                        <span class="divider-line"></span>
+                    </div>
+
+                    <!-- LIGAS FUTURAS -->
+                    <div class="ligas-subseccion" *ngIf="ligasFuturas.length > 0">
+                        <div class="subseccion-header futuras">
+                            <div class="subseccion-icon">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                            </div>
+                            <div class="subseccion-info">
+                                <h3 class="subseccion-title">Próximas Ligas</h3>
+                                <span class="subseccion-count">{{ ligasFuturas.length }} inscripción{{ ligasFuturas.length !== 1 ? 'es' : '' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="ligas-grid">
+                            <div class="liga-card futura" *ngFor="let participacion of ligasFuturas">
+                                <div class="liga-status futura">
+                                    <i class="fa-solid fa-hourglass-half"></i>
+                                    Por Comenzar
+                                </div>
+                                <h4 class="liga-nombre">{{ participacion.liga.nombre }}</h4>
+                                <p class="liga-descripcion" *ngIf="participacion.liga.descripcion">
+                                    {{ participacion.liga.descripcion }}
+                                </p>
+
+                                <div class="liga-info-grid">
+                                    <div class="liga-info-item">
+                                        <i class="fa-solid fa-calendar-plus"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Inicio</span>
+                                            <span class="info-value">{{ formatearFecha(participacion.liga.fecha_inicio) }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item" *ngIf="participacion.liga.lugar">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Sede</span>
+                                            <span class="info-value">{{ participacion.liga.lugar }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item" *ngIf="participacion.grupo">
+                                        <i class="fa-solid fa-layer-group"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Grupo</span>
+                                            <span class="info-value">{{ participacion.grupo.nombre }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item">
+                                        <i class="fa-solid fa-user-check"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Estado</span>
+                                            <span class="info-value">{{ participacion.estado || 'Inscrito' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="liga-footer" *ngIf="participacion.fecha_inscripcion">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                    Inscrito el {{ formatearFecha(participacion.fecha_inscripcion) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LIGAS PASADAS -->
+                    <div class="ligas-subseccion" *ngIf="ligasPasadas.length > 0">
+                        <div class="subseccion-header pasadas">
+                            <div class="subseccion-icon">
+                                <i class="fa-solid fa-flag-checkered"></i>
+                            </div>
+                            <div class="subseccion-info">
+                                <h3 class="subseccion-title">Ligas Finalizadas</h3>
+                                <span class="subseccion-count">{{ ligasPasadas.length }} liga{{ ligasPasadas.length !== 1 ? 's' : '' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="ligas-grid">
+                            <div class="liga-card pasada" *ngFor="let participacion of ligasPasadas">
+                                <div class="liga-status pasada">
+                                    <i class="fa-solid fa-flag-checkered"></i>
+                                    Finalizada
+                                </div>
+                                <h4 class="liga-nombre">{{ participacion.liga.nombre }}</h4>
+
+                                <div class="liga-info-grid">
+                                    <div class="liga-info-item">
+                                        <i class="fa-solid fa-calendar"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Periodo</span>
+                                            <span class="info-value">{{ formatearRangoFechas(participacion.liga.fecha_inicio, participacion.liga.fecha_fin) }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item" *ngIf="participacion.grupo">
+                                        <i class="fa-solid fa-layer-group"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Grupo</span>
+                                            <span class="info-value">{{ participacion.grupo.nombre }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item">
+                                        <i class="fa-solid fa-star"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Puntos</span>
+                                            <span class="info-value">{{ participacion.puntos || 0 }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="liga-info-item" *ngIf="participacion.posicion_grupo">
+                                        <i class="fa-solid fa-medal"></i>
+                                        <div class="info-text">
+                                            <span class="info-label">Posición Final</span>
+                                            <span class="info-value">{{ participacion.posicion_grupo }}º lugar</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="liga-stats">
+                                    <div class="stat-box">
+                                        <span class="stat-value">{{ participacion.partidas_jugadas || 0 }}</span>
+                                        <span class="stat-label">Partidas</span>
+                                    </div>
+                                    <div class="stat-box victoria">
+                                        <span class="stat-value">{{ participacion.victorias || 0 }}</span>
+                                        <span class="stat-label">V</span>
+                                    </div>
+                                    <div class="stat-box empate">
+                                        <span class="stat-value">{{ participacion.empates || 0 }}</span>
+                                        <span class="stat-label">E</span>
+                                    </div>
+                                    <div class="stat-box derrota">
+                                        <span class="stat-value">{{ participacion.derrotas || 0 }}</span>
+                                        <span class="stat-label">D</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-data" *ngIf="ligasActivas.length === 0 && ligasPasadas.length === 0 && ligasFuturas.length === 0">
+                    <i class="fa-solid fa-ranking-star"></i>
+                    <h4>Sin participaciones en ligas</h4>
+                    <p>Este jugador aún no ha participado en ninguna liga.</p>
                 </div>
             </div>
         </div>
