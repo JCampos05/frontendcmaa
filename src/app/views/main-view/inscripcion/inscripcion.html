@@ -182,8 +182,11 @@
                     [class.invalido]="inscripcionForm.get('categoria_id')?.invalid && (inscripcionForm.get('categoria_id')?.touched || submitted)"
                     (change)="onCategoriaChange($event)">
                     <option value="">Seleccione una categoría</option>
-                    <option *ngFor="let cat of categorias" [value]="cat.categoria?.idCategoria || cat.idCategoria">
+                    <option *ngFor="let cat of categorias"
+                        [value]="cat.categoria?.idCategoria || cat.idCategoria"
+                        [disabled]="!isCategoriaAbierta(cat)">
                         {{ cat.categoria?.nombre || cat.nombre }} - ${{ cat.categoria?.costo || cat.costo | number:'1.2-2' }}
+                        {{ !isCategoriaAbierta(cat) ? ' (Inscripciones cerradas)' : '' }}
                     </option>
                 </select>
             </div>

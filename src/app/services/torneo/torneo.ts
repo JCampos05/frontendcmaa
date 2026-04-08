@@ -64,6 +64,8 @@ export class TorneoService {
               premios: datosIntermedia.premios || null,
               desempates: datosIntermedia.desempates || null,
               activo: datosIntermedia.activo !== undefined ? datosIntermedia.activo : true,
+              cierre_inscripciones: datosIntermedia.cierre_inscripciones || null,
+              cierreInscripciones: datosIntermedia.cierre_inscripciones || null,
               categoria: {
                 idCategoria: cat.idCategoria,
                 nombre: cat.nombre,

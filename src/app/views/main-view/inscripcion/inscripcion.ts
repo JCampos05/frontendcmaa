@@ -33,6 +33,7 @@ export class InscripcionComponent implements OnInit {
   costoInscripcion: number = 0;
   torneoIdInicial: number | null = null;
   sistemaPago: any = null;
+  torneoActual: Torneo | null = null;
 
   dias: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
   meses = [
@@ -171,6 +172,7 @@ export class InscripcionComponent implements OnInit {
 
       // Obtener información del sistema de pago del torneo seleccionado
       const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoIdNumero);
+      this.torneoActual = torneoSeleccionado || null;
       if (torneoSeleccionado && torneoSeleccionado.sistema_pago) {
         this.sistemaPago = torneoSeleccionado.sistema_pago;
       } else {
@@ -206,6 +208,7 @@ export class InscripcionComponent implements OnInit {
     } else {
       this.categorias = [];
       this.sistemaPago = null;
+      this.torneoActual = null;
     }
 
     this.inscripcionForm.patchValue({ categoria_id: '' });
@@ -399,6 +402,15 @@ export class InscripcionComponent implements OnInit {
       return;
     }
 
+    const categoriaEnForm = this.categorias.find(
+      c => (c.categoria?.idCategoria || c.idCategoria) === categoriaId
+    );
+    if (categoriaEnForm && !this.isCategoriaAbierta(categoriaEnForm)) {
+      this.errores = ['Las inscripciones para esta categoría ya han cerrado'];
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     if (isNaN(torneoId) || torneoId <= 0) {
       this.errores = ['Debe seleccionar un torneo válido'];
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -557,6 +569,18 @@ export class InscripcionComponent implements OnInit {
       //console.error('Error al verificar cierre de inscripciones:', e);
       return false;
     }
+  }
+
+  // Verificar si una categoría tiene inscripciones abiertas (considera cierre propio o del torneo padre)
+  isCategoriaAbierta(cat: any): boolean {
+    // Cierre propio de la categoría tiene prioridad
+    const cierreCat = cat.cierre_inscripciones || cat.cierreInscripciones;
+    if (cierreCat) {
+      return !this.verificarInscripcionesCerradas(cierreCat);
+    }
+    // Fallback: cierre del torneo padre
+    const cierreTorneo = this.torneoActual?.cierreInscripciones || this.torneoActual?.cierre_inscripciones;
+    return !this.verificarInscripcionesCerradas(cierreTorneo);
   }
 
   // FUNCIÓN AUXILIAR para verificar cierre de inscripciones (reutilizable)

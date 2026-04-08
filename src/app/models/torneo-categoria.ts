@@ -18,6 +18,10 @@ export interface TorneoCategoria {
     desempates?: string[]; // Array de códigos de sistemas de desempate
     activo?: boolean;
 
+    // Cierre de inscripciones propio (NULL = usa el del torneo padre)
+    cierre_inscripciones?: Date | string | null;
+    cierreInscripciones?: Date | string | null;
+
     // Relación (cuando se incluye en consultas)
     categoria?: Categoria;
 }
