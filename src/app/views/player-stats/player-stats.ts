@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { JugadorService } from '../../services/jugador/jugador';
-import { JugadorLigaService } from '../../services/jugadorLiga/jugador-liga';
+import { JugadorService } from '../../services/jugador';
+import { JugadorLigaService } from '../../services/jugador-liga';
 
 import { InfoLiga } from '../../models/infoLiga';
 import { GrupoLiga } from '../../models/grupoLiga';

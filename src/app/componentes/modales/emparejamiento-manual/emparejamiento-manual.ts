@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { MesaService } from '../../../services/mesa/mesa';
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
+import { MesaService } from '../../../services/mesa';
+import { InscripcionService } from '../../../services/inscripcion';
 import { CreateMesaDto } from '../../../models/mesa';
 
 @Component({

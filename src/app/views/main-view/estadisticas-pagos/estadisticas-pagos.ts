@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import flatpickr from 'flatpickr';
 
-import { EstadisticasPagoService } from '../../../services/estadisticas-pago/estadisticas-pago';
+import { EstadisticasPagoService } from '../../../services/estadisticas-pago';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 import { GraficasEstadisticasComponent } from './graficas-estadisticas/graficas-estadisticas';
 import { ExportadorReportesComponent } from './exportar-reportes/exportar-reportes';

@@ -290,8 +290,7 @@
                             <td class="center">
                                 <span class="status-badge" [ngClass]="{
             'status-active': insc.jugador && insc.jugador.estado === 'activo',
-            'status-inactive': insc.jugador && insc.jugador.estado === 'inactivo',
-            'status-retired': insc.jugador && insc.jugador.estado === 'retirado'
+            'status-inactive': insc.jugador && insc.jugador.estado === 'inactivo'
         }">
                                     <i class="fa-solid fa-circle"></i>
                                     {{ insc.jugador?.estado || 'Activo' }}
@@ -442,7 +441,7 @@
                         </div>
                         <div class="detalle-item">
                             <span class="detalle-label">Edad:</span>
-                            <span class="detalle-value">{{ inscripcionSeleccionada.jugador?.edad || '-' }} años</span>
+                            <span class="detalle-value">{{ inscripcionSeleccionada.edad || '-' }} años</span>
                         </div>
                         <div class="detalle-item">
                             <span class="detalle-label">Rating:</span>
@@ -462,8 +461,7 @@
                             <span class="detalle-value">
                                 <span class="status-badge" [ngClass]="{
                         'status-active': inscripcionSeleccionada.jugador?.estado === 'activo',
-                        'status-inactive': inscripcionSeleccionada.jugador?.estado === 'inactivo',
-                        'status-retired': inscripcionSeleccionada.jugador?.estado === 'retirado'
+                        'status-inactive': inscripcionSeleccionada.jugador?.estado === 'inactivo'
                     }">
                                     <i class="fa-solid fa-circle"></i>
                                     {{ inscripcionSeleccionada.jugador?.estado || 'Activo' }}

@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth/auth';
+import { AuthService } from '../../services/auth';
 import { ToastNoti } from '../../componentes/modales/toast-noti/toast-noti';
 
 @Component({
@@ -27,8 +27,7 @@ export class LoginComponent {
   ) {
     // Si ya está autenticado, redirigir al dashboard
     if (this.authService.isAuthenticated()) {
-      this.toast.success('Éxito', 'Inicio de sesión exitoso');
-      this.router.navigate(['./main-view/torneo-actual']);
+      this.router.navigate(['/main-view/torneo-actual']);
     }
   }
 
@@ -49,7 +48,10 @@ export class LoginComponent {
       next: (response) => {
         this.loading = false;
         this.toast.success('Éxito', 'Inicio de sesión exitoso');
-        this.router.navigate(['/main-view/torneo-actual']);
+        // Dar tiempo para que se guarde el token en localStorage
+        setTimeout(() => {
+          this.router.navigate(['/main-view/torneo-actual']);
+        }, 500);
       },
       error: (error) => {
         this.loading = false;

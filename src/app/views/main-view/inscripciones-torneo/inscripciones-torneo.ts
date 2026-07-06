@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { TorneoService } from '../../../services/torneo/torneo';
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
+import { TorneoService } from '../../../services/torneo';
+import { InscripcionService } from '../../../services/inscripcion';
 import { Torneo } from '../../../models/torneo';
 import { Inscripcion } from '../../../models/inscripcion';
 import { ModalEdicionInscripcionComponent } from '../../../componentes/modales/edicion-inscripcion/edicion-inscripcion';
@@ -216,7 +216,7 @@ export class InscripcionesAdminComponent implements OnInit {
     }, 0);
 
     const edades = inscripciones
-      .map(i => i.jugador?.edad || 0)
+      .map(i => i.edad || 0)
       .filter(e => e > 0);
 
     const ratings = inscripciones
@@ -300,8 +300,8 @@ export class InscripcionesAdminComponent implements OnInit {
           valorB = b.jugador?.rating || 0;
           break;
         case 'edad':
-          valorA = a.jugador?.edad || 0;
-          valorB = b.jugador?.edad || 0;
+          valorA = a.edad || 0;
+          valorB = b.edad || 0;
           break;
         case 'monto':
           valorA = a.montoPagado || 0;
@@ -553,7 +553,7 @@ export class InscripcionesAdminComponent implements OnInit {
       i.jugador?.apellido1 || '',
       i.jugador?.apellido2 || '',
       i.jugador?.telefono || '',
-      i.jugador?.edad || '',
+      i.edad || '',
       i.jugador?.rating || '',
       i.categoria?.nombre || '',
       i.pagoConfirmado ? 'Confirmado' : 'Pendiente',

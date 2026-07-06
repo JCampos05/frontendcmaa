@@ -1,3 +1,5 @@
+export type TipoValidacionEdad = 'anio_torneo' | 'fecha_exacta';
+
 export interface Categoria {
     idCategoria?: number;
     nombre: string;
@@ -5,4 +7,7 @@ export interface Categoria {
     nota?: string;
     edadMinima?: number | null;
     edadMaxima?: number | null;
+
+    // Tipo de validación de edad
+    tipoValidacionEdad?: TipoValidacionEdad;
 }

@@ -94,7 +94,7 @@
           <i class="fa-solid fa-clock"></i>
           <div class="info-content">
             <span class="info-label">Hora de inicio</span>
-            <span class="info-value">{{ torneoDestacado.hora }}</span>
+            <span class="info-value">{{ torneoDestacado.hora_inicio | horaAmPm }}</span>
           </div>
         </div>
 
@@ -116,15 +116,15 @@
       </div>
 
       <!-- Información adicional -->
-      <div class="featured-extra" *ngIf="torneoDestacado.torneoCategoria && torneoDestacado.torneoCategoria.length > 0">
+      <div class="featured-extra" *ngIf="torneoDestacado.torneoCategorias && torneoDestacado.torneoCategorias.length > 0">
         <div class="extra-item" *ngIf="getSistemaCompetencia(torneoDestacado) !== 'No especificado'">
           <i class="fa-solid fa-diagram-project"></i>
           <span>{{ getSistemaCompetencia(torneoDestacado) }}</span>
         </div>
 
-        <div class="extra-item" *ngIf="torneoDestacado.torneoCategoria.length > 0">
+        <div class="extra-item" *ngIf="torneoDestacado.torneoCategorias.length > 0">
           <i class="fa-solid fa-layer-group"></i>
-          <span>{{ torneoDestacado.torneoCategoria.length }} {{ torneoDestacado.torneoCategoria.length === 1 ?
+          <span>{{ torneoDestacado.torneoCategorias.length }} {{ torneoDestacado.torneoCategorias.length === 1 ?
             'categoría' : 'categorías' }}</span>
         </div>
 
@@ -172,7 +172,7 @@
             </span>
             <span class="card-detail">
               <i class="fa-solid fa-clock"></i>
-              {{ torneo.hora }}
+              {{ torneo.hora_inicio | horaAmPm }}
             </span>
             <span class="card-detail">
               <i class="fa-solid fa-chess"></i>

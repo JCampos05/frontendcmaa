@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TorneoService } from '../../../services/torneo/torneo';
+import { TorneoService } from '../../../services/torneo';
 import { Torneo } from '../../../models/torneo';
+import { HoraAmPmPipe } from '../../../pipes/hora-ampm.pipe';
 
 interface DetalleNota {
   titulo: string;
@@ -13,7 +14,7 @@ interface DetalleNota {
 @Component({
   selector: 'app-torneo-actual',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HoraAmPmPipe],
   templateUrl: './torneo-actual.html',
   styleUrls: ['./torneo-actual.css']
 })
@@ -111,11 +112,11 @@ export class TorneoActualComponent implements OnInit {
   }
 
   getCategorias(): string[] {
-    if (!this.torneoActual?.categorias) return [];
+    if (!this.torneoActual?.torneoCategorias) return [];
     try {
-      const cats = typeof this.torneoActual.categorias === 'string' 
-        ? JSON.parse(this.torneoActual.categorias) 
-        : this.torneoActual.categorias;
+      const cats = typeof this.torneoActual.torneoCategorias === 'string'
+        ? JSON.parse(this.torneoActual.torneoCategorias)
+        : this.torneoActual.torneoCategorias;
       return Array.isArray(cats) ? cats : [];
     } catch {
       return [];
@@ -124,11 +125,11 @@ export class TorneoActualComponent implements OnInit {
 
   getCategoriasDetalladas(): any[] {
     // Intentar con diferentes nombres de la relación
-    const torneoCategoria = this.torneoActual?.torneoCategoria 
+    const torneoCategoria = this.torneoActual?.torneoCategorias
       || (this.torneoActual as any)?.torneo_categorias
       || (this.torneoActual as any)?.TorneoCategorias
       || [];
-    
+
     if (!torneoCategoria || torneoCategoria.length === 0) {
       return [];
     }
@@ -147,22 +148,22 @@ export class TorneoActualComponent implements OnInit {
   }
 
   getRitmoJuego(): string {
-    if (!this.torneoActual?.torneoCategoria || this.torneoActual.torneoCategoria.length === 0) {
+    if (!this.torneoActual?.torneoCategorias || this.torneoActual.torneoCategorias.length === 0) {
       return '';
     }
-    const ritmos = this.torneoActual.torneoCategoria
-      .map(tc => tc.ritmoJuego)
-      .filter((v, i, a) => v && a.indexOf(v) === i);
+    const ritmos = this.torneoActual.torneoCategorias
+      .map((tc: any) => tc.ritmoJuego)
+      .filter((v: any, i: number, a: any[]) => v && a.indexOf(v) === i);
     return ritmos.length > 0 ? ritmos.join(', ') : '';
   }
 
   getSistemaCompetencia(): string {
-    if (!this.torneoActual?.torneoCategoria || this.torneoActual.torneoCategoria.length === 0) {
+    if (!this.torneoActual?.torneoCategorias || this.torneoActual.torneoCategorias.length === 0) {
       return '';
     }
-    const sistemas = this.torneoActual.torneoCategoria
-      .map(tc => tc.sistemaCompetencia)
-      .filter((v, i, a) => v && a.indexOf(v) === i);
+    const sistemas = this.torneoActual.torneoCategorias
+      .map((tc: any) => tc.sistemaCompetencia)
+      .filter((v: any, i: number, a: any[]) => v && a.indexOf(v) === i);
     return sistemas.length > 0 ? sistemas.join(', ') : '';
   }
 

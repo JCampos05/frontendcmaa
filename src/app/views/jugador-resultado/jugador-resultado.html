@@ -160,7 +160,7 @@
                         </div>
                         <div class="info-item-main">
                             <span class="info-label-main">Hora:</span>
-                            <span class="info-value-main">{{ torneoSeleccionado.hora }}</span>
+                            <span class="info-value-main">{{ torneoSeleccionado.hora_inicio | horaAmPm }}</span>
                         </div>
                     </div>
                 </div>
@@ -269,8 +269,8 @@
                                     </span>
                                 </td>
                                 <td class="col-edad center">
-                                    <span *ngIf="jugador.edad">{{ jugador.edad }} años</span>
-                                    <span *ngIf="!jugador.edad" class="sin-rating">-</span>
+                                    <span *ngIf="jugador.jugador?.edad">{{ jugador.jugador?.edad }} años</span>
+                                    <span *ngIf="!jugador.jugador?.edad" class="sin-rating">-</span>
                                 </td>
                             </tr>
                         </tbody>

@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { InscripcionAdminService, InscripcionAdminData, EventoActivo } from '../../../services/inscripcion-admin/inscripcion-admin';
-import { JugadorService } from '../../../services/jugador/jugador';
+import { InscripcionAdminService, InscripcionAdminData, EventoActivo } from '../../../services/inscripcion-admin';
+import { JugadorService } from '../../../services/jugador';
 import { Jugador } from '../../../models/jugador';
 
 @Component({

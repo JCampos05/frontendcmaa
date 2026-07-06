@@ -1,12 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import * as XLSX from 'xlsx';
 
-import { EstadisticaTorneoService } from '../../../services/estadistica-torneo/estadistica-torneo';
-import { TorneoCategoriaService } from '../../../services/torneo-categoria/torneo-categoria';
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
+import { EstadisticaTorneoService } from '../../../services/estadistica-torneo';
+import { TorneoCategoriaService } from '../../../services/torneo-categoria';
+import { InscripcionService } from '../../../services/inscripcion';
 
 import { TorneoCategoria } from '../../../models/torneo-categoria';
 import { Inscripcion } from '../../../models/inscripcion';
@@ -252,7 +252,7 @@ export class CargarRankingExcelComponent implements OnInit {
       let idxExcel = 0;
       for (const sistema of this.sistemasDesempate) {
         if (sistema.toLowerCase().includes('edad')) {
-          desempates[sistema] = jugador.edad || 0;
+          desempates[sistema] = inscripcion.edad || 0;
         } else {
           desempates[sistema] = valoresExcel[idxExcel] || 0;
           idxExcel++;

@@ -150,13 +150,6 @@
                     </div>
                 </div>
                 <div class="dato-item">
-                    <i class="fa-solid fa-hashtag"></i>
-                    <div class="dato-content">
-                        <span class="dato-label">Edad</span>
-                        <span class="dato-value">{{ jugadorSeleccionado.edad || '-' }} años</span>
-                    </div>
-                </div>
-                <div class="dato-item">
                     <i class="fa-solid fa-calendar"></i>
                     <div class="dato-content">
                         <span class="dato-label">Fecha de Registro</span>
@@ -209,13 +202,6 @@
                             Fecha de Nacimiento
                         </label>
                         <input type="date" [(ngModel)]="jugadorEditado.fechaNacimiento" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <i class="fa-solid fa-hashtag"></i>
-                            Edad
-                        </label>
-                        <input type="number" [(ngModel)]="jugadorEditado.edad" class="form-control">
                     </div>
                     <div class="form-group">
                         <label>

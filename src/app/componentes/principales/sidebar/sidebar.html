@@ -256,8 +256,8 @@
                 </div>
             </div>
 
-            <!-- SISTEMA -->
-            <div class="menu-section">
+            <!-- SISTEMA (solo adminGral) -->
+            <div class="menu-section" *ngIf="esAdminGral">
                 <div class="section-title" *ngIf="!isCollapsed || esMobile">SISTEMA</div>
                 <div class="section-divider" *ngIf="isCollapsed && !esMobile"></div>
 

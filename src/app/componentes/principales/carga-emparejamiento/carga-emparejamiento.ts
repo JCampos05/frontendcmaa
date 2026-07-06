@@ -1,10 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 
-import { MesaService } from '../../../services/mesa/mesa';
-import { JugadorService } from '../../../services/jugador/jugador';
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
+import { MesaService } from '../../../services/mesa';
+import { JugadorService } from '../../../services/jugador';
+import { InscripcionService } from '../../../services/inscripcion';
 import { ModalConfirmacionComponent } from '../../modales/modal-confirmacion/modal-confirmacion';
 import { CreateMesaDto } from '../../../models/mesa';
 import { Jugador } from '../../../models/jugador';

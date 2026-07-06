@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { InfoLigaService } from '../../../services/infoLiga/info-liga';
-import { GrupoLigaService } from '../../../services/grupoLiga/grupo-liga';
+import { InfoLigaService } from '../../../services/info-liga';
+import { GrupoLigaService } from '../../../services/grupo-liga';
 import { InfoLiga } from '../../../models/infoLiga';
 import { GrupoLiga } from '../../../models/grupoLiga';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';

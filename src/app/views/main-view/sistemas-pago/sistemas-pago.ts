@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { SistemaPagoService } from '../../../services/sistema-pago/sistema-pago';
+import { SistemaPagoService } from '../../../services/sistema-pago';
 import { SistemaPago } from '../../../models/sistema-pago';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 

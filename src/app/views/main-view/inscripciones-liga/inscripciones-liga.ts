@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { InfoLigaService } from '../../../services/infoLiga/info-liga';
-import { JugadorLigaService } from '../../../services/jugadorLiga/jugador-liga';
-import { GrupoLigaService } from '../../../services/grupoLiga/grupo-liga';
+import { InfoLigaService } from '../../../services/info-liga';
+import { JugadorLigaService } from '../../../services/jugador-liga';
+import { GrupoLigaService } from '../../../services/grupo-liga';
 import { InfoLiga } from '../../../models/infoLiga';
 import { JugadorLiga } from '../../../models/jugadorLiga';
 import { GrupoLiga } from '../../../models/grupoLiga';

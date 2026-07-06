@@ -2,11 +2,12 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Torneo } from '../../../models/torneo';
 import { TorneoCategoria } from '../../../models/torneo-categoria';
+import { HoraAmPmPipe } from '../../../pipes/hora-ampm.pipe';
 
 @Component({
   selector: 'app-torneo-detalle-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HoraAmPmPipe],
   templateUrl: './torneo-detalle.html',
   styleUrls: ['./torneo-detalle.css']
 })
@@ -90,8 +91,7 @@ export class TorneoDetalleModalComponent {
   getCategorias(): TorneoCategoria[] {
     if (!this.torneo) return [];
 
-    // Intentar ambos alias del backend
-    const categorias = this.torneo.torneoCategoria || this.torneo.torneo_categorias;
+    const categorias = this.torneo.torneoCategorias;
 
     if (!categorias || !Array.isArray(categorias)) return [];
 
@@ -100,11 +100,11 @@ export class TorneoDetalleModalComponent {
   }
 
   getRitmoJuego(categoria: TorneoCategoria): string {
-    return categoria.ritmoJuego || categoria.ritmo_juego || 'No especificado';
+    return categoria.ritmoJuego || 'No especificado';
   }
 
   getSistemaCompetencia(categoria: TorneoCategoria): string {
-    return categoria.sistemaCompetencia || categoria.sistema_competencia || 'No especificado';
+    return categoria.sistemaCompetencia || 'No especificado';
   }
 
   getPremios(categoria: TorneoCategoria): string[] {
@@ -185,7 +185,7 @@ export class TorneoDetalleModalComponent {
 
   getCierreInscripciones(): Date | string | undefined {
     if (!this.torneo) return undefined;
-    return this.torneo.cierreInscripciones || this.torneo.cierre_inscripciones;
+    return this.torneo.cierreInscripciones;
   }
 
   hayInformacionAdicional(categoria: TorneoCategoria): boolean {

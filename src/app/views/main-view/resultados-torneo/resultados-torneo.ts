@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,9 +6,9 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-import { TorneoService } from '../../../services/torneo/torneo';
-import { RondaService } from '../../../services/ronda/ronda';
-import { EstadisticaTorneoService } from '../../../services/estadistica-torneo/estadistica-torneo';
+import { TorneoService } from '../../../services/torneo';
+import { RondaService } from '../../../services/ronda';
+import { EstadisticaTorneoService } from '../../../services/estadistica-torneo';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 import { CargarRankingExcelComponent } from '../../../componentes/principales/cargar-ranking-excel/cargar-ranking-excel';
 
@@ -757,8 +757,7 @@ export class ResultadosTorneoComponent implements OnInit {
       nombre: e.jugador?.nombre || '',
       apellido1: e.jugador?.apellido1 || '',
       apellido2: e.jugador?.apellido2 || '',
-      rating: e.jugador?.rating || 0,
-      edad: e.jugador?.edad || 0
+      rating: e.jugador?.rating || 0
     }));
   }
 

@@ -1,16 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TorneoService } from '../../../services/torneo/torneo';
+import { TorneoService } from '../../../services/torneo';
 import { Torneo } from '../../../models/torneo';
 import { ModalConfirmacionComponent } from '../../../componentes/modales/modal-confirmacion/modal-confirmacion';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
+import { HoraAmPmPipe } from '../../../pipes/hora-ampm.pipe';
 
 @Component({
   selector: 'app-torneos',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ModalConfirmacionComponent, ToastNoti],
+  imports: [CommonModule, RouterModule, FormsModule, ModalConfirmacionComponent, ToastNoti, HoraAmPmPipe],
   templateUrl: './torneos.html',
   styleUrls: ['./torneos.css']
 })
@@ -43,7 +44,7 @@ export class TorneosComponent implements OnInit {
       next: (torneos) => {
         this.torneos = torneos.map(t => ({
           ...t,
-          categorias: this.parsearJSON(t.categorias),
+          torneoCategorias: this.parsearJSON(t.torneoCategorias),
           activo: this.verificarEstadoTorneo(t)
         }));
         this.filtrarTorneos();
@@ -216,20 +217,20 @@ export class TorneosComponent implements OnInit {
     }
   }
 
-  // Métodos auxiliares para obtener datos de torneoCategoria
+  // Métodos auxiliares para obtener datos de torneoCategorias
   getSistemasCompetencia(torneo: Torneo): string {
-    if (!torneo.torneoCategoria || torneo.torneoCategoria.length === 0) return '';
-    const sistemas = torneo.torneoCategoria
-      .map(tc => tc.sistemaCompetencia)
-      .filter((v, i, a) => v && a.indexOf(v) === i);
+    if (!torneo.torneoCategorias || torneo.torneoCategorias.length === 0) return '';
+    const sistemas = torneo.torneoCategorias
+      .map((tc: any) => tc.sistemaCompetencia)
+      .filter((v: any, i: number, a: any[]) => v && a.indexOf(v) === i);
     return sistemas.length > 0 ? sistemas.join(', ') : '';
   }
 
   getRitmosJuego(torneo: Torneo): string {
-    if (!torneo.torneoCategoria || torneo.torneoCategoria.length === 0) return '';
-    const ritmos = torneo.torneoCategoria
-      .map(tc => tc.ritmoJuego)
-      .filter((v, i, a) => v && a.indexOf(v) === i);
+    if (!torneo.torneoCategorias || torneo.torneoCategorias.length === 0) return '';
+    const ritmos = torneo.torneoCategorias
+      .map((tc: any) => tc.ritmoJuego)
+      .filter((v: any, i: number, a: any[]) => v && a.indexOf(v) === i);
     return ritmos.length > 0 ? ritmos.join(', ') : '';
   }
 

@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CategoriaService } from '../../../services/categoria/categoria';
-import { SistemaCompetenciaService } from '../../../services/sistema-competencia/sistema-competencia';
-import { RitmoJuegoService } from '../../../services/ritmo-juego/ritmo-juego';
-import { SistemaDesempateService } from '../../../services/sistema-desempates/sistema-desempates';
+import { CategoriaService } from '../../../services/categoria';
+import { SistemaCompetenciaService } from '../../../services/sistema-competencia';
+import { RitmoJuegoService } from '../../../services/ritmo-juego';
+import { SistemaDesempateService } from '../../../services/sistema-desempates';
 import { Categoria } from '../../../models/categoria';
 import { SistemaCompetencia } from '../../../models/sistema-competencia';
 import { RitmoJuego } from '../../../models/ritmo-juego';

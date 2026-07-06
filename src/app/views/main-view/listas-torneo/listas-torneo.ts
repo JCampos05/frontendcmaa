@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import * as XLSX from 'xlsx';
 
-import { TorneoService } from '../../../services/torneo/torneo';
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
-import { JugadorService } from '../../../services/jugador/jugador';
+import { TorneoService } from '../../../services/torneo';
+import { InscripcionService } from '../../../services/inscripcion';
+import { JugadorService } from '../../../services/jugador';
 import { Torneo } from '../../../models/torneo';
 import { Inscripcion } from '../../../models/inscripcion';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';

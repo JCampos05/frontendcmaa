@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
-import { InfoLigaService } from '../../../services/infoLiga/info-liga';
-import { GrupoLigaService } from '../../../services/grupoLiga/grupo-liga';
-import { RitmoJuegoService } from '../../../services/ritmo-juego/ritmo-juego';
-import { SistemaDesempateService } from '../../../services/sistema-desempates/sistema-desempates';
+import { InfoLigaService } from '../../../services/info-liga';
+import { GrupoLigaService } from '../../../services/grupo-liga';
+import { RitmoJuegoService } from '../../../services/ritmo-juego';
+import { SistemaDesempateService } from '../../../services/sistema-desempates';
 
 import { InfoLiga } from '../../../models/infoLiga';
 import { GrupoLiga } from '../../../models/grupoLiga';

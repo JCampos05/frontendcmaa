@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-sidebar',
@@ -35,7 +36,11 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     return window.innerWidth <= 768;
   }
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
+
+  get esAdminGral(): boolean {
+    return this.authService.currentUserValue?.rol === 'adminGral';
+  }
 
   ngOnInit(): void {
     this.rutaActual = this.router.url;

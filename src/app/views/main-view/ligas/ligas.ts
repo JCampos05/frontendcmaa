@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { InfoLigaService } from '../../../services/infoLiga/info-liga';
+import { InfoLigaService } from '../../../services/info-liga';
 import { InfoLiga } from '../../../models/infoLiga';
 import { ModalConfirmacionComponent } from '../../../componentes/modales/modal-confirmacion/modal-confirmacion';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';

@@ -1,8 +1,8 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
-import { InscripcionesGeneralesService } from '../../../services/inscripciones-generales/inscripciones-generales';
+import { InscripcionesGeneralesService } from '../../../services/inscripciones-generales';
 import { ExportModalComponent } from '../../../componentes/modales/export-modal/export-modal';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 

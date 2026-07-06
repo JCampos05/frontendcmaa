@@ -1,15 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService } from '../../../services/usuario/usuario';
-import { AuthService } from '../../../services/auth/auth';
-import { HistorialAccesoService } from '../../../services/historial-acceso/historial-acceso';
-import { SesionesActivasService } from '../../../services/sesiones-activas/sesiones-activas';
-import { LogsSistemaService } from '../../../services/logs-sistema/logs-sistema';
+import { UsuarioService } from '../../../services/usuario';
+import { AuthService } from '../../../services/auth';
+import { HistorialAccesoService } from '../../../services/historial-acceso';
+import { SesionesActivasService } from '../../../services/sesiones-activas';
+import { LogsSistemaService } from '../../../services/logs-sistema';
+import { ConfigGralService } from '../../../services/config-gral';
 import { Usuario } from '../../../models/usuario';
 import { HistorialAcceso, EstadisticasAcceso } from '../../../models/historial-acceso';
 import { SesionActiva } from '../../../models/sesion-activa';
 import { LogSistema, EstadisticasLogs } from '../../../models/log-sistema';
+import { ConfigGral } from '../../../models/config-gral';
+import { ZonaHoraria } from '../../../models/zona-horaria';
 import { ModalConfirmacionComponent } from '../../../componentes/modales/modal-confirmacion/modal-confirmacion';
 import { Router } from '@angular/router';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
@@ -18,10 +21,26 @@ interface UsuarioExtendido extends Usuario {
   mostrarPassword?: boolean;
 }
 
-// Interface para mensajes toast
 interface ToastMessage {
   type: 'success' | 'error' | 'warning' | 'info';
   message: string;
+}
+
+interface FormularioConfig {
+  nombreComite: string;
+  descripcion: string;
+  telefono: string;
+  email: string;
+  ciudad: string;
+  estado: string;
+  pais: string;
+  facebook: string;
+  instagram: string;
+  twitter: string;
+  youtube: string;
+  whatsapp: string;
+  idZonaHoraria: number | null;
+  diasAutoDesactivar: number;
 }
 
 @Component({
@@ -39,16 +58,14 @@ export class Configuracion implements OnInit {
   cargando = false;
   error: string | null = null;
 
-  seccionActiva: 'usuarios' | 'historial' | 'sesiones' | 'logs' = 'usuarios';
+  seccionActiva: 'usuarios' | 'historial' | 'sesiones' | 'logs' | 'config' = 'usuarios';
 
   modalAbierto = false;
   modoModal: 'crear' | 'editar' | 'cambiarPassword' | 'eliminar' = 'crear';
   usuarioSeleccionado: UsuarioExtendido | null = null;
 
-  // Toast messages
   toastMessage: ToastMessage | null = null;
 
-  // Modal de confirmación
   modalConfirmacion = {
     mostrar: false,
     titulo: '',
@@ -96,38 +113,63 @@ export class Configuracion implements OnInit {
     accion: ''
   };
 
+  // ── Configuración General ──────────────────────────────────────
+  configGral: ConfigGral | null = null;
+  zonasHorarias: ZonaHoraria[] = [];
+  cargandoConfig = false;
+  guardandoConfig = false;
+  errorConfig: string | null = null;
+  formularioConfig: FormularioConfig = {
+    nombreComite: '',
+    descripcion: '',
+    telefono: '',
+    email: '',
+    ciudad: '',
+    estado: '',
+    pais: '',
+    facebook: '',
+    instagram: '',
+    twitter: '',
+    youtube: '',
+    whatsapp: '',
+    idZonaHoraria: null,
+    diasAutoDesactivar: 30
+  };
+
   constructor(
     private usuarioService: UsuarioService,
     private authService: AuthService,
     private historialService: HistorialAccesoService,
     private sesionesService: SesionesActivasService,
     private logsService: LogsSistemaService,
+    private configGralService: ConfigGralService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
     this.usuarioActual = this.authService.currentUserValue;
 
-    // Verificar que el servicio esté disponible
-    if (!this.authService) {
-      console.error('AuthService no está disponible en ngOnInit');
-      this.error = 'Error al inicializar el servicio de autenticación';
+    if (this.usuarioActual?.rol !== 'adminGral') {
+      this.router.navigate(['/main-view']);
       return;
     }
 
     this.cargarUsuarios();
   }
 
-  // Métodos para Toast
+  get esAdminGral(): boolean {
+    return this.usuarioActual?.rol === 'adminGral';
+  }
+
+  // ── Toast ──────────────────────────────────────────────────────
   private showToast(type: ToastMessage['type'], message: string): void {
     this.toastMessage = { type, message };
-    // Auto-ocultar después de 3 segundos
     setTimeout(() => {
       this.toastMessage = null;
     }, 3000);
   }
 
-  // Métodos del modal de confirmación
+  // ── Modal confirmación ─────────────────────────────────────────
   mostrarModalConfirmacion(config: Partial<typeof this.modalConfirmacion>): void {
     this.modalConfirmacion = {
       ...this.modalConfirmacion,
@@ -148,7 +190,7 @@ export class Configuracion implements OnInit {
     this.cerrarModalConfirmacion();
   }
 
-  cambiarSeccion(seccion: 'usuarios' | 'historial' | 'sesiones' | 'logs'): void {
+  cambiarSeccion(seccion: 'usuarios' | 'historial' | 'sesiones' | 'logs' | 'config'): void {
     this.seccionActiva = seccion;
 
     if (seccion === 'usuarios') {
@@ -159,9 +201,12 @@ export class Configuracion implements OnInit {
       this.cargarSesiones();
     } else if (seccion === 'logs') {
       this.cargarLogs();
+    } else if (seccion === 'config') {
+      this.cargarConfig();
     }
   }
 
+  // ── Usuarios ───────────────────────────────────────────────────
   cargarUsuarios(): void {
     this.cargando = true;
     this.error = null;
@@ -179,6 +224,7 @@ export class Configuracion implements OnInit {
     });
   }
 
+  // ── Historial ──────────────────────────────────────────────────
   cargarHistorial(): void {
     this.cargando = true;
     this.error = null;
@@ -207,6 +253,7 @@ export class Configuracion implements OnInit {
     });
   }
 
+  // ── Sesiones ───────────────────────────────────────────────────
   cargarSesiones(): void {
     this.cargando = true;
     this.error = null;
@@ -215,14 +262,11 @@ export class Configuracion implements OnInit {
       next: (sesiones) => {
         this.sesionesActivas = sesiones;
         this.cargando = false;
-
-        // IMPORTANTE: Verificar si la sesión actual sigue activa
         this.verificarSesionActual(sesiones);
       },
       error: (err) => {
-        // Si es error 401, la sesión fue cerrada
         if (err.status === 401) {
-          console.error('⚠️ Sesión cerrada remotamente detectada');
+          console.error('Sesión cerrada remotamente detectada');
           this.authService.logoutLocal();
           this.router.navigate(['/login']);
           return;
@@ -238,21 +282,17 @@ export class Configuracion implements OnInit {
   private verificarSesionActual(sesiones: SesionActiva[]): void {
     const tokenActual = this.authService.getToken();
     if (!tokenActual) {
-      console.warn('⚠️ No hay token actual');
+      console.warn('No hay token actual');
       return;
     }
 
     const sesionActualActiva = sesiones.some(s => s.token === tokenActual);
 
     if (!sesionActualActiva) {
-      console.warn('⚠️ Tu sesión no está en la lista de sesiones activas');
-      console.warn('Esto puede significar que fue cerrada remotamente');
-
-      // Mostrar mensaje usando el sistema de toast interno
+      console.warn('Tu sesión no está en la lista de sesiones activas');
       this.showToast('warning', 'Tu sesión ha sido cerrada desde otro dispositivo');
       this.toast.warning('Precaución', '');
 
-      // Esperar un momento para que vean el mensaje
       setTimeout(() => {
         this.authService.logoutLocal();
         this.router.navigate(['/login']);
@@ -261,7 +301,6 @@ export class Configuracion implements OnInit {
   }
 
   confirmarCerrarSesion(idSesion: number): void {
-    // Verificar si es la sesión actual
     const sesion = this.sesionesActivas.find(s => s.idSesion === idSesion);
     if (!sesion) {
       this.showToast('error', 'Sesión no encontrada');
@@ -292,7 +331,6 @@ export class Configuracion implements OnInit {
     this.sesionesService.cerrarSesion(idSesion).subscribe({
       next: () => {
         this.showToast('success', 'Sesión cerrada exitosamente');
-        // Recargar sesiones después de un pequeño delay
         setTimeout(() => {
           this.cargarSesiones();
         }, 500);
@@ -324,23 +362,22 @@ export class Configuracion implements OnInit {
         this.showToast('info', `${cantidad} sesión(es) expirada(s) limpiada(s)`);
         this.cargarSesiones();
       },
-      error: (err) => {
+      error: () => {
         this.showToast('error', 'Error al limpiar sesiones expiradas');
       }
     });
   }
 
+  // ── Logs ───────────────────────────────────────────────────────
   cargarLogs(): void {
     this.cargando = true;
     this.error = null;
-
 
     const filtros = {
       nivel: this.filtrosLogs.nivel || undefined,
       entidad: this.filtrosLogs.entidad || undefined,
       accion: this.filtrosLogs.accion || undefined
     };
-
 
     this.logsService.getAll(this.limitePorPaginaLogs, this.paginaLogs, filtros).subscribe({
       next: (response) => {
@@ -351,7 +388,6 @@ export class Configuracion implements OnInit {
       },
       error: (err) => {
         this.error = 'Error al cargar logs del sistema';
-        //console.error('Error:', err);
         this.cargando = false;
       }
     });
@@ -382,15 +418,138 @@ export class Configuracion implements OnInit {
   }
 
   limpiarFiltrosLogs(): void {
-    this.filtrosLogs = {
-      nivel: '',
-      entidad: '',
-      accion: ''
-    };
+    this.filtrosLogs = { nivel: '', entidad: '', accion: '' };
     this.paginaLogs = 1;
     this.cargarLogs();
   }
 
+  // ── Configuración General ──────────────────────────────────────
+  cargarConfig(): void {
+    if (!this.esAdminGral) return;
+
+    this.cargandoConfig = true;
+    this.errorConfig = null;
+
+    this.configGralService.getZonasHorarias().subscribe({
+      next: (zonas) => {
+        this.zonasHorarias = zonas;
+      },
+      error: (err) => {
+        console.error('Error al cargar zonas horarias:', err);
+      }
+    });
+
+    this.configGralService.getCompleta().subscribe({
+      next: (config) => {
+        this.configGral = config;
+        this.formularioConfig = {
+          nombreComite:       config.nombreComite   ?? '',
+          descripcion:        config.descripcion    ?? '',
+          telefono:           config.telefono       ?? '',
+          email:              config.email          ?? '',
+          ciudad:             config.ciudad         ?? '',
+          estado:             config.estado         ?? '',
+          pais:               config.pais           ?? '',
+          facebook:           config.facebook       ?? '',
+          instagram:          config.instagram      ?? '',
+          twitter:            config.twitter        ?? '',
+          youtube:            config.youtube        ?? '',
+          whatsapp:           config.whatsapp       ?? '',
+          idZonaHoraria:      config.idZonaHoraria  ?? null,
+          diasAutoDesactivar: config.diasAutoDesactivar ?? 30
+        };
+        this.cargandoConfig = false;
+      },
+      error: (err) => {
+        this.errorConfig = 'Error al cargar la configuración';
+        console.error('Error:', err);
+        this.cargandoConfig = false;
+      }
+    });
+  }
+
+  private urlValida(valor: string): boolean {
+    if (!valor) return true;
+    try {
+      new URL(valor);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private emailValido(valor: string): boolean {
+    if (!valor) return true;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+  }
+
+  private nullIfEmpty(valor: string): string | null {
+    return valor.trim() === '' ? null : valor.trim();
+  }
+
+  guardarConfig(): void {
+    if (!this.esAdminGral) return;
+
+    const f = this.formularioConfig;
+
+    if (!f.nombreComite.trim()) {
+      this.showToast('error', 'El nombre del comité es requerido');
+      return;
+    }
+
+    const diasNum = Number(f.diasAutoDesactivar);
+    if (isNaN(diasNum) || diasNum < 1 || diasNum > 30) {
+      this.showToast('error', 'Los días de auto-desactivación deben estar entre 1 y 30');
+      return;
+    }
+
+    for (const campo of ['facebook', 'instagram', 'twitter', 'youtube'] as const) {
+      if (f[campo] && !this.urlValida(f[campo])) {
+        this.showToast('error', `La URL de ${campo} no es válida`);
+        return;
+      }
+    }
+
+    if (f.email && !this.emailValido(f.email)) {
+      this.showToast('error', 'El correo electrónico no tiene un formato válido');
+      return;
+    }
+
+    const payload: Partial<ConfigGral> = {
+      nombreComite:       f.nombreComite.trim(),
+      descripcion:        this.nullIfEmpty(f.descripcion) as any,
+      telefono:           this.nullIfEmpty(f.telefono)    as any,
+      email:              this.nullIfEmpty(f.email)       as any,
+      ciudad:             this.nullIfEmpty(f.ciudad)      as any,
+      estado:             this.nullIfEmpty(f.estado)      as any,
+      pais:               this.nullIfEmpty(f.pais)        as any,
+      facebook:           this.nullIfEmpty(f.facebook)    as any,
+      instagram:          this.nullIfEmpty(f.instagram)   as any,
+      twitter:            this.nullIfEmpty(f.twitter)     as any,
+      youtube:            this.nullIfEmpty(f.youtube)     as any,
+      whatsapp:           this.nullIfEmpty(f.whatsapp)    as any,
+      idZonaHoraria:      f.idZonaHoraria                 as any,
+      diasAutoDesactivar: diasNum
+    };
+
+    this.guardandoConfig = true;
+
+    this.configGralService.update(payload).subscribe({
+      next: (config) => {
+        this.configGral = config;
+        this.guardandoConfig = false;
+        this.showToast('success', 'Configuración guardada correctamente');
+      },
+      error: (err) => {
+        this.guardandoConfig = false;
+        const msg = err.error?.mensaje || err.error?.message || 'Error al guardar la configuración';
+        this.showToast('error', msg);
+        console.error('Error al guardar config:', err);
+      }
+    });
+  }
+
+  // ── CRUD Usuarios ──────────────────────────────────────────────
   abrirModalCrear(): void {
     this.modoModal = 'crear';
     this.usuarioSeleccionado = null;
@@ -430,19 +589,11 @@ export class Configuracion implements OnInit {
   }
 
   limpiarFormulario(): void {
-    this.formulario = {
-      telefono: '',
-      password: '',
-      passwordConfirm: ''
-    };
+    this.formulario = { telefono: '', password: '', passwordConfirm: '' };
   }
 
   limpiarFormularioPassword(): void {
-    this.formularioPassword = {
-      passwordActual: '',
-      passwordNuevo: '',
-      passwordNuevoConfirm: ''
-    };
+    this.formularioPassword = { passwordActual: '', passwordNuevo: '', passwordNuevoConfirm: '' };
   }
 
   validarFormulario(): string | null {
@@ -579,6 +730,7 @@ export class Configuracion implements OnInit {
     });
   }
 
+  // ── Utilidades ─────────────────────────────────────────────────
   formatearFecha(fecha: Date | string | undefined): string {
     if (!fecha) return 'No disponible';
 
@@ -642,22 +794,15 @@ export class Configuracion implements OnInit {
 
   esSesionActual(sesion: SesionActiva): boolean {
     try {
-      if (!this.authService) {
-        console.error('AuthService no disponible');
-        return false;
-      }
-
+      if (!this.authService) return false;
       const tokenActual = this.authService.getToken();
-      if (!tokenActual) {
-        return false;
-      }
-
+      if (!tokenActual) return false;
       return sesion.token === tokenActual;
-    } catch (error) {
-      console.error('Error al verificar sesión actual:', error);
+    } catch {
       return false;
     }
   }
+
   cambiarPaginaHistorial(pagina: number): void {
     if (pagina < 1 || pagina > this.totalPaginasHistorial) return;
     this.paginaHistorial = pagina;

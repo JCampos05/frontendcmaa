@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
-import { JugadorService } from '../../../services/jugador/jugador';
+import { InscripcionService } from '../../../services/inscripcion';
+import { JugadorService } from '../../../services/jugador';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 
 @Component({

@@ -1,28 +1,47 @@
-export * from './auth/auth';
-export * from './jugador/jugador';
-export * from './torneo/torneo';
-export * from './categoria/categoria';
-export * from './inscripcion/inscripcion';
-export * from './premio/premio';
-export * from './sistema-competencia/sistema-competencia';
-export * from './ritmo-juego/ritmo-juego';
-export * from './torneo-categoria/torneo-categoria';
-export * from './sistema-desempates/sistema-desempates';
-export * from './ronda/ronda';
-export * from './mesa/mesa';
-export * from './partida/partida';
-export * from './estadistica-torneo/estadistica-torneo';
-export * from './historial-emparejamiento/historial-emparejamiento';
-export * from './usuario/usuario';
-export * from './historial-acceso/historial-acceso';
-export * from './logs-sistema/logs-sistema';
-export * from './sesiones-activas/sesiones-activas';
-export * from './sistema-pago/sistema-pago';
-// Liga
-export * from './infoLiga/info-liga';
-export * from './grupoLiga/grupo-liga';
-export * from './jugadorLiga/jugador-liga';
-export * from './rondaLiga/ronda-liga';
-export * from './mesaLiga/mesa-liga';
+// Autenticación y seguridad
+export * from './auth';
+export * from './auth-interceptor';
+export * from './sesiones-activas';
+export * from './session-monitor';
+export * from './historial-acceso';
+export * from './logs-sistema';
 
-export *from './inscripcion-admin/inscripcion-admin';
+// Catálogos
+export * from './categoria';
+export * from './ritmo-juego';
+export * from './sistema-competencia';
+export * from './sistema-desempates';
+export * from './sistema-pago';
+
+// Usuarios
+export * from './usuario';
+
+// Jugadores
+export * from './jugador';
+export * from './jugador-liga';
+
+// Torneos
+export * from './torneo';
+export * from './torneo-categoria';
+export * from './estadistica-torneo';
+export * from './historial-emparejamiento';
+
+// Operaciones de torneo
+export * from './ronda';
+export * from './mesa';
+export * from './partida';
+
+// Inscripciones
+export * from './inscripcion';
+export * from './inscripcion-admin';
+export * from './inscripciones-generales';
+export * from './estadisticas-pago';
+
+// Liga
+export * from './info-liga';
+export * from './grupo-liga';
+export * from './ronda-liga';
+export * from './mesa-liga';
+export * from './partida-liga';
+
+// NOTA: export * from './premio' eliminado (modelo premio.ts no existe)

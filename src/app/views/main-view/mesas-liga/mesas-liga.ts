@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { InfoLigaService } from '../../../services/infoLiga/info-liga';
-import { GrupoLigaService } from '../../../services/grupoLiga/grupo-liga';
-import { RondaLigaService } from '../../../services/rondaLiga/ronda-liga';
-import { MesaLigaService } from '../../../services/mesaLiga/mesa-liga';
+import { InfoLigaService } from '../../../services/info-liga';
+import { GrupoLigaService } from '../../../services/grupo-liga';
+import { RondaLigaService } from '../../../services/ronda-liga';
+import { MesaLigaService } from '../../../services/mesa-liga';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 
 import { InfoLiga } from '../../../models/infoLiga';

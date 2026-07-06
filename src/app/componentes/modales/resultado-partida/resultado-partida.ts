@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { MesaService } from '../../../services/mesa/mesa';
-import { PartidaService } from '../../../services/partida/partida';
+import { MesaService } from '../../../services/mesa';
+import { PartidaService } from '../../../services/partida';
 import { Mesa, UpdateMesaDto } from '../../../models/mesa';
 import { CreatePartidaDto, TipoFinalizacion } from '../../../models/partida';
 

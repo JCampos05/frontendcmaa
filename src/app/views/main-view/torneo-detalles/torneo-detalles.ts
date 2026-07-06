@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TorneoService } from '../../../services/torneo/torneo';
+import { TorneoService } from '../../../services/torneo';
 import { TorneoCategoria } from '../../../models/torneo-categoria';
 import { Torneo } from '../../../models/torneo';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
@@ -80,11 +80,11 @@ export class TorneoDetalleComponent implements OnInit {
           ...torneo,
           activo: this.verificarEstadoTorneo(torneo) // Aplicar verificación automática
         };
-        this.torneoCategorias = torneo.torneoCategoria || [];
+        this.torneoCategorias = torneo.torneoCategorias || [];
 
         // Cargar sistema de pago si existe
-        if (torneo.sistemaPago || torneo.sistema_pago) {
-          this.sistemaPago = torneo.sistemaPago || torneo.sistema_pago;
+        if (torneo.sistemaPago) {
+          this.sistemaPago = torneo.sistemaPago;
         }
 
         // Expandir primera categoría por defecto
@@ -197,7 +197,12 @@ export class TorneoDetalleComponent implements OnInit {
 
   formatearHora(hora: string): string {
     if (!hora) return '';
-    return hora;
+    const [horasStr, minutosStr] = hora.split(':');
+    const horas = parseInt(horasStr, 10);
+    if (isNaN(horas)) return hora;
+    const periodo = horas >= 12 ? 'PM' : 'AM';
+    const horas12 = horas % 12 === 0 ? 12 : horas % 12;
+    return `${horas12}:${minutosStr} ${periodo}`;
   }
 
   formatearFechaHoraRonda(fechaHora: string): string {

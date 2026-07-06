@@ -1,7 +1,11 @@
-import { Premio } from './premio';
 import { Inscripcion } from './inscripcion';
 import { TorneoCategoria } from './torneo-categoria';
 import { SistemaPago } from './sistema-pago';
+import { ZonaHoraria } from './zona-horaria';
+import { TorneoPatrocinador } from './torneo-patrocinador';
+import { UsuarioTorneo } from './usuario-torneo';
+
+export type EstadoTorneo = 'borrador' | 'publicado' | 'en_curso' | 'finalizado' | 'cancelado';
 
 export interface Torneo {
     idTorneo?: number;
@@ -9,29 +13,36 @@ export interface Torneo {
     lugar: string;
     direccion: string;
     fecha: Date | string;
-    hora: string;
-    categorias?: string[]; // JSON - array de nombres de categorías
+    hora_inicio: string;
+    hora_fin: string;
+    urlMaps?: string;
     notas?: string;
     rondas: number;
-    
-    // Aceptar ambos formatos (snake_case del backend y camelCase del frontend)
-    cierreInscripciones?: Date | string;
-    cierre_inscripciones?: Date | string;
-    
-    idSistemaPago?: number;
-    
+
+    // Estado del torneo
+    estado?: EstadoTorneo;
+
+    // Control de visibilidad
+    esActual?: boolean;
     activo?: boolean;
+
+    // Cupo máximo de participantes
+    cupoMaximo?: number;
+
+    // Cierre de inscripciones
+    cierreInscripciones?: Date | string;
+
+    idSistemaPago?: number;
+    idZonaHoraria?: number;
+
     fechaCreacion?: Date | string;
-    fecha_creacion?: Date | string;
     fechaActualizacion?: Date | string;
-    fecha_actualizacion?: Date | string;
 
     // Relaciones (cuando se incluyen en las consultas)
-    // Aceptar ambos aliases
-    premios?: Premio[];
     inscripciones?: Inscripcion[];
-    torneoCategoria?: TorneoCategoria[];
-    torneo_categorias?: TorneoCategoria[];
+    torneoCategorias?: TorneoCategoria[];
     sistemaPago?: SistemaPago;
-    sistema_pago?: SistemaPago;
+    zonaHoraria?: ZonaHoraria;
+    patrocinadores?: TorneoPatrocinador[];
+    adminsAsignados?: UsuarioTorneo[];
 }

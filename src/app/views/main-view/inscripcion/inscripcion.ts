@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
-import { TorneoService } from '../../../services/torneo/torneo';
+import { InscripcionService } from '../../../services/inscripcion';
+import { TorneoService } from '../../../services/torneo';
 import { Torneo } from '../../../models/torneo'
 
 @Component({
@@ -126,7 +126,7 @@ export class InscripcionComponent implements OnInit {
         const ahora = new Date();
 
         this.torneos = (torneos || []).filter(torneo => {
-          const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
+          const cierreInscripciones = torneo.cierreInscripciones;
 
           if (!cierreInscripciones) {
             return true;
@@ -380,7 +380,7 @@ export class InscripcionComponent implements OnInit {
     const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoId);
 
     if (torneoSeleccionado) {
-      const cierreInscripciones = torneoSeleccionado.cierreInscripciones || torneoSeleccionado.cierre_inscripciones;
+      const cierreInscripciones = torneoSeleccionado.cierreInscripciones;
 
       if (this.verificarInscripcionesCerradas(cierreInscripciones)) {
         this.errores = ['Las inscripciones para este torneo ya han cerrado'];
@@ -536,7 +536,7 @@ export class InscripcionComponent implements OnInit {
 
   // Reemplaza la función inscripcionesCerradas() existente con esta versión:
   inscripcionesCerradas(torneo: Torneo): boolean {
-    const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
+    const cierreInscripciones = torneo.cierreInscripciones;
     //console.log('Cierre inscripciones desde BD:', cierreInscripciones);
 
     if (!cierreInscripciones) {
@@ -579,7 +579,7 @@ export class InscripcionComponent implements OnInit {
       return !this.verificarInscripcionesCerradas(cierreCat);
     }
     // Fallback: cierre del torneo padre
-    const cierreTorneo = this.torneoActual?.cierreInscripciones || this.torneoActual?.cierre_inscripciones;
+    const cierreTorneo = this.torneoActual?.cierreInscripciones;
     return !this.verificarInscripcionesCerradas(cierreTorneo);
   }
 

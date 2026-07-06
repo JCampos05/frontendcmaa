@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { TorneoService } from '../../services/torneo/torneo';
+import { TorneoService } from '../../services/torneo';
 import { Torneo } from '../../models/torneo';
 import { TorneoDetalleModalComponent } from '../../componentes/modales/torneo-detalle/torneo-detalle';
 import { RelojSectionComponent } from '../../views/reloj-section/reloj-section';
+import { HoraAmPmPipe } from '../../pipes/hora-ampm.pipe';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterModule, TorneoDetalleModalComponent],
+  imports: [CommonModule, RouterModule, TorneoDetalleModalComponent, HoraAmPmPipe],
   templateUrl: './landing-page.html',
   styleUrls: ['./landing-page.css']
 })
@@ -146,15 +147,9 @@ export class LandingComponent implements OnInit {
   }
 
   getSistemaCompetencia(torneo: Torneo): string {
-    if (torneo.torneoCategoria && torneo.torneoCategoria.length > 0) {
-      return torneo.torneoCategoria[0].sistemaCompetencia
-        || torneo.torneoCategoria[0].sistema_competencia
-        || 'No especificado';
-    }
-    if (torneo.torneo_categorias && torneo.torneo_categorias.length > 0) {
-      return torneo.torneo_categorias[0].sistemaCompetencia
-        || torneo.torneo_categorias[0].sistema_competencia
-        || 'No especificado';
+    const categorias = torneo.torneoCategorias;
+    if (categorias && categorias.length > 0) {
+      return categorias[0].sistemaCompetencia || 'No especificado';
     }
     return 'No especificado';
   }
@@ -171,7 +166,7 @@ export class LandingComponent implements OnInit {
 
   // NUEVA FUNCIÓN: Verificar si las inscripciones están cerradas
   inscripcionesCerradas(torneo: Torneo): boolean {
-    const cierreInscripciones = torneo.cierreInscripciones || torneo.cierre_inscripciones;
+    const cierreInscripciones = torneo.cierreInscripciones;
     //console.log('Cierre inscripciones desde BD:', cierreInscripciones);
 
     if (!cierreInscripciones) {

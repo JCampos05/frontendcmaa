@@ -1,17 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-import { TorneoService } from '../../../services/torneo/torneo';
-import { RondaService } from '../../../services/ronda/ronda';
-import { MesaService } from '../../../services/mesa/mesa';
+import { TorneoService } from '../../../services/torneo';
+import { RondaService } from '../../../services/ronda';
+import { MesaService } from '../../../services/mesa';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
 
 import { Torneo } from '../../../models/torneo';
 import { TorneoCategoria } from '../../../models/torneo-categoria';
 import { Ronda } from '../../../models/ronda';
 import { Mesa } from '../../../models/mesa';
+import { HoraAmPmPipe } from '../../../pipes/hora-ampm.pipe';
 
 @Component({
   selector: 'app-visualizacion-mesas',
@@ -19,7 +20,8 @@ import { Mesa } from '../../../models/mesa';
   imports: [
     CommonModule,
     FormsModule,
-    ToastNoti
+    ToastNoti,
+    HoraAmPmPipe
   ],
   templateUrl: './visualizacion-mesas.html',
   styleUrls: ['./visualizacion-mesas.css']

@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { MesaLigaService } from '../../../services/mesaLiga/mesa-liga';
-import { JugadorLigaService } from '../../../services/jugadorLiga/jugador-liga';
+import { MesaLigaService } from '../../../services/mesa-liga';
+import { JugadorLigaService } from '../../../services/jugador-liga';
 import { Jugador } from '../../../models/jugador';
 
 @Component({

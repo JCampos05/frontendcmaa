@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { MesaLigaService } from '../../../services/mesaLiga/mesa-liga';
-import { PartidaLigaService } from '../../../services/partidaLiga/partida-liga';
+import { MesaLigaService } from '../../../services/mesa-liga';
+import { PartidaLigaService } from '../../../services/partida-liga';
 import { MesaLiga } from '../../../models/mesaLiga';
 
 type TipoFinalizacion = 'jaquemate' | 'tiempo' | 'rendicion' | 'ilegales' | 

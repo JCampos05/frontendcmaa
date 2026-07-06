@@ -1,14 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
-import { TorneoService } from '../../services/torneo/torneo';
-import { RondaService } from '../../services/ronda/ronda';
-import { MesaService } from '../../services/mesa/mesa';
-import { TorneoCategoriaService } from '../../services/torneo-categoria/torneo-categoria';
-import { EstadisticaTorneoService } from '../../services/estadistica-torneo/estadistica-torneo';
-import { JugadorService } from '../../services/jugador/jugador';
+import { TorneoService } from '../../services/torneo';
+import { RondaService } from '../../services/ronda';
+import { MesaService } from '../../services/mesa';
+import { TorneoCategoriaService } from '../../services/torneo-categoria';
+import { EstadisticaTorneoService } from '../../services/estadistica-torneo';
+import { JugadorService } from '../../services/jugador';
 import { ToastNoti } from '../../componentes/modales/toast-noti/toast-noti';
 
 import { Torneo } from '../../models/torneo';
@@ -16,6 +16,7 @@ import { TorneoCategoria } from '../../models/torneo-categoria';
 import { Ronda } from '../../models/ronda';
 import { Mesa } from '../../models/mesa';
 import { EstadisticaTorneo } from '../../models/estadistica-torneo';
+import { HoraAmPmPipe } from '../../pipes/hora-ampm.pipe';
 
 @Component({
   selector: 'app-jugador-resultado',
@@ -24,7 +25,8 @@ import { EstadisticaTorneo } from '../../models/estadistica-torneo';
     CommonModule,
     FormsModule,
     RouterModule,
-    ToastNoti
+    ToastNoti,
+    HoraAmPmPipe
   ],
   templateUrl: './jugador-resultado.html',
   styleUrls: ['./jugador-resultado.css']

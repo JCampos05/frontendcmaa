@@ -1,9 +1,9 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+﻿import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
-import { SessionMonitorService } from './services/session-monitor/session-monitor';
-import { AuthService } from './services/auth/auth';
+import { SessionMonitorService } from './services/session-monitor';
+import { AuthService } from './services/auth';
 import { ModalSesionCerradaComponent } from './componentes/modales/sesion-cerrada/sesion-cerrada';
 
 @Component({

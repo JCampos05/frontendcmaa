@@ -6,7 +6,6 @@ export interface SistemaPago {
     clabe: string;
     telefono: string;
     activo?: boolean;
-    fecha_registro?: Date | string;
     fechaRegistro?: Date | string;
     actualizacion?: Date | string;
 }

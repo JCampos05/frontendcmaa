@@ -87,7 +87,7 @@
                     
                     <span class="detalle-chip">
                         <i class="fa-solid fa-clock"></i>
-                        {{ torneo.hora }}
+                        {{ torneo.hora_inicio | horaAmPm }}
                     </span>
                     
                     <span class="detalle-chip">
@@ -113,9 +113,9 @@
                         Cierre: {{ formatearFechaCorta(torneo.cierreInscripciones) }}
                     </span>
                     
-                    <span class="extra-categorias" *ngIf="torneo.categorias && torneo.categorias.length > 0">
+                    <span class="extra-categorias" *ngIf="torneo.torneoCategorias && torneo.torneoCategorias.length > 0">
                         <i class="fa-solid fa-layer-group"></i>
-                        {{ torneo.categorias.length }} {{ torneo.categorias.length === 1 ? 'categoría' : 'categorías' }}
+                        {{ torneo.torneoCategorias.length }} {{ torneo.torneoCategorias.length === 1 ? 'categoría' : 'categorías' }}
                     </span>
                 </div>
             </div>

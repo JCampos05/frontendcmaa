@@ -32,6 +32,11 @@
             <i class="fa-solid fa-file-lines"></i>
             <span>Logs del Sistema</span>
         </button>
+
+        <button *ngIf="esAdminGral" class="tab-btn" [class.active]="seccionActiva === 'config'" (click)="cambiarSeccion('config')">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Configuración General</span>
+        </button>
     </div>
 
     <!-- Contenido según la sección activa -->
@@ -288,6 +293,243 @@
                     <p>Actualmente no hay usuarios conectados</p>
                 </div>
             </div>
+        </div>
+
+        <!-- SECCIÓN: CONFIGURACIÓN GENERAL (solo adminGral) -->
+        <div *ngIf="seccionActiva === 'config' && esAdminGral" class="seccion-content">
+            <div class="seccion-header">
+                <div class="seccion-info">
+                    <h2>Configuración General del Sistema</h2>
+                    <p>Datos del comité, redes sociales y parámetros del sistema</p>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div *ngIf="cargandoConfig" class="loading-container">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Cargando configuración...</p>
+            </div>
+
+            <!-- Error -->
+            <div *ngIf="errorConfig && !cargandoConfig" class="error-container">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <p>{{ errorConfig }}</p>
+                <button class="btn-retry" (click)="cargarConfig()">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    Reintentar
+                </button>
+            </div>
+
+            <!-- Formulario de configuración -->
+            <form *ngIf="!cargandoConfig && !errorConfig" class="config-form" (ngSubmit)="guardarConfig()">
+
+                <!-- Datos del Comité -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fa-solid fa-chess-king"></i>
+                        Datos del Comité
+                    </h3>
+
+                    <div class="form-group">
+                        <label for="nombreComite">
+                            <i class="fa-solid fa-chess-king"></i>
+                            Nombre del Comité <span class="required">*</span>
+                        </label>
+                        <input type="text" id="nombreComite" name="nombreComite"
+                            [(ngModel)]="formularioConfig.nombreComite"
+                            placeholder="Ej: Comité Municipal de Ajedrez"
+                            maxlength="200">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">
+                            <i class="fa-solid fa-align-left"></i>
+                            Descripción
+                        </label>
+                        <textarea id="descripcion" name="descripcion"
+                            [(ngModel)]="formularioConfig.descripcion"
+                            placeholder="Descripción breve del comité..."
+                            rows="3" maxlength="1000"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cfgTelefono">
+                                <i class="fa-solid fa-phone"></i>
+                                Teléfono
+                            </label>
+                            <input type="text" id="cfgTelefono" name="cfgTelefono"
+                                [(ngModel)]="formularioConfig.telefono"
+                                placeholder="Ej: 5512345678"
+                                maxlength="20">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cfgEmail">
+                                <i class="fa-solid fa-envelope"></i>
+                                Correo Electrónico
+                            </label>
+                            <input type="email" id="cfgEmail" name="cfgEmail"
+                                [(ngModel)]="formularioConfig.email"
+                                placeholder="contacto@comite.org"
+                                maxlength="100">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ciudad">
+                                <i class="fa-solid fa-city"></i>
+                                Ciudad
+                            </label>
+                            <input type="text" id="ciudad" name="ciudad"
+                                [(ngModel)]="formularioConfig.ciudad"
+                                placeholder="Ej: Ciudad de México"
+                                maxlength="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">
+                                <i class="fa-solid fa-map"></i>
+                                Estado
+                            </label>
+                            <input type="text" id="estado" name="estado"
+                                [(ngModel)]="formularioConfig.estado"
+                                placeholder="Ej: CDMX"
+                                maxlength="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pais">
+                                <i class="fa-solid fa-earth-americas"></i>
+                                País
+                            </label>
+                            <input type="text" id="pais" name="pais"
+                                [(ngModel)]="formularioConfig.pais"
+                                placeholder="Ej: México"
+                                maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Redes Sociales -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        Redes Sociales
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="facebook">
+                                <i class="fa-brands fa-facebook"></i>
+                                Facebook
+                            </label>
+                            <input type="url" id="facebook" name="facebook"
+                                [(ngModel)]="formularioConfig.facebook"
+                                placeholder="https://facebook.com/..."
+                                maxlength="255">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="instagram">
+                                <i class="fa-brands fa-instagram"></i>
+                                Instagram
+                            </label>
+                            <input type="url" id="instagram" name="instagram"
+                                [(ngModel)]="formularioConfig.instagram"
+                                placeholder="https://instagram.com/..."
+                                maxlength="255">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="twitter">
+                                <i class="fa-brands fa-x-twitter"></i>
+                                X / Twitter
+                            </label>
+                            <input type="url" id="twitter" name="twitter"
+                                [(ngModel)]="formularioConfig.twitter"
+                                placeholder="https://x.com/..."
+                                maxlength="255">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="youtube">
+                                <i class="fa-brands fa-youtube"></i>
+                                YouTube
+                            </label>
+                            <input type="url" id="youtube" name="youtube"
+                                [(ngModel)]="formularioConfig.youtube"
+                                placeholder="https://youtube.com/..."
+                                maxlength="255">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="whatsapp">
+                                <i class="fa-brands fa-whatsapp"></i>
+                                WhatsApp
+                            </label>
+                            <input type="text" id="whatsapp" name="whatsapp"
+                                [(ngModel)]="formularioConfig.whatsapp"
+                                placeholder="Ej: 5512345678"
+                                maxlength="20">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parámetros del Sistema -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fa-solid fa-gears"></i>
+                        Parámetros del Sistema
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="zonaHoraria">
+                                <i class="fa-solid fa-clock"></i>
+                                Zona Horaria
+                            </label>
+                            <select id="zonaHoraria" name="zonaHoraria"
+                                [(ngModel)]="formularioConfig.idZonaHoraria">
+                                <option [ngValue]="null">— Sin zona horaria —</option>
+                                <option *ngFor="let zona of zonasHorarias" [ngValue]="zona.idZonaHoraria">
+                                    {{ zona.nombreMostrar }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="diasAutoDesactivar">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                                Días de Auto-Desactivación
+                            </label>
+                            <input type="number" id="diasAutoDesactivar" name="diasAutoDesactivar"
+                                [(ngModel)]="formularioConfig.diasAutoDesactivar"
+                                min="1" max="30" step="1">
+                            <small>Días inactivos antes de desactivar una cuenta (1–30)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer del formulario -->
+                <div class="config-form-footer">
+                    <button type="button" class="btn-secondary" (click)="cargarConfig()" [disabled]="guardandoConfig">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        Recargar
+                    </button>
+                    <button type="submit" class="btn-primary" [disabled]="guardandoConfig">
+                        <i class="fa-solid" [class.fa-spinner]="guardandoConfig" [class.fa-spin]="guardandoConfig"
+                            [class.fa-floppy-disk]="!guardandoConfig"></i>
+                        {{ guardandoConfig ? 'Guardando...' : 'Guardar Configuración' }}
+                    </button>
+                </div>
+
+            </form>
         </div>
 
         <!-- SECCIÓN: LOGS DEL SISTEMA -->

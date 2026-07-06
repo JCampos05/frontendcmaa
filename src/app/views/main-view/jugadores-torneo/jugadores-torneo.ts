@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { TorneoService } from '../../../services/torneo/torneo';
-import { InscripcionService } from '../../../services/inscripcion/inscripcion';
+import { TorneoService } from '../../../services/torneo';
+import { InscripcionService } from '../../../services/inscripcion';
 import { Torneo } from '../../../models/torneo';
 import { Inscripcion } from '../../../models/inscripcion';
 import { ToastNoti } from '../../../componentes/modales/toast-noti/toast-noti';
@@ -207,7 +207,7 @@ export class JugadoresTorneoComponent implements OnInit {
       cat.totalJugadores++;
 
       const rating = insc.jugador?.rating || 0;
-      const edad = insc.jugador?.edad || 0;
+      const edad = insc.edad || 0;
 
       if (rating > 0) {
         cat.ratingMasAlto = Math.max(cat.ratingMasAlto, rating);
@@ -230,7 +230,7 @@ export class JugadoresTorneoComponent implements OnInit {
         : 0;
 
       const edades = cat.jugadores
-        .map(j => j.jugador?.edad || 0)
+        .map(j => j.edad || 0)
         .filter(e => e > 0);
 
       cat.edadPromedio = edades.length > 0
@@ -248,7 +248,7 @@ export class JugadoresTorneoComponent implements OnInit {
       .map(i => i.jugador?.rating || 0)
       .filter(r => r > 0);
     const edades = inscripciones
-      .map(i => i.jugador?.edad || 0)
+      .map(i => i.edad || 0)
       .filter(e => e > 0);
 
     this.estadisticasGenerales = {
@@ -286,8 +286,8 @@ export class JugadoresTorneoComponent implements OnInit {
           valorB = b.jugador?.rating || 0;
           break;
         case 'edad':
-          valorA = a.jugador?.edad || 0;
-          valorB = b.jugador?.edad || 0;
+          valorA = a.edad || 0;
+          valorB = b.edad || 0;
           break;
         case 'categoria':
           valorA = a.categoria?.nombre || '';

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -6,13 +6,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 
-import { TorneoService } from '../../../services/torneo/torneo';
-import { TorneoCategoriaService } from '../../../services/torneo-categoria/torneo-categoria';
-import { CategoriaService } from '../../../services/categoria/categoria';
-import { RitmoJuegoService } from '../../../services/ritmo-juego/ritmo-juego';
-import { SistemaCompetenciaService } from '../../../services/sistema-competencia/sistema-competencia';
-import { SistemaDesempateService } from '../../../services/sistema-desempates/sistema-desempates';
-import { SistemaPagoService } from '../../../services/sistema-pago/sistema-pago';
+import { TorneoService } from '../../../services/torneo';
+import { TorneoCategoriaService } from '../../../services/torneo-categoria';
+import { CategoriaService } from '../../../services/categoria';
+import { RitmoJuegoService } from '../../../services/ritmo-juego';
+import { SistemaCompetenciaService } from '../../../services/sistema-competencia';
+import { SistemaDesempateService } from '../../../services/sistema-desempates';
+import { SistemaPagoService } from '../../../services/sistema-pago';
 
 import { SistemaPago } from '../../../models/sistema-pago';
 import { Categoria } from '../../../models/categoria';
@@ -75,7 +75,8 @@ export class EditarTorneoComponent implements OnInit {
       lugar: ['', Validators.required],
       direccion: ['', Validators.required],
       fecha: ['', Validators.required],
-      hora: ['', Validators.required],
+      hora_inicio: ['', Validators.required],
+      hora_fin: ['', Validators.required],
       cierreInscripciones: ['', Validators.required],
       idSistemaPago: [null],
       tiempoEspera: [10, [Validators.min(0)]],
@@ -150,7 +151,8 @@ export class EditarTorneoComponent implements OnInit {
       lugar: torneo.lugar || '',
       direccion: torneo.direccion || '',
       fecha: fechaISO,
-      hora: torneo.hora || '',
+      hora_inicio: torneo.hora_inicio || '',
+      hora_fin: torneo.hora_fin || '',
       cierreInscripciones: cierreISO,
       idSistemaPago: torneo.idSistemaPago || null,
       tiempoEspera: 10,
@@ -158,8 +160,8 @@ export class EditarTorneoComponent implements OnInit {
       notas: torneo.notas || ''
     });
 
-    // Cargar categorías - puede venir como torneoCategoria o torneo_categorias
-    const categoriasData = (torneo as any).torneoCategoria || (torneo as any).torneo_categorias || [];
+    // Cargar categorías
+    const categoriasData = (torneo as any).torneoCategoria || [];
 
     if (categoriasData && Array.isArray(categoriasData) && categoriasData.length > 0) {
       // Obtener desempates globales del primer torneo-categoria
@@ -478,7 +480,8 @@ export class EditarTorneoComponent implements OnInit {
       lugar: this.torneoOriginal.lugar || '',
       direccion: this.torneoOriginal.direccion || '',
       fecha: fechaISO,
-      hora: this.torneoOriginal.hora || '',
+      hora_inicio: this.torneoOriginal.hora_inicio || '',
+      hora_fin: this.torneoOriginal.hora_fin || '',
       cierreInscripciones: cierreISO,
       tiempoEspera: 10,
       permitirByePrimeraRonda: true,
@@ -544,7 +547,8 @@ export class EditarTorneoComponent implements OnInit {
         lugar: formValue.lugar,
         direccion: formValue.direccion,
         fecha: formValue.fecha,
-        hora: formValue.hora,
+        hora_inicio: formValue.hora_inicio,
+        hora_fin: formValue.hora_fin,
         cierre_inscripciones: formValue.cierreInscripciones,
         idSistemaPago: formValue.idSistemaPago || null,
         notas: formValue.notas || null,
