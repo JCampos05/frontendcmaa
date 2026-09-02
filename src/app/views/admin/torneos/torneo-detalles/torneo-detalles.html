@@ -1,0 +1,307 @@
+<div class="torneo-detalle-container">
+    <app-toast-noti></app-toast-noti>
+
+    <!-- Loading State -->
+    <app-state-message *ngIf="loading" mode="loading" title="Cargando detalles del torneo..."></app-state-message>
+
+    <!-- Contenido del torneo -->
+    <div *ngIf="!loading && torneo">
+        <app-page-header icon="trophy" [title]="torneo.nombre || torneo.lugar" subtitle="Detalles completos del torneo">
+            <app-icon-button actions icon="arrow-left" variant="secondary" ariaLabel="Volver a torneos" (clicked)="volver()"></app-icon-button>
+            <app-button actions *ngIf="torneo.activo" icon="pencil-simple" (clicked)="editarTorneo()">
+                Editar Torneo
+            </app-button>
+        </app-page-header>
+
+        <div class="torneo-content">
+            <!-- Informacion General -->
+            <div class="section-card" [class.collapsed]="!seccionesExpandidas.informacionGeneral">
+                <div class="section-header clickable" (click)="toggleSeccion('informacionGeneral')">
+                    <app-icon class="section-header-icon" name="info"></app-icon>
+                    <h2>Informacion General</h2>
+                    <app-icon [name]="seccionesExpandidas.informacionGeneral ? 'caret-up' : 'caret-down'"></app-icon>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.informacionGeneral">
+                    <div class="grid-info">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="trophy"></app-icon>
+                                Nombre del Torneo
+                            </span>
+                            <span class="info-value">{{ torneo.nombre || 'Sin nombre' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="map-pin"></app-icon>
+                                Lugar
+                            </span>
+                            <span class="info-value">{{ torneo.lugar }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="obtenerDireccion()">
+                            <span class="info-label">
+                                <app-icon name="map-pin"></app-icon>
+                                Direccion Completa
+                            </span>
+                            <span class="info-value">{{ obtenerDireccion() }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="calendar"></app-icon>
+                                Fecha del Torneo
+                            </span>
+                            <span class="info-value">{{ formatearFecha(torneo.fecha) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="clock"></app-icon>
+                                Hora de Inicio
+                            </span>
+                            <span class="info-value">{{ formatearHora(torneo.hora_inicio) }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="torneo.cierreInscripciones">
+                            <span class="info-label">
+                                <app-icon name="calendar-x"></app-icon>
+                                Cierre de Inscripciones
+                            </span>
+                            <span class="info-value">{{ formatearFechaHora(torneo.cierreInscripciones) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="check-circle"></app-icon>
+                                Estado
+                            </span>
+                            <span class="info-value">
+                                <app-badge
+                                    [status]="torneo.activo ? 'active' : 'finished'"
+                                    [text]="torneo.activo ? 'Activo' : 'Finalizado'"
+                                    [icon]="torneo.activo ? 'check-circle' : 'flag-checkered'">
+                                </app-badge>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sistema de Pago -->
+            <div class="section-card" [class.collapsed]="!seccionesExpandidas.sistemaPago" *ngIf="sistemaPago">
+                <div class="section-header clickable" (click)="toggleSeccion('sistemaPago')">
+                    <app-icon class="section-header-icon" name="credit-card"></app-icon>
+                    <h2>Sistema de Pago</h2>
+                    <app-icon [name]="seccionesExpandidas.sistemaPago ? 'caret-up' : 'caret-down'"></app-icon>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.sistemaPago">
+                    <div class="grid-info">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="bank"></app-icon>
+                                Banco
+                            </span>
+                            <span class="info-value">{{ sistemaPago.banco }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="user"></app-icon>
+                                Titular de la Cuenta
+                            </span>
+                            <span class="info-value">{{ sistemaPago.nombreCuenta }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="hash"></app-icon>
+                                Número de Cuenta
+                            </span>
+                            <span class="info-value">{{ sistemaPago.numeroCuenta }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="key"></app-icon>
+                                CLABE Interbancaria
+                            </span>
+                            <span class="info-value clabe-format">{{ formatearClabe(sistemaPago.clabe) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="phone"></app-icon>
+                                Teléfono de Contacto
+                            </span>
+                            <span class="info-value">{{ formatearTelefono(sistemaPago.telefono) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categorias del Torneo -->
+            <div class="section-card" [class.collapsed]="!seccionesExpandidas.categoriasTorneo"
+                *ngIf="torneoCategorias.length > 0">
+                <div class="section-header clickable" (click)="toggleSeccion('categoriasTorneo')">
+                    <app-icon class="section-header-icon" name="stack"></app-icon>
+                    <h2>Categorias del Torneo</h2>
+                    <app-icon [name]="seccionesExpandidas.categoriasTorneo ? 'caret-up' : 'caret-down'"></app-icon>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.categoriasTorneo">
+                    <div class="categorias-lista">
+                        <span class="category-badge" *ngFor="let tc of torneoCategorias">
+                            <app-icon name="grid-four" weight="regular"></app-icon>
+                            {{ tc.categoria?.nombre || 'Categoria' }}
+                            <span class="categoria-costo" *ngIf="tc.categoria?.costo">
+                                ${{ tc.categoria?.costo }}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuracion por Categoria -->
+            <div class="section-card" [class.collapsed]="!seccionesExpandidas.configuracionPorCategoria"
+                *ngIf="torneoCategorias.length > 0">
+                <div class="section-header clickable" (click)="toggleSeccion('configuracionPorCategoria')">
+                    <app-icon class="section-header-icon" name="gear"></app-icon>
+                    <h2>Configuracion por Categoria</h2>
+                    <app-icon [name]="seccionesExpandidas.configuracionPorCategoria ? 'caret-up' : 'caret-down'"></app-icon>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.configuracionPorCategoria">
+                    <div class="categorias-config-container">
+                        <div *ngFor="let tc of torneoCategorias; let i = index" class="card-bordered categoria-detalle-card"
+                            [class.collapsed]="!categoriasExpandidas[i]">
+
+                            <div class="config-header clickable" (click)="toggleCategoria(i)">
+                                <div class="config-title">
+                                    <app-icon name="grid-four" weight="regular"></app-icon>
+                                    <h3>{{ tc.categoria?.nombre || 'Categoria' }}</h3>
+                                </div>
+                                <app-icon [name]="categoriasExpandidas[i] ? 'caret-up' : 'caret-down'"></app-icon>
+                            </div>
+
+                            <div class="config-content" *ngIf="categoriasExpandidas[i]">
+                                <!-- Configuracion Basica -->
+                                <div class="config-subsection">
+                                    <h4><app-icon name="sliders"></app-icon> Configuracion Basica</h4>
+                                    <div class="grid-info">
+                                        <div class="info-item">
+                                            <span class="info-label">Numero de Rondas</span>
+                                            <span class="info-value">{{ tc.rondas || 'No especificado' }}</span>
+                                        </div>
+
+                                        <div class="info-item">
+                                            <span class="info-label">Ritmo de Juego</span>
+                                            <span class="info-value">{{ tc.ritmoJuego || 'No especificado' }}</span>
+                                        </div>
+
+                                        <div class="info-item full-width">
+                                            <span class="info-label">Sistema de Competencia</span>
+                                            <span class="info-value">{{ tc.sistemaCompetencia || 'No especificado'
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Calendario de Rondas -->
+                                <div class="config-subsection" *ngIf="tc.calendario && tc.calendario.length > 0">
+                                    <h4><app-icon name="calendar"></app-icon> Calendario de Rondas</h4>
+                                    <div class="calendario-lista">
+                                        <div class="ronda-detalle" *ngFor="let ronda of tc.calendario">
+                                            <div class="ronda-numero">
+                                                <app-icon name="clock"></app-icon>
+                                                <span>Ronda {{ ronda.numero }}</span>
+                                            </div>
+                                            <div class="ronda-fecha">
+                                                <app-icon name="calendar"></app-icon>
+                                                <span>{{ formatearFechaHoraRonda(ronda.fecha) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Premios -->
+                                <div class="config-subsection" *ngIf="tc.premios">
+                                    <h4><app-icon name="trophy"></app-icon> Premios</h4>
+                                    <div class="premios-lista">
+                                        <div class="premio-detalle"
+                                            *ngFor="let premio of obtenerPremios(tc.premios); let j = index">
+                                            <app-icon name="medal" weight="fill" [class.medal-gold]="j === 0"
+                                                [class.medal-silver]="j === 1" [class.medal-bronze]="j === 2"
+                                                [class.medal-other]="j > 2"></app-icon>
+                                            <span>{{ premio }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuracion Adicional -->
+            <div class="section-card" [class.collapsed]="!seccionesExpandidas.configuracionAdicional">
+                <div class="section-header clickable" (click)="toggleSeccion('configuracionAdicional')">
+                    <app-icon class="section-header-icon" name="sliders"></app-icon>
+                    <h2>Configuracion Adicional</h2>
+                    <app-icon [name]="seccionesExpandidas.configuracionAdicional ? 'caret-up' : 'caret-down'"></app-icon>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.configuracionAdicional">
+                    <div class="grid-info">
+                        <div class="info-item">
+                            <span class="info-label">Tiempo de Espera</span>
+                            <span class="info-value">{{ obtenerTiempoEspera() }} minutos</span>
+                        </div>
+                    </div>
+
+                    <div class="opciones-lista">
+                        <div class="opcion-item">
+                            <app-icon [name]="requiereEquipo() ? 'check-circle' : 'x-circle'"
+                                [class.text-success]="requiereEquipo()" [class.text-muted]="!requiereEquipo()"></app-icon>
+                            <span>Los jugadores deben traer su equipo de ajedrez</span>
+                        </div>
+
+                        <div class="opcion-item">
+                            <app-icon [name]="permiteBye() ? 'check-circle' : 'x-circle'"
+                                [class.text-success]="permiteBye()" [class.text-muted]="!permiteBye()"></app-icon>
+                            <span>Permitir solicitud de bye en primera ronda</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas Adicionales -->
+            <div class="section-card" [class.collapsed]="!seccionesExpandidas.notasAdicionales"
+                *ngIf="obtenerNotasGenerales()">
+                <div class="section-header clickable" (click)="toggleSeccion('notasAdicionales')">
+                    <app-icon class="section-header-icon" name="file-text"></app-icon>
+                    <h2>Notas Adicionales</h2>
+                    <app-icon [name]="seccionesExpandidas.notasAdicionales ? 'caret-up' : 'caret-down'"></app-icon>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.notasAdicionales">
+                    <div class="notas-content">
+                        <pre>{{ obtenerNotasGenerales() }}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Accion -->
+            <div class="form-actions">
+                <app-button variant="secondary" icon="arrow-left" (clicked)="volver()">
+                    Volver a Torneos
+                </app-button>
+                <app-button *ngIf="torneo.activo" icon="pencil-simple" (clicked)="editarTorneo()">
+                    Editar Torneo
+                </app-button>
+            </div>
+        </div>
+    </div>
+</div>

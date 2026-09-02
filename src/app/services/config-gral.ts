@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../environment/enviroment';
 import { ConfigGral } from '../models/config-gral';
 import { ZonaHoraria } from '../models/zona-horaria';
 

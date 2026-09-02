@@ -11,11 +11,15 @@
   <!-- Font Awesome — librería legacy, se mantiene durante la migración -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Phosphor Icons — librería nueva
-       Uso: <ph-house weight="regular"></ph-house>
-       Pesos disponibles: thin · light · regular · bold · fill · duotone
-       Docs: https://phosphoricons.com -->
-  <script type="module" src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Phosphor Icons v2 — librería nueva
+       USO CORRECTO (CSS classes, como Font Awesome):
+         <i class="ph-bold ph-house"></i>         bold weight
+         <i class="ph ph-house"></i>              regular weight
+         <i class="ph-fill ph-house"></i>         fill weight
+       NO usar web components <ph-house> — esa sintaxis no existe en esta versión. -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 
   <!-- Google Fonts - ABeeZee -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../environment/enviroment';
 import { TorneoCategoria } from '../models/torneo-categoria';
 
 @Injectable({

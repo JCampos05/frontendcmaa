@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../environment/enviroment';
 import { Usuario } from '../models/usuario';
 
 interface LoginResponse {

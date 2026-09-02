@@ -1,0 +1,128 @@
+<app-toast-noti></app-toast-noti>
+
+<app-admin-list-page
+    headerIcon="trophy"
+    headerTitle="Torneos"
+    headerSubtitle="Consulta y administra todos los torneos del comité"
+    [searchValue]="searchTerm"
+    searchPlaceholder="Buscar torneos por nombre o lugar..."
+    [filterOptions]="filterOptions"
+    [activeFilter]="filtroActivo"
+    (searchChange)="onSearchChange($event)"
+    (filterChange)="cambiarFiltro($event)"
+    [items]="torneosFiltrados"
+    [loading]="loading"
+    loadingText="Cargando torneos..."
+    [emptyTitle]="getEmptyMessage()"
+    [emptyDescription]="getEmptyDescription()">
+
+    <app-button actions icon="plus" routerLink="/main-view/nuevo-torneo">
+        Nuevo Torneo
+    </app-button>
+
+    <ng-template let-torneo>
+        <app-badge
+            [status]="torneo.activo ? 'active' : 'finished'"
+            [text]="torneo.activo ? 'Activo' : 'Finalizado'"
+            [icon]="torneo.activo ? 'check-circle' : 'flag-checkered'">
+        </app-badge>
+
+        <div class="item-fecha">
+            <span class="fecha-dia">{{ getDia(torneo.fecha) }}</span>
+            <span class="fecha-mes">{{ getMes(torneo.fecha) }}</span>
+        </div>
+
+        <div class="item-info">
+            <h3 class="item-titulo">{{ torneo.nombre || torneo.lugar }}</h3>
+            <p class="item-subtitulo" *ngIf="torneo.nombre">{{ torneo.lugar }}</p>
+
+            <div class="item-detalles">
+                <span class="detalle-chip">
+                    <app-icon name="map-pin"></app-icon>
+                    {{ torneo.lugar }}
+                </span>
+
+                <span class="detalle-chip">
+                    <app-icon name="clock"></app-icon>
+                    {{ torneo.hora_inicio | horaAmPm }}
+                </span>
+
+                <span class="detalle-chip">
+                    <app-icon name="grid-four" weight="regular"></app-icon>
+                    {{ torneo.rondas }} rondas
+                </span>
+
+                <span class="detalle-chip" *ngIf="tieneSistemasCompetencia(torneo)">
+                    <app-icon name="tree-structure"></app-icon>
+                    {{ getSistemasCompetencia(torneo) }}
+                </span>
+
+                <span class="detalle-chip" *ngIf="tieneRitmosJuego(torneo)">
+                    <app-icon name="hourglass"></app-icon>
+                    {{ getRitmosJuego(torneo) }}
+                </span>
+            </div>
+
+            <div class="item-extra">
+                <span class="extra-cierre" *ngIf="torneo.cierreInscripciones">
+                    <app-icon name="calendar-x"></app-icon>
+                    Cierre: {{ formatearFechaCorta(torneo.cierreInscripciones) }}
+                </span>
+
+                <span class="extra-categorias" *ngIf="torneo.torneoCategorias && torneo.torneoCategorias.length > 0">
+                    <app-icon name="stack"></app-icon>
+                    {{ torneo.torneoCategorias.length }} {{ torneo.torneoCategorias.length === 1 ? 'categoría' : 'categorías' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="item-acciones">
+            <app-button variant="ghost" size="sm" icon="eye" (clicked)="verDetalle(torneo.idTorneo)">
+                Ver Detalle
+            </app-button>
+            <app-icon-button
+                *ngIf="torneo.activo"
+                icon="pencil-simple"
+                variant="warning"
+                ariaLabel="Editar torneo"
+                (clicked)="editarTorneo(torneo.idTorneo)">
+            </app-icon-button>
+            <app-icon-button
+                icon="trash"
+                variant="danger"
+                ariaLabel="Eliminar torneo"
+                (clicked)="confirmarEliminacion(torneo)">
+            </app-icon-button>
+        </div>
+    </ng-template>
+</app-admin-list-page>
+
+<app-modal-confirmacion
+    [mostrar]="mostrarModalEditar"
+    titulo="¿Editar Torneo?"
+    [mensaje]="'¿Deseas editar el torneo ' + (torneoAEditar?.nombre || torneoAEditar?.lugar) + '?'"
+    mensajeSecundario="Se cargará el formulario con los datos actuales del torneo para su modificación."
+    textoConfirmar="Editar Torneo"
+    textoCancelar="Cancelar"
+    tipoBotonPrimario="secondary"
+    icono="fa-pen-to-square"
+    iconoBotonPrimario="fa-pen-to-square"
+    [tipoAdvertencia]="false"
+    (confirmar)="confirmarEdicion()"
+    (cancelar)="cancelarEdicion()">
+</app-modal-confirmacion>
+
+<app-modal-confirmacion
+    [mostrar]="mostrarModalEliminar"
+    titulo="¿Eliminar Torneo?"
+    [mensaje]="'¿Estás seguro de que deseas eliminar el torneo ' + (torneoAEliminar?.nombre || torneoAEliminar?.lugar) + '?'"
+    mensajeSecundario="Esta acción no se puede deshacer y se eliminarán todas las inscripciones asociadas."
+    textoConfirmar="Eliminar Torneo"
+    textoCancelar="Cancelar"
+    tipoBotonPrimario="danger"
+    icono="fa-triangle-exclamation"
+    iconoBotonPrimario="fa-trash"
+    [tipoAdvertencia]="true"
+    (confirmar)="eliminarTorneo()"
+    (cancelar)="cancelarEliminacion()">
+</app-modal-confirmacion>

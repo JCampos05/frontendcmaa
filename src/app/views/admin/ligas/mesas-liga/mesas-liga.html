@@ -1,0 +1,266 @@
+<div class="mesas-container">
+    <app-page-header icon="grid-four" title="Gestión de Mesas - Liga"
+        [subtitle]="(ligaActual?.nombre || 'Liga Actual') + ' - ' + formatearFecha(ligaActual?.fecha_inicio)"
+        [hasActions]="false">
+    </app-page-header>
+
+    <app-state-message *ngIf="cargando" mode="loading" title="Cargando información..."></app-state-message>
+
+    <div *ngIf="error && !cargando" class="error-container">
+        <app-state-message mode="error" [title]="error"></app-state-message>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarDatos()">Reintentar</app-button>
+    </div>
+
+    <app-empty-state *ngIf="sinDatos && !cargando && !error"
+        icon="handshake" [title]="sinDatos" description="Activa una liga para gestionar sus mesas">
+    </app-empty-state>
+
+    <div *ngIf="!cargando && !error && !sinDatos" class="content-wrapper">
+
+        <div class="selectores-section">
+            <div class="selector-group">
+                <label>
+                    <app-icon name="trophy"></app-icon>
+                    Liga
+                </label>
+                <app-select [options]="ligaSelectOptions" [value]="ligaActual"
+                    (valueChange)="onLigaSelectChange($event)">
+                </app-select>
+            </div>
+
+            <div class="selector-group">
+                <label>
+                    <app-icon name="users"></app-icon>
+                    Grupo
+                </label>
+                <app-select [options]="grupoSelectOptions" [value]="grupoSeleccionado"
+                    [disabled]="!ligaActual || grupos.length === 0" (valueChange)="onGrupoSelectChange($event)">
+                </app-select>
+            </div>
+
+            <div class="selector-group">
+                <label>
+                    <app-icon name="list"></app-icon>
+                    Ronda
+                </label>
+                <app-select [options]="rondaSelectOptions" [value]="rondaSeleccionada"
+                    [disabled]="!grupoSeleccionado || rondasDisponibles.length === 0"
+                    (valueChange)="onRondaSelectChange($event)">
+                </app-select>
+            </div>
+        </div>
+
+        <div class="crear-ronda-section" *ngIf="grupoSeleccionado && rondasDisponibles.length === 0 && !cargando">
+            <app-empty-state icon="info" title="Este grupo no tiene rondas creadas"
+                description="Para comenzar el emparejamiento, primero debes crear la Ronda 1" actionLabel="Crear Ronda 1"
+                (action)="crearRonda1()">
+            </app-empty-state>
+        </div>
+
+        <div class="ronda-info" *ngIf="rondaActualData && grupoSeleccionado">
+            <div class="info-card">
+                <div class="info-header">
+                    <app-icon name="info"></app-icon>
+                    <h3>Estado de la Ronda {{ rondaSeleccionada }}</h3>
+                </div>
+                <div class="info-body">
+                    <div class="info-item">
+                        <span class="info-label">Estado:</span>
+                        <app-badge [status]="getEstadoRondaBadgeStatus(rondaActualData.estado)"
+                            [text]="rondaActualData.estado?.toUpperCase() || 'PLANIFICADA'"></app-badge>
+                    </div>
+                    <div class="info-item" *ngIf="rondaActualData.fecha_inicio">
+                        <span class="info-label">Inicio:</span>
+                        <span>{{ formatearFechaHora(rondaActualData.fecha_inicio) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Mesas:</span>
+                        <span>{{ mesasRonda.length }} totales</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Finalizadas:</span>
+                        <span>{{ getMesasFinalizadas() }} / {{ mesasRonda.length }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ronda-actions">
+                <app-button *ngIf="rondaActualData.estado === 'planificada'" variant="purple" icon="users"
+                    (clicked)="abrirModalEmparejamientoManual()">
+                    Emparejamiento Manual
+                </app-button>
+
+                <app-button *ngIf="rondaActualData.estado === 'planificada' && mesasRonda.length > 0"
+                    variant="success" icon="play" (clicked)="confirmarInicioRonda()">
+                    Iniciar Ronda
+                </app-button>
+
+                <app-button *ngIf="rondaActualData.estado === 'en_curso' && todasMesasFinalizadas()"
+                    variant="secondary" icon="flag-checkered" (clicked)="confirmarFinalizarRonda()">
+                    Finalizar Ronda
+                </app-button>
+
+                <app-button *ngIf="puedeCrearSiguienteRonda() && !siguienteRondaYaExiste()" variant="purple"
+                    icon="plus" (clicked)="confirmarCrearSiguienteRonda()">
+                    Crear Ronda {{ rondaActualData.numeroRonda + 1 }}
+                </app-button>
+
+                <app-button *ngIf="rondaActualData.estado === 'finalizada' && siguienteRondaYaExiste()"
+                    variant="purple" icon="caret-up" (clicked)="irASiguienteRonda()">
+                    Ir a Ronda {{ rondaActualData.numeroRonda + 1 }}
+                </app-button>
+
+                <div *ngIf="rondaActualData.estado === 'finalizada' && !puedeCrearSiguienteRonda()"
+                    class="ronda-completada-mensaje">
+                    <app-icon name="trophy"></app-icon>
+                    <span>¡Todas las rondas completadas! El grupo ha finalizado.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mesas-section" *ngIf="mesasRonda.length > 0">
+            <div class="section-header">
+                <app-icon name="grid-four"></app-icon>
+                <h2>Mesas de la Ronda</h2>
+                <span class="badge">{{ mesasRonda.length }} mesas</span>
+            </div>
+
+            <div class="mesas-grid">
+                <div *ngFor="let mesa of mesasRonda" class="mesa-card" [ngClass]="getMesaEstadoClase(mesa.estado)"
+                    (click)="abrirModalMesa(mesa)">
+
+                    <div class="mesa-header">
+                        <div class="mesa-numero">
+                            <app-icon name="grid-four"></app-icon>
+                            <span>Mesa {{ mesa.numeroMesa }}</span>
+                        </div>
+                        <div class="mesa-header-actions">
+                            <span class="mesa-status" [ngClass]="getMesaEstadoClase(mesa.estado)">
+                                <app-icon name="circle" weight="fill"></app-icon>
+                            </span>
+                            <app-icon-button *ngIf="mesa.estado === 'finalizada'" icon="pencil-simple"
+                                variant="info" ariaLabel="Editar resultado" class="btn-editar-mesa"
+                                (clicked)="abrirModalEdicionMesa(mesa, $event)">
+                            </app-icon-button>
+                        </div>
+                    </div>
+
+                    <div class="mesa-jugadores">
+                        <div class="jugador-item jugador-blanco">
+                            <div class="jugador-color">
+                                <app-icon name="square" weight="fill"></app-icon>
+                            </div>
+                            <div class="jugador-info">
+                                <span class="jugador-nombre">
+                                    {{ mesa.jugador_blanco?.nombre }} {{ mesa.jugador_blanco?.apellido1 }}
+                                </span>
+                                <span class="jugador-rating" *ngIf="mesa.jugador_blanco?.rating">
+                                    <app-icon name="star" weight="fill"></app-icon>
+                                    {{ mesa.jugador_blanco?.rating }}
+                                </span>
+                            </div>
+                            <div class="jugador-ilegales" *ngIf="mesa.ilegalesBlanco && mesa.ilegalesBlanco > 0">
+                                <app-icon name="warning"></app-icon>
+                                {{ mesa.ilegalesBlanco }}
+                            </div>
+                        </div>
+
+                        <div class="vs-separator">vs</div>
+
+                        <div class="jugador-item jugador-negro">
+                            <div class="jugador-color">
+                                <app-icon name="square" weight="fill"></app-icon>
+                            </div>
+                            <div class="jugador-info">
+                                <span class="jugador-nombre">
+                                    {{ mesa.jugador_negro?.nombre }} {{ mesa.jugador_negro?.apellido1 }}
+                                </span>
+                                <span class="jugador-rating" *ngIf="mesa.jugador_negro?.rating">
+                                    <app-icon name="star" weight="fill"></app-icon>
+                                    {{ mesa.jugador_negro?.rating }}
+                                </span>
+                            </div>
+                            <div class="jugador-ilegales" *ngIf="mesa.ilegalesNegro && mesa.ilegalesNegro > 0">
+                                <app-icon name="warning"></app-icon>
+                                {{ mesa.ilegalesNegro }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mesa-resultado" *ngIf="mesa.partida">
+                        <div class="resultado-badge">
+                            <app-icon name="trophy"></app-icon>
+                            {{ mesa.partida.resultado }}
+                        </div>
+                        <div class="resultado-tipo" *ngIf="mesa.partida.tipo_finalizacion">
+                            <app-icon name="info"></app-icon>
+                            {{ getTipoFinalizacionTexto(mesa.partida.tipo_finalizacion) }}
+                        </div>
+                    </div>
+
+                    <div class="mesa-notas" *ngIf="mesa.notas">
+                        <app-icon name="note"></app-icon>
+                        <span>{{ mesa.notas }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <app-empty-state *ngIf="grupoSeleccionado && rondaActualData && mesasRonda.length === 0" icon="grid-four"
+            title="No hay mesas configuradas" description="Crea las mesas manualmente para esta ronda">
+        </app-empty-state>
+
+        <app-empty-state *ngIf="grupoSeleccionado && !rondaActualData" icon="info" title="No hay rondas disponibles"
+            description="Este grupo aún no tiene rondas creadas. Crea la primera ronda para comenzar.">
+        </app-empty-state>
+
+        <app-empty-state *ngIf="!grupoSeleccionado && grupos.length > 0" icon="users" title="Selecciona un grupo"
+            description="Elige un grupo del menú desplegable para ver sus rondas y mesas">
+        </app-empty-state>
+
+        <app-empty-state *ngIf="ligaActual && grupos.length === 0" icon="users" title="No hay grupos disponibles"
+            description="Esta liga no tiene grupos configurados. Configura los grupos primero.">
+        </app-empty-state>
+    </div>
+</div>
+
+<app-modal-emparejamiento-manual-liga
+    *ngIf="modalEmparejamientoVisible"
+    [visible]="modalEmparejamientoVisible"
+    [idRonda]="rondaActualData?.idRondaLiga"
+    [idLiga]="ligaActual?.idLiga"
+    [idGrupo]="grupoSeleccionado?.idGrupoLiga"
+    (cerrar)="cerrarModalEmparejamiento()"
+    (emparejamientoCreado)="onEmparejamientoCreado()">
+</app-modal-emparejamiento-manual-liga>
+
+<app-modal-resultado-partida-liga
+    *ngIf="modalResultadoVisible"
+    [visible]="modalResultadoVisible"
+    [mesa]="mesaSeleccionada"
+    [modoEdicion]="mesaSeleccionada?.estado === 'finalizada'"
+    (cerrar)="cerrarModalResultado()"
+    (resultadoGuardado)="onResultadoGuardado()">
+</app-modal-resultado-partida-liga>
+
+<app-modal-confirmacion
+    [mostrar]="modalConfirmacionVisible"
+    [titulo]="confirmacionTitulo"
+    [mensaje]="confirmacionMensaje"
+    [textoConfirmar]="confirmacionTextoConfirmar"
+    [tipoBotonPrimario]="confirmacionTipo"
+    (confirmar)="ejecutarAccionConfirmada()"
+    (cancelar)="cerrarModalConfirmacion()">
+</app-modal-confirmacion>
+
+<app-modal-advertencia-edicion
+    [visible]="modalAdvertenciaEdicionVisible"
+    [numeroMesa]="mesaSeleccionada?.numeroMesa"
+    [jugadorBlanco]="mesaSeleccionada?.jugador_blanco?.nombre + ' ' + mesaSeleccionada?.jugador_blanco?.apellido1"
+    [jugadorNegro]="mesaSeleccionada?.jugador_negro?.nombre + ' ' + mesaSeleccionada?.jugador_negro?.apellido1"
+    [resultadoActual]="mesaSeleccionada?.partida?.resultado"
+    (confirmar)="confirmarEdicionMesa()"
+    (cancelar)="cancelarEdicionMesa()">
+</app-modal-advertencia-edicion>
+
+<app-toast-noti></app-toast-noti>

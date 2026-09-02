@@ -1,0 +1,10 @@
+<button
+  [type]="type"
+  [class]="classes"
+  [disabled]="disabled || loading"
+  (click)="onClick($event)">
+  <app-icon *ngIf="loading" name="spinner" weight="bold" [spin]="true"></app-icon>
+  <app-icon *ngIf="!loading && icon && iconPos === 'left'" [name]="icon"></app-icon>
+  <ng-content></ng-content>
+  <app-icon *ngIf="!loading && icon && iconPos === 'right'" [name]="icon"></app-icon>
+</button>

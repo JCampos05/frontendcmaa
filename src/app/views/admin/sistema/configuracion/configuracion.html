@@ -1,0 +1,924 @@
+<div class="configuracion-container">
+
+    <!-- Header -->
+    <app-page-header icon="gear" title="Configuración del Sistema" subtitle="Panel de control exclusivo — administración general del sistema" [hasActions]="false"></app-page-header>
+
+    <!-- Navegación por pestañas -->
+    <div class="tabs-navegacion">
+        <button class="tab-btn" [class.active]="seccionActiva === 'general'" (click)="cambiarSeccion('general')">
+            <app-icon name="sliders"></app-icon>
+            <span>General</span>
+        </button>
+
+        <button class="tab-btn" [class.active]="seccionActiva === 'usuarios'" (click)="cambiarSeccion('usuarios')">
+            <app-icon name="users"></app-icon>
+            <span>Usuarios</span>
+        </button>
+
+        <button class="tab-btn" [class.active]="seccionActiva === 'patrocinadores'" (click)="cambiarSeccion('patrocinadores')">
+            <app-icon name="handshake"></app-icon>
+            <span>Patrocinadores</span>
+        </button>
+
+        <button class="tab-btn" [class.active]="seccionActiva === 'acceso'" (click)="cambiarSeccion('acceso')">
+            <app-icon name="shield-check"></app-icon>
+            <span>Acceso</span>
+        </button>
+
+        <button class="tab-btn" [class.active]="seccionActiva === 'logs'" (click)="cambiarSeccion('logs')">
+            <app-icon name="file-text"></app-icon>
+            <span>Logs</span>
+        </button>
+    </div>
+
+    <!-- Contenido según la sección activa -->
+    <div class="content-wrapper">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB: GENERAL                                                   -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div *ngIf="seccionActiva === 'general'" class="seccion-content">
+            <div class="seccion-header">
+                <div class="seccion-info">
+                    <h2>Configuración General del Sistema</h2>
+                    <p>Datos del comité, redes sociales y parámetros del sistema</p>
+                </div>
+            </div>
+
+            <app-state-message *ngIf="cargandoConfig" mode="loading" title="Cargando configuración..."></app-state-message>
+
+            <div *ngIf="errorConfig && !cargandoConfig" class="error-container">
+                <app-icon name="warning-circle"></app-icon>
+                <p>{{ errorConfig }}</p>
+                <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarConfig()">Reintentar</app-button>
+            </div>
+
+            <form *ngIf="!cargandoConfig && !errorConfig" class="config-form" (ngSubmit)="guardarConfig()">
+
+                <!-- Datos del Comité -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <app-icon name="crown"></app-icon>
+                        Datos del Comité
+                    </h3>
+
+                    <div class="form-group">
+                        <label for="nombreComite">
+                            <app-icon name="crown"></app-icon>
+                            Nombre del Comité <span class="required">*</span>
+                        </label>
+                        <input type="text" id="nombreComite" name="nombreComite"
+                            [(ngModel)]="formularioConfig.nombreComite"
+                            placeholder="Ej: Comité Municipal de Ajedrez"
+                            maxlength="200">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">
+                            <app-icon name="file-text"></app-icon>
+                            Descripción
+                        </label>
+                        <textarea id="descripcion" name="descripcion"
+                            [(ngModel)]="formularioConfig.descripcion"
+                            placeholder="Descripción breve del comité..."
+                            rows="3" maxlength="1000"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cfgTelefono">
+                                <app-icon name="phone"></app-icon>
+                                Teléfono
+                            </label>
+                            <input type="text" id="cfgTelefono" name="cfgTelefono"
+                                [(ngModel)]="formularioConfig.telefono"
+                                placeholder="Ej: 5512345678"
+                                maxlength="20">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cfgEmail">
+                                <app-icon name="envelope"></app-icon>
+                                Correo Electrónico
+                            </label>
+                            <input type="email" id="cfgEmail" name="cfgEmail"
+                                [(ngModel)]="formularioConfig.email"
+                                placeholder="contacto@comite.org"
+                                maxlength="100">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ciudad">
+                                <app-icon name="buildings"></app-icon>
+                                Ciudad
+                            </label>
+                            <input type="text" id="ciudad" name="ciudad"
+                                [(ngModel)]="formularioConfig.ciudad"
+                                placeholder="Ej: Ciudad de México"
+                                maxlength="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">
+                                <app-icon name="map-pin"></app-icon>
+                                Estado
+                            </label>
+                            <input type="text" id="estado" name="estado"
+                                [(ngModel)]="formularioConfig.estado"
+                                placeholder="Ej: CDMX"
+                                maxlength="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pais">
+                                <app-icon name="globe-hemisphere-west"></app-icon>
+                                País
+                            </label>
+                            <input type="text" id="pais" name="pais"
+                                [(ngModel)]="formularioConfig.pais"
+                                placeholder="Ej: México"
+                                maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Redes Sociales -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <app-icon name="share-network"></app-icon>
+                        Redes Sociales
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="facebook">
+                                <app-icon name="globe"></app-icon>
+                                Facebook
+                            </label>
+                            <input type="url" id="facebook" name="facebook"
+                                [(ngModel)]="formularioConfig.facebook"
+                                placeholder="https://facebook.com/..."
+                                maxlength="255">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="instagram">
+                                <app-icon name="globe"></app-icon>
+                                Instagram
+                            </label>
+                            <input type="url" id="instagram" name="instagram"
+                                [(ngModel)]="formularioConfig.instagram"
+                                placeholder="https://instagram.com/..."
+                                maxlength="255">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="twitter">
+                                <app-icon name="globe"></app-icon>
+                                X / Twitter
+                            </label>
+                            <input type="url" id="twitter" name="twitter"
+                                [(ngModel)]="formularioConfig.twitter"
+                                placeholder="https://x.com/..."
+                                maxlength="255">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="youtube">
+                                <app-icon name="globe"></app-icon>
+                                YouTube
+                            </label>
+                            <input type="url" id="youtube" name="youtube"
+                                [(ngModel)]="formularioConfig.youtube"
+                                placeholder="https://youtube.com/..."
+                                maxlength="255">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="whatsapp">
+                                <app-icon name="phone"></app-icon>
+                                WhatsApp
+                            </label>
+                            <input type="text" id="whatsapp" name="whatsapp"
+                                [(ngModel)]="formularioConfig.whatsapp"
+                                placeholder="Ej: 5512345678"
+                                maxlength="20">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parámetros del Sistema -->
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <app-icon name="gear-six"></app-icon>
+                        Parámetros del Sistema
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="zonaHoraria">
+                                <app-icon name="clock"></app-icon>
+                                Zona Horaria
+                            </label>
+                            <select id="zonaHoraria" name="zonaHoraria"
+                                [(ngModel)]="formularioConfig.idZonaHoraria">
+                                <option [ngValue]="null">— Sin zona horaria —</option>
+                                <option *ngFor="let zona of zonasHorarias" [ngValue]="zona.idZonaHoraria">
+                                    {{ zona.nombreMostrar }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="diasAutoDesactivar">
+                                <app-icon name="calendar-x"></app-icon>
+                                Días de Auto-Desactivación
+                            </label>
+                            <input type="number" id="diasAutoDesactivar" name="diasAutoDesactivar"
+                                [(ngModel)]="formularioConfig.diasAutoDesactivar"
+                                min="1" max="30" step="1">
+                            <small>Días inactivos antes de desactivar una cuenta (1–30)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-form-footer">
+                    <app-button variant="secondary" icon="arrow-clockwise" type="button" [disabled]="guardandoConfig" (clicked)="cargarConfig()">
+                        Recargar
+                    </app-button>
+                    <app-button variant="primary" icon="floppy-disk" type="submit" [loading]="guardandoConfig" [disabled]="guardandoConfig">
+                        {{ guardandoConfig ? 'Guardando...' : 'Guardar Configuración' }}
+                    </app-button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB: USUARIOS                                                  -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div *ngIf="seccionActiva === 'usuarios'" class="seccion-content">
+
+            <div class="seccion-header">
+                <div class="seccion-info">
+                    <h2>Usuarios del Sistema</h2>
+                    <p>Gestiona los usuarios administradores y sus permisos por torneo</p>
+                </div>
+                <app-button icon="plus" (clicked)="abrirModalCrear()">Nuevo Usuario</app-button>
+            </div>
+
+            <!-- Error -->
+            <div *ngIf="error && !cargando" class="error-container">
+                <app-icon name="warning-circle"></app-icon>
+                <p>{{ error }}</p>
+                <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarUsuarios()">Reintentar</app-button>
+            </div>
+
+            <!-- Tabla de usuarios -->
+            <div *ngIf="!error" class="tabla-container">
+                <app-data-table [columns]="columnasUsuarios" [rows]="usuarios" [loading]="cargando"
+                    loadingText="Cargando usuarios..." emptyIcon="users" emptyTitle="No hay usuarios registrados"
+                    emptyDescription="Crea el primer usuario administrador del sistema">
+                    <ng-template let-usuario>
+                        <tr [class.usuario-actual]="esUsuarioActual(usuario)">
+                            <td>{{ usuario.idUsuario }}</td>
+                            <td>
+                                <div class="telefono-cell">
+                                    <app-icon name="phone"></app-icon>
+                                    {{ usuario.telefono }}
+                                    <span *ngIf="esUsuarioActual(usuario)" class="badge-actual">Tú</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-rol" [class.badge-admin-gral]="usuario.rol === 'adminGral'"
+                                    [class.badge-admin-torneo]="usuario.rol === 'adminTorneo'">
+                                    {{ usuario.rol === 'adminGral' ? 'Admin General' : 'Admin Torneo' }}
+                                </span>
+                            </td>
+                            <td>{{ formatearFecha(usuario.fechaRegistro) }}</td>
+                            <td>
+                                <div class="acciones-cell">
+                                    <app-icon-button icon="pencil-simple" variant="warning" ariaLabel="Editar usuario"
+                                        (clicked)="abrirModalEditar(usuario)"></app-icon-button>
+                                    <app-icon-button icon="key" variant="info" ariaLabel="Cambiar contraseña"
+                                        (clicked)="abrirModalCambiarPassword(usuario)"></app-icon-button>
+                                    <app-icon-button *ngIf="usuario.rol === 'adminTorneo'" icon="grid-four" variant="secondary"
+                                        ariaLabel="Ver torneos asignados" (clicked)="verTorneosAsignados(usuario)"></app-icon-button>
+                                    <app-icon-button icon="trash" variant="danger" ariaLabel="Eliminar usuario"
+                                        [disabled]="esUsuarioActual(usuario)" (clicked)="abrirModalEliminar(usuario)"></app-icon-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </app-data-table>
+            </div>
+
+            <!-- Panel Torneos Asignados -->
+            <div *ngIf="mostrandoPanelTorneos && usuarioConTorneos" class="panel-torneos">
+                <div class="panel-torneos-header">
+                    <div>
+                        <h3>
+                            <app-icon name="grid-four"></app-icon>
+                            Torneos de {{ usuarioConTorneos.telefono }}
+                        </h3>
+                        <p>Gestiona los torneos asignados a este administrador</p>
+                    </div>
+                    <app-button variant="secondary" icon="x" (clicked)="cerrarPanelTorneos()">Cerrar</app-button>
+                </div>
+
+                <app-state-message *ngIf="cargandoTorneos" mode="loading" title="Cargando torneos..."></app-state-message>
+
+                <div *ngIf="!cargandoTorneos" class="torneos-panel-body">
+                    <!-- Torneos asignados -->
+                    <div class="torneos-asignados-lista">
+                        <h4>Torneos asignados ({{ torneosAsignados.length }})</h4>
+                        <div *ngIf="torneosAsignados.length === 0" class="empty-state-small">
+                            <app-icon name="grid-four"></app-icon>
+                            <span>Sin torneos asignados</span>
+                        </div>
+                        <div *ngFor="let t of torneosAsignados" class="torneo-chip">
+                            <span>{{ t.nombre }}</span>
+                            <app-icon-button icon="x" variant="ghost" size="md" ariaLabel="Quitar torneo"
+                                (clicked)="quitarTorneo(t.idTorneo!)"></app-icon-button>
+                        </div>
+                    </div>
+
+                    <!-- Selector para agregar torneos -->
+                    <div class="torneos-disponibles">
+                        <h4>Asignar torneo</h4>
+                        <div class="torneos-disponibles-lista">
+                            <div *ngFor="let t of todosLosTorneos" class="torneo-disponible-item"
+                                [class.ya-asignado]="torneoYaAsignado(t.idTorneo!)">
+                                <span class="torneo-nombre">{{ t.nombre }}</span>
+                                <span *ngIf="torneoYaAsignado(t.idTorneo!)" class="badge-asignado">Asignado</span>
+                                <app-button *ngIf="!torneoYaAsignado(t.idTorneo!)" variant="secondary" size="sm" icon="plus"
+                                    (clicked)="asignarTorneo(t.idTorneo!)">Asignar</app-button>
+                            </div>
+                            <div *ngIf="todosLosTorneos.length === 0" class="empty-state-small">
+                                <span>No hay torneos disponibles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB: PATROCINADORES                                            -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div *ngIf="seccionActiva === 'patrocinadores'" class="seccion-content">
+
+            <div class="seccion-header">
+                <div class="seccion-info">
+                    <h2>Patrocinadores</h2>
+                    <p>Gestiona los patrocinadores del comité</p>
+                </div>
+                <app-button icon="plus" (clicked)="abrirFormPatrocinador()">Nuevo Patrocinador</app-button>
+            </div>
+
+            <!-- Tabla -->
+            <div class="tabla-container">
+                <app-data-table [columns]="columnasPatrocinadores" [rows]="patrocinadores" [loading]="cargando"
+                    loadingText="Cargando patrocinadores..." emptyIcon="handshake" emptyTitle="No hay patrocinadores"
+                    emptyDescription="Agrega el primer patrocinador del comité">
+                    <ng-template let-p>
+                        <tr>
+                            <td>{{ p.idPatrocinador }}</td>
+                            <td>
+                                <div class="patrocinador-nombre-cell">
+                                    <img *ngIf="p.logoUrl" [src]="p.logoUrl" class="patrocinador-logo" alt="logo">
+                                    <span>{{ p.nombre }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a *ngIf="p.sitioWeb" [href]="p.sitioWeb" target="_blank" class="link-externo">
+                                    <app-icon name="arrow-square-out"></app-icon>
+                                    {{ p.sitioWeb | slice:0:30 }}...
+                                </a>
+                                <span *ngIf="!p.sitioWeb">—</span>
+                            </td>
+                            <td>{{ p.contacto || '—' }}</td>
+                            <td>
+                                <app-badge [status]="p.activo ? 'active' : 'inactive'" [text]="p.activo ? 'Activo' : 'Inactivo'"></app-badge>
+                            </td>
+                            <td>
+                                <div class="acciones-cell">
+                                    <app-icon-button icon="pencil-simple" variant="warning" ariaLabel="Editar"
+                                        (clicked)="abrirFormPatrocinador(p)"></app-icon-button>
+                                    <app-icon-button [icon]="p.activo ? 'eye' : 'eye-slash'" variant="secondary"
+                                        [ariaLabel]="p.activo ? 'Desactivar' : 'Activar'" (clicked)="toggleActivoPatrocinador(p)"></app-icon-button>
+                                    <app-icon-button icon="trash" variant="danger" ariaLabel="Eliminar"
+                                        (clicked)="confirmarEliminarPatrocinador(p)"></app-icon-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </app-data-table>
+            </div>
+
+            <!-- Formulario inline de patrocinador -->
+            <div *ngIf="mostrandoFormPatrocinador" class="modal-overlay" (click)="cerrarFormPatrocinador()">
+                <div class="modal-content" (click)="$event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3>
+                            <app-icon name="handshake"></app-icon>
+                            {{ editandoPatrocinador ? 'Editar Patrocinador' : 'Nuevo Patrocinador' }}
+                        </h3>
+                        <app-icon-button icon="x" variant="ghost" ariaLabel="Cerrar" (clicked)="cerrarFormPatrocinador()"></app-icon-button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>
+                                <app-icon name="tag"></app-icon>
+                                Nombre <span class="required">*</span>
+                            </label>
+                            <input type="text" [(ngModel)]="formularioPatrocinador.nombre"
+                                placeholder="Nombre del patrocinador" maxlength="150">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <app-icon name="image"></app-icon>
+                                URL del Logo
+                            </label>
+                            <input type="url" [(ngModel)]="formularioPatrocinador.logoUrl"
+                                placeholder="https://...">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <app-icon name="globe"></app-icon>
+                                Sitio Web
+                            </label>
+                            <input type="url" [(ngModel)]="formularioPatrocinador.sitioWeb"
+                                placeholder="https://...">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <app-icon name="phone"></app-icon>
+                                Contacto
+                            </label>
+                            <input type="text" [(ngModel)]="formularioPatrocinador.contacto"
+                                placeholder="Correo o teléfono de contacto">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <app-icon name="file-text"></app-icon>
+                                Descripción
+                            </label>
+                            <textarea [(ngModel)]="formularioPatrocinador.descripcion"
+                                placeholder="Breve descripción del patrocinador..."
+                                rows="3" maxlength="500"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <app-button variant="ghost" (clicked)="cerrarFormPatrocinador()" [disabled]="cargando">Cancelar</app-button>
+                        <app-button variant="primary" icon="floppy-disk" [loading]="cargando" [disabled]="cargando" (clicked)="guardarPatrocinador()">
+                            {{ editandoPatrocinador ? 'Actualizar' : 'Guardar' }}
+                        </app-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB: ACCESO (Historial + Sesiones)                            -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div *ngIf="seccionActiva === 'acceso'" class="seccion-content">
+
+            <div class="seccion-header">
+                <div class="seccion-info">
+                    <h2>Control de Acceso</h2>
+                    <p>Historial de accesos y sesiones activas del sistema</p>
+                </div>
+            </div>
+
+            <!-- Sub-toggle Historial / Sesiones -->
+            <div class="sub-toggle">
+                <button class="sub-toggle-btn" [class.active]="subSeccionAcceso === 'historial'"
+                    (click)="cambiarSubSeccionAcceso('historial')">
+                    <app-icon name="clock-clockwise"></app-icon>
+                    Historial de Accesos
+                </button>
+                <button class="sub-toggle-btn" [class.active]="subSeccionAcceso === 'sesiones'"
+                    (click)="cambiarSubSeccionAcceso('sesiones')">
+                    <app-icon name="user-circle"></app-icon>
+                    Sesiones Activas
+                </button>
+            </div>
+
+            <!-- SUB-SECCIÓN: HISTORIAL -->
+            <div *ngIf="subSeccionAcceso === 'historial'">
+
+                <!-- Filtros historial -->
+                <div class="filtros-container">
+                    <div class="filtro-group">
+                        <label>Mes:</label>
+                        <input type="month" [(ngModel)]="mesInputHistorial">
+                    </div>
+                    <div class="filtro-group">
+                        <label>Tipo:</label>
+                        <select [(ngModel)]="filtrosHistorial.tipo">
+                            <option value="">Todos</option>
+                            <option value="login_exitoso">Login exitoso</option>
+                            <option value="login_fallido">Login fallido</option>
+                            <option value="logout">Logout</option>
+                        </select>
+                    </div>
+                    <app-button icon="funnel" (clicked)="aplicarFiltrosHistorial()">Aplicar</app-button>
+                    <app-button variant="secondary" icon="funnel-x" (clicked)="limpiarFiltrosHistorial()">Limpiar</app-button>
+                </div>
+
+                <div class="historial-content">
+                    <!-- Resumen de resultados -->
+                    <div class="resultados-info" *ngIf="totalHistorial > 0">
+                        <app-icon name="list-numbers"></app-icon>
+                        <span>{{ totalHistorial }} registro(s)
+                            <ng-container *ngIf="filtrosHistorial.mes"> — {{ formatearMes(filtrosHistorial.mes) }}</ng-container>
+                        </span>
+                    </div>
+
+                    <div *ngIf="estadisticasAcceso" class="estadisticas-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <app-icon name="chart-pie"></app-icon>
+                            </div>
+                            <div class="stat-content">
+                                <h4>Por Tipo</h4>
+                                <div class="stat-items">
+                                    <div *ngFor="let item of estadisticasAcceso.porTipo" class="stat-item">
+                                        <span class="stat-label">{{ item.tipo }}:</span>
+                                        <span class="stat-value">{{ item.total }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tabla-container">
+                        <app-data-table [columns]="columnasHistorial" [rows]="historialAccesos" [loading]="cargando"
+                            loadingText="Cargando historial..." emptyIcon="clock-clockwise" emptyTitle="No hay registros"
+                            emptyDescription="Aún no hay accesos registrados en el sistema">
+                            <ng-template let-acceso>
+                                <tr>
+                                    <td>{{ formatearFecha(acceso.fecha) }}</td>
+                                    <td>{{ acceso.usuario?.telefono || 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge-tipo" [ngClass]="getTipoAccesoClase(acceso.tipo)">
+                                            {{ acceso.tipo }}
+                                        </span>
+                                    </td>
+                                    <td>{{ acceso.ip || 'N/A' }}</td>
+                                    <td>{{ acceso.navegador || 'N/A' }}</td>
+                                    <td>{{ acceso.dispositivo || 'N/A' }}</td>
+                                </tr>
+                            </ng-template>
+                        </app-data-table>
+
+                        <div *ngIf="historialAccesos.length > 0 && totalPaginasHistorial > 1" class="paginacion">
+                            <app-icon-button icon="caret-left" variant="secondary" ariaLabel="Página anterior"
+                                [disabled]="paginaHistorial === 1" (clicked)="cambiarPaginaHistorial(paginaHistorial - 1)"></app-icon-button>
+
+                            <button *ngIf="primeraVisible_H" class="btn-numero-pagina"
+                                (click)="cambiarPaginaHistorial(1)">1</button>
+                            <span *ngIf="haySeparadorIzq_H" class="paginacion-dots">…</span>
+
+                            <button *ngFor="let p of paginasHistorial" class="btn-numero-pagina"
+                                [class.activo]="p === paginaHistorial"
+                                (click)="cambiarPaginaHistorial(p)">{{ p }}</button>
+
+                            <span *ngIf="haySeparadorDer_H" class="paginacion-dots">…</span>
+                            <button *ngIf="ultimaVisible_H" class="btn-numero-pagina"
+                                (click)="cambiarPaginaHistorial(totalPaginasHistorial)">{{ totalPaginasHistorial }}</button>
+
+                            <app-icon-button icon="caret-right" variant="secondary" ariaLabel="Página siguiente"
+                                [disabled]="paginaHistorial === totalPaginasHistorial" (clicked)="cambiarPaginaHistorial(paginaHistorial + 1)"></app-icon-button>
+                            <div class="info-paginacion">
+                                <span>Pág. {{ paginaHistorial }}/{{ totalPaginasHistorial }}</span>
+                                <span class="separador">|</span>
+                                <span>{{ totalHistorial }} registros</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-SECCIÓN: SESIONES -->
+            <div *ngIf="subSeccionAcceso === 'sesiones'">
+                <div class="seccion-header" style="margin-top:1.5rem">
+                    <div></div>
+                    <app-button variant="secondary" icon="broom" (clicked)="confirmarLimpiarSesionesExpiradas()">Limpiar Expiradas</app-button>
+                </div>
+
+                <app-state-message *ngIf="cargando" mode="loading" title="Cargando sesiones..."></app-state-message>
+
+                <div *ngIf="!cargando" class="sesiones-grid">
+                    <div *ngFor="let sesion of sesionesActivas" class="sesion-card"
+                        [class.sesion-actual]="esSesionActual(sesion)">
+                        <div class="sesion-header">
+                            <div class="sesion-usuario">
+                                <app-icon name="user"></app-icon>
+                                <span>{{ sesion.usuario?.telefono }}</span>
+                            </div>
+                            <span *ngIf="esSesionActual(sesion)" class="badge-actual-sesion">Tu sesión</span>
+                        </div>
+
+                        <div class="sesion-info">
+                            <div class="info-row">
+                                <app-icon name="network"></app-icon>
+                                <span>{{ sesion.ip || 'N/A' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <app-icon name="app-window"></app-icon>
+                                <span>{{ sesion.navegador || 'N/A' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <app-icon name="desktop"></app-icon>
+                                <span>{{ sesion.dispositivo || 'N/A' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <app-icon name="clock"></app-icon>
+                                <span>Último acceso: {{ formatearFechaCorta(sesion.ultimoAcceso) }}</span>
+                            </div>
+                            <div class="info-row">
+                                <app-icon name="hourglass"></app-icon>
+                                <span>Expira: {{ formatearFechaCorta(sesion.fechaExpiracion) }}</span>
+                            </div>
+                        </div>
+
+                        <app-button *ngIf="!esSesionActual(sesion)" variant="danger" icon="x-circle" [block]="true"
+                            (clicked)="confirmarCerrarSesion(sesion.idSesion!)">Cerrar Sesión</app-button>
+                    </div>
+
+                    <app-empty-state *ngIf="sesionesActivas.length === 0" class="empty-state-full"
+                        icon="user-minus" title="No hay sesiones activas" description="Actualmente no hay usuarios conectados">
+                    </app-empty-state>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB: LOGS                                                      -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div *ngIf="seccionActiva === 'logs'" class="seccion-content">
+            <div class="seccion-header">
+                <div class="seccion-info">
+                    <h2>Logs del Sistema</h2>
+                    <p>Registro de actividades y eventos del sistema</p>
+                </div>
+            </div>
+
+            <div class="filtros-container">
+                <div class="filtro-group">
+                    <label>Mes:</label>
+                    <input type="month" [(ngModel)]="mesInputLogs">
+                </div>
+
+                <div class="filtro-group">
+                    <label>Nivel:</label>
+                    <select [(ngModel)]="filtrosLogs.nivel" name="nivelSelect">
+                        <option value="">Todos</option>
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="filtro-group">
+                    <label>Entidad:</label>
+                    <input type="text" [(ngModel)]="filtrosLogs.entidad" placeholder="Ej: torneo, usuario">
+                </div>
+
+                <div class="filtro-group">
+                    <label>Acción:</label>
+                    <input type="text" [(ngModel)]="filtrosLogs.accion" placeholder="Ej: crear, editar">
+                </div>
+
+                <app-button icon="funnel" (clicked)="aplicarFiltrosLogsConMes()">Aplicar</app-button>
+                <app-button variant="secondary" icon="funnel-x" (clicked)="limpiarFiltrosLogs()">Limpiar</app-button>
+            </div>
+
+            <div *ngIf="!cargando && totalLogs > 0" class="resultados-info">
+                <app-icon name="list-numbers"></app-icon>
+                <span>{{ totalLogs }} log(s)
+                    <ng-container *ngIf="filtrosLogs.mes"> — {{ formatearMes(filtrosLogs.mes) }}</ng-container>
+                </span>
+            </div>
+
+            <div class="tabla-container">
+                <app-data-table [columns]="columnasLogs" [rows]="logs" [loading]="cargando"
+                    loadingText="Cargando logs..." emptyIcon="file-text" emptyTitle="No hay logs"
+                    emptyDescription="No se encontraron registros con los filtros aplicados">
+                    <ng-template let-log>
+                        <tr>
+                            <td>{{ formatearFecha(log.fecha) }}</td>
+                            <td>
+                                <span class="badge-nivel" [ngClass]="getNivelLogClase(log.nivel)">
+                                    {{ log.nivel }}
+                                </span>
+                            </td>
+                            <td>{{ log.usuario?.telefono || 'Sistema' }}</td>
+                            <td>{{ log.accion }}</td>
+                            <td>{{ log.entidad }}</td>
+                            <td class="detalles-cell">{{ log.detalles || '-' }}</td>
+                        </tr>
+                    </ng-template>
+                </app-data-table>
+
+                <div *ngIf="logs.length > 0 && totalPaginasLogs > 1" class="paginacion">
+                    <app-icon-button icon="caret-left" variant="secondary" ariaLabel="Página anterior"
+                        [disabled]="paginaLogs === 1" (clicked)="cambiarPaginaLogs(paginaLogs - 1)"></app-icon-button>
+
+                    <button *ngIf="primeraVisible_L" class="btn-numero-pagina"
+                        (click)="cambiarPaginaLogs(1)">1</button>
+                    <span *ngIf="haySeparadorIzq_L" class="paginacion-dots">…</span>
+
+                    <button *ngFor="let p of paginasLogs" class="btn-numero-pagina"
+                        [class.activo]="p === paginaLogs"
+                        (click)="cambiarPaginaLogs(p)">{{ p }}</button>
+
+                    <span *ngIf="haySeparadorDer_L" class="paginacion-dots">…</span>
+                    <button *ngIf="ultimaVisible_L" class="btn-numero-pagina"
+                        (click)="cambiarPaginaLogs(totalPaginasLogs)">{{ totalPaginasLogs }}</button>
+
+                    <app-icon-button icon="caret-right" variant="secondary" ariaLabel="Página siguiente"
+                        [disabled]="paginaLogs === totalPaginasLogs" (clicked)="cambiarPaginaLogs(paginaLogs + 1)"></app-icon-button>
+                    <div class="info-paginacion">
+                        <span>Pág. {{ paginaLogs }}/{{ totalPaginasLogs }}</span>
+                        <span class="separador">|</span>
+                        <span>{{ totalLogs }} registros</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- MODAL GESTIÓN DE USUARIOS                                          -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+
+            <div class="modal-header">
+                <h3>
+                    <app-icon *ngIf="modoModal === 'crear'" name="plus"></app-icon>
+                    <app-icon *ngIf="modoModal === 'editar'" name="pencil-simple"></app-icon>
+                    <app-icon *ngIf="modoModal === 'cambiarPassword'" name="key"></app-icon>
+                    <app-icon *ngIf="modoModal === 'eliminar'" name="trash"></app-icon>
+                    {{
+                        modoModal === 'crear' ? 'Crear Usuario' :
+                        modoModal === 'editar' ? 'Editar Usuario' :
+                        modoModal === 'cambiarPassword' ? 'Cambiar Contraseña' :
+                        'Eliminar Usuario'
+                    }}
+                </h3>
+                <app-icon-button icon="x" variant="ghost" ariaLabel="Cerrar" (clicked)="cerrarModal()"></app-icon-button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- Crear / Editar -->
+                <div *ngIf="modoModal === 'crear' || modoModal === 'editar'">
+                    <div class="form-group">
+                        <label for="telefono">
+                            <app-icon name="phone"></app-icon>
+                            Teléfono
+                        </label>
+                        <input type="text" id="telefono" [(ngModel)]="formulario.telefono"
+                            placeholder="Ingresa 10 dígitos" maxlength="10">
+                        <small>Debe tener exactamente 10 dígitos</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rolUsuario">
+                            <app-icon name="shield-star"></app-icon>
+                            Rol
+                        </label>
+                        <select id="rolUsuario" [(ngModel)]="formulario.rol"
+                            [disabled]="modoModal === 'editar' && esUsuarioActual(usuarioSeleccionado!)">
+                            <option value="adminTorneo">Admin Torneo</option>
+                            <option value="adminGral">Admin General</option>
+                        </select>
+                        <small *ngIf="modoModal === 'editar' && esUsuarioActual(usuarioSeleccionado!)">
+                            No puedes cambiar tu propio rol
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <app-icon name="lock"></app-icon>
+                            {{ modoModal === 'crear' ? 'Contraseña' : 'Nueva Contraseña (opcional)' }}
+                        </label>
+                        <input type="password" id="password" [(ngModel)]="formulario.password"
+                            placeholder="Mínimo 6 caracteres">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordConfirm">
+                            <app-icon name="lock"></app-icon>
+                            Confirmar Contraseña
+                        </label>
+                        <input type="password" id="passwordConfirm" [(ngModel)]="formulario.passwordConfirm"
+                            placeholder="Repite la contraseña">
+                    </div>
+                </div>
+
+                <!-- Cambiar Contraseña -->
+                <div *ngIf="modoModal === 'cambiarPassword'">
+                    <div class="info-usuario-password">
+                        <app-icon name="user"></app-icon>
+                        <div>
+                            <strong>Usuario:</strong> {{ usuarioSeleccionado?.telefono }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordActual">
+                            <app-icon name="lock"></app-icon>
+                            Contraseña Actual
+                        </label>
+                        <input type="password" id="passwordActual" [(ngModel)]="formularioPassword.passwordActual"
+                            placeholder="Contraseña actual">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordNuevo">
+                            <app-icon name="key"></app-icon>
+                            Nueva Contraseña
+                        </label>
+                        <input type="password" id="passwordNuevo" [(ngModel)]="formularioPassword.passwordNuevo"
+                            placeholder="Mínimo 6 caracteres">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordNuevoConfirm">
+                            <app-icon name="key"></app-icon>
+                            Confirmar Nueva Contraseña
+                        </label>
+                        <input type="password" id="passwordNuevoConfirm"
+                            [(ngModel)]="formularioPassword.passwordNuevoConfirm"
+                            placeholder="Repite la nueva contraseña">
+                    </div>
+                </div>
+
+                <!-- Eliminar -->
+                <div *ngIf="modoModal === 'eliminar'" class="confirmacion-eliminar">
+                    <app-icon name="warning"></app-icon>
+                    <h4>¿Estás seguro?</h4>
+                    <p>
+                        Estás a punto de eliminar al usuario con teléfono
+                        <strong>{{ usuarioSeleccionado?.telefono }}</strong>.
+                        Esta acción no se puede deshacer.
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <app-button variant="ghost" [disabled]="cargando" (clicked)="cerrarModal()">Cancelar</app-button>
+                <app-button *ngIf="modoModal === 'crear' || modoModal === 'editar'"
+                    variant="primary" icon="floppy-disk" [loading]="cargando" [disabled]="cargando" (clicked)="guardarUsuario()">
+                    {{ modoModal === 'crear' ? 'Crear' : 'Guardar' }}
+                </app-button>
+                <app-button *ngIf="modoModal === 'cambiarPassword'"
+                    variant="primary" icon="key" [loading]="cargando" [disabled]="cargando" (clicked)="cambiarPassword()">
+                    Cambiar Contraseña
+                </app-button>
+                <app-button *ngIf="modoModal === 'eliminar'"
+                    variant="danger" icon="trash" [disabled]="cargando" (clicked)="eliminarUsuario()">
+                    Eliminar
+                </app-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación reutilizable -->
+    <app-modal-confirmacion
+        [mostrar]="modalConfirmacion.mostrar"
+        [titulo]="modalConfirmacion.titulo"
+        [mensaje]="modalConfirmacion.mensaje"
+        [mensajeSecundario]="modalConfirmacion.mensajeSecundario"
+        [textoConfirmar]="modalConfirmacion.textoConfirmar"
+        [textoCancelar]="modalConfirmacion.textoCancelar"
+        [tipoBotonPrimario]="modalConfirmacion.tipoBoton"
+        [icono]="modalConfirmacion.icono"
+        [iconoBotonPrimario]="modalConfirmacion.iconoBoton"
+        [tipoAdvertencia]="modalConfirmacion.tipoAdvertencia"
+        (confirmar)="ejecutarAccionConfirmacion()"
+        (cancelar)="cerrarModalConfirmacion()">
+    </app-modal-confirmacion>
+
+    <app-toast-noti></app-toast-noti>
+
+</div>

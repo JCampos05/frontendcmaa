@@ -1,0 +1,153 @@
+<div class="jugadores-torneo-container">
+    <app-toast-noti></app-toast-noti>
+
+    <app-page-header icon="users" title="Jugadores por Torneo" subtitle="Estadísticas y análisis de participantes" [hasActions]="false"></app-page-header>
+
+    <app-state-message *ngIf="cargando" mode="loading" title="Cargando información..."></app-state-message>
+
+    <div *ngIf="error && !cargando" class="error-container">
+        <app-state-message mode="error" [title]="error"></app-state-message>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarTorneos()">Reintentar</app-button>
+    </div>
+
+    <app-empty-state *ngIf="sinDatos && !cargando && !error"
+        icon="trophy" [title]="sinDatos" description="Crea un torneo para gestionar sus jugadores">
+    </app-empty-state>
+
+    <div *ngIf="!cargando && !error && !sinDatos" class="content-wrapper">
+        <div class="selector-torneo-section">
+            <div class="selector-header">
+                <app-icon name="trophy"></app-icon>
+                <h3>Seleccionar Torneo</h3>
+            </div>
+            <app-select
+                [options]="torneoOptions"
+                [value]="torneoSeleccionado"
+                (valueChange)="onTorneoSeleccionadoChange($event)">
+            </app-select>
+        </div>
+
+        <div class="estadisticas-generales" *ngIf="estadisticasGenerales && torneoSeleccionado">
+            <div class="torneo-info-card">
+                <div class="torneo-info-header">
+                    <app-icon name="grid-four"></app-icon>
+                    <h3>{{ torneoSeleccionado.nombre }}</h3>
+                </div>
+                <div class="torneo-info-details">
+                    <div class="info-item">
+                        <app-icon name="calendar"></app-icon>
+                        <span>{{ formatearFecha(torneoSeleccionado.fecha) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <app-icon name="map-pin"></app-icon>
+                        <span>{{ torneoSeleccionado.lugar }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <app-stat-card-grid [stats]="statCards"></app-stat-card-grid>
+        </div>
+
+        <div class="categorias-section">
+            <div class="section-header">
+                <app-icon name="chart-pie"></app-icon>
+                <h2>Estadísticas por Categoría</h2>
+            </div>
+
+            <app-filter-chips
+                [options]="categoriaFilterOptions"
+                [active]="categoriaFilterActive"
+                (change)="onCategoriaFilterChange($event)">
+            </app-filter-chips>
+
+            <div class="categorias-grid" *ngIf="categoriaSeleccionada === null">
+                <div *ngFor="let cat of estadisticasPorCategoria" class="categoria-stats-card">
+                    <div class="categoria-header-stats">
+                        <app-icon name="grid-four"></app-icon>
+                        <h3>{{ cat.nombreCategoria }}</h3>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <app-icon name="users"></app-icon>
+                            <span class="stat-label">Jugadores</span>
+                            <span class="stat-value">{{ cat.totalJugadores }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <app-icon name="chart-line"></app-icon>
+                            <span class="stat-label">Rating Prom.</span>
+                            <span class="stat-value">{{ cat.ratingPromedio | number:'1.0-0' }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <app-icon name="arrow-up"></app-icon>
+                            <span class="stat-label">Rating Alto</span>
+                            <span class="stat-value">{{ cat.ratingMasAlto }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <app-icon name="arrow-down"></app-icon>
+                            <span class="stat-label">Rating Bajo</span>
+                            <span class="stat-value">{{ cat.ratingMasBajo }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <app-icon name="cake"></app-icon>
+                            <span class="stat-label">Edad Prom.</span>
+                            <span class="stat-value">{{ cat.edadPromedio | number:'1.0-0' }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <app-icon name="clock-countdown"></app-icon>
+                            <span class="stat-label">Rango Edad</span>
+                            <span class="stat-value">{{ cat.edadMasBaja }}-{{ cat.edadMasAlta }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabla-section">
+            <div class="tabla-header">
+                <div class="tabla-titulo">
+                    <app-icon name="table"></app-icon>
+                    <h3>Jugadores</h3>
+                    <span class="badge">{{ jugadoresFiltrados.length }} registros</span>
+                </div>
+            </div>
+
+            <app-data-table
+                [columns]="columnsVisibles"
+                [rows]="jugadoresFiltrados"
+                [sortKey]="columnaOrden"
+                [sortDir]="direccionOrden"
+                emptyIcon="tray"
+                emptyTitle="No hay jugadores registrados"
+                emptyDescription=""
+                (sortChange)="onSortChange($event)">
+                <ng-template let-jugador>
+                    <tr>
+                        <td class="nombre-cell">
+                            <div class="cell-avatar">
+                                <div class="avatar">
+                                    <app-icon name="user"></app-icon>
+                                </div>
+                                <span>{{ jugador.jugador?.nombre }} {{ jugador.jugador?.apellido1 }} {{ jugador.jugador?.apellido2 }}</span>
+                            </div>
+                        </td>
+                        <td>{{ formatearTelefono(jugador.jugador?.telefono) }}</td>
+                        <td *ngIf="categoriaSeleccionada === null">
+                            <span class="category-badge">{{ jugador.categoria?.nombre }}</span>
+                        </td>
+                        <td class="center">
+                            <span class="rating-badge" *ngIf="jugador.jugador?.rating">
+                                <app-icon name="star"></app-icon>
+                                {{ jugador.jugador?.rating }}
+                            </span>
+                            <span class="sin-rating" *ngIf="!jugador.jugador?.rating">Sin rating</span>
+                        </td>
+                        <td class="center">
+                            <span class="edad-value">{{ jugador.edad || '-' }}</span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </app-data-table>
+        </div>
+    </div>
+</div>

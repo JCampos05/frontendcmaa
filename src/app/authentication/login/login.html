@@ -1,29 +1,29 @@
 <div class="login-container">
     <app-toast-noti></app-toast-noti>
     <div class="login-background">
-        <i class="fa-solid fa-chess-king bg-piece piece-1"></i>
-        <i class="fa-solid fa-chess-queen bg-piece piece-2"></i>
-        <i class="fa-solid fa-chess-rook bg-piece piece-3"></i>
-        <i class="fa-solid fa-chess-bishop bg-piece piece-4"></i>
+        <span class="bg-piece piece-1">♔</span>
+        <span class="bg-piece piece-2">♛</span>
+        <span class="bg-piece piece-3">♜</span>
+        <span class="bg-piece piece-4">♝</span>
     </div>
 
     <div class="login-card">
         <button class="btn-back" (click)="goToLanding()">
-            <i class="fa-solid fa-arrow-left"></i>
+            <i class="ph-bold ph-arrow-left ph-icon"></i>
             Volver
         </button>
 
         <div class="login-header">
-            <i class="fa-solid fa-chess-knight login-icon"></i>
+            <span class="login-icon">♞</span>
             <h2 class="login-title">Iniciar Sesión</h2>
-            <p class="login-subtitle">Accede a tu cuenta administrativa del comité de ajedrez </p>
+            <p class="login-subtitle">Accede a tu cuenta administrativa del comité de ajedrez</p>
         </div>
 
         <form class="login-form" (ngSubmit)="onSubmit()">
 
             <div class="form-group">
                 <label for="telefono" class="form-label">
-                    <i class="fa-solid fa-phone"></i>
+                    <i class="ph-bold ph-phone ph-icon"></i>
                     Teléfono
                 </label>
                 <input type="tel" id="telefono" name="telefono" [(ngModel)]="telefono" class="form-input"
@@ -32,7 +32,7 @@
 
             <div class="form-group">
                 <label for="password" class="form-label">
-                    <i class="fa-solid fa-lock"></i>
+                    <i class="ph-bold ph-lock ph-icon"></i>
                     Contraseña
                 </label>
                 <div class="password-wrapper">
@@ -41,23 +41,23 @@
                         [disabled]="loading" required />
                     <button type="button" class="btn-toggle-password" (click)="togglePasswordVisibility()"
                         [disabled]="loading">
-                        <i class="fa-solid" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+                        <i [class]="showPassword ? 'ph-bold ph-eye-slash ph-icon' : 'ph-bold ph-eye ph-icon'"></i>
                     </button>
                 </div>
             </div>
 
             <div class="error-message" *ngIf="errorMessage">
-                <i class="fa-solid fa-circle-exclamation"></i>
+                <i class="ph-bold ph-warning-circle ph-icon"></i>
                 {{ errorMessage }}
             </div>
 
             <button type="submit" class="btn-submit" [disabled]="loading">
                 <span *ngIf="!loading">
-                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <i class="ph-bold ph-sign-in ph-icon"></i>
                     Iniciar Sesión
                 </span>
                 <span *ngIf="loading">
-                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <i class="ph-bold ph-spinner ph-icon ph-spin"></i>
                     Iniciando...
                 </span>
             </button>
@@ -66,7 +66,7 @@
 
         <div class="login-footer">
             <p class="footer-text">
-                <i class="fa-solid fa-info-circle"></i>
+                <i class="ph-bold ph-info ph-icon"></i>
                 ¿Olvidaste tu contraseña? Contacta al administrador
             </p>
         </div>

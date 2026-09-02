@@ -144,20 +144,6 @@
                     </div>
                 </div>
 
-                <div class="nav-item" (click)="cargarConfiguracionTorneos()"
-                    [class.active]="esRutaActiva('/main-view/configuracion-torneos')">
-                    <div class="nav-item-content">
-                        <i class="fa-solid fa-sliders nav-icon"></i>
-                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Config. Torneos</span>
-                    </div>
-                </div>
-                <div class="nav-item" (click)="cargarSistemasPago()"
-                    [class.active]="esRutaActiva('/main-view/sistemas-pago')">
-                    <div class="nav-item-content">
-                        <i class="fa-solid fa-credit-card nav-icon"></i>
-                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Sistemas de Pago</span>
-                    </div>
-                </div>
             </div>
 
             <!-- GESTIÓN LIGA -->
@@ -266,6 +252,22 @@
                     <div class="nav-item-content">
                         <i class="fa-solid fa-gear nav-icon"></i>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Configuración</span>
+                    </div>
+                </div>
+
+                <div class="nav-item" (click)="cargarConfiguracionTorneos()"
+                    [class.active]="esRutaActiva('/main-view/configuracion-torneos')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-sliders nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Config. Torneos</span>
+                    </div>
+                </div>
+
+                <div class="nav-item" (click)="cargarSistemasPago()"
+                    [class.active]="esRutaActiva('/main-view/sistemas-pago')">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-credit-card nav-icon"></i>
+                        <span class="nav-label" *ngIf="!isCollapsed || esMobile">Sistemas de Pago</span>
                     </div>
                 </div>
             </div>

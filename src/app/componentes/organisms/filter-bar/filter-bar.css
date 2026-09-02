@@ -1,0 +1,7 @@
+.filters-section {
+    display: flex;
+    gap: var(--space-8);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-8);
+}

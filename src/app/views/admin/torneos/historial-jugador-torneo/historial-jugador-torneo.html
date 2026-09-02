@@ -1,0 +1,164 @@
+<div class="historial-container">
+    <app-toast-noti></app-toast-noti>
+
+    <app-page-header icon="clock-counter-clockwise" title="Historial de Partidas" subtitle="Consulta el historial completo de cualquier jugador" [hasActions]="true">
+        <app-button actions variant="secondary" icon="arrow-left" (clicked)="volver()">Volver</app-button>
+        <app-button actions *ngIf="partidasHistorial.length > 0" variant="danger" icon="file-pdf" (clicked)="exportarPDF()">Exportar PDF</app-button>
+    </app-page-header>
+
+    <app-state-message *ngIf="cargando" mode="loading" title="Cargando información..."></app-state-message>
+
+    <div *ngIf="error && !cargando" class="error-container">
+        <app-state-message mode="error" [title]="error"></app-state-message>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarTorneos()">Reintentar</app-button>
+    </div>
+
+    <!-- Sección de Filtros y Búsqueda -->
+    <div *ngIf="!cargando && !error" class="section-card filtros-section">
+        <div class="section-body">
+            <div class="filtros-grid">
+                <div class="form-group">
+                    <label class="form-label"><app-icon name="trophy"></app-icon> Torneo</label>
+                    <app-select
+                        [options]="torneoOptions"
+                        [value]="torneoSeleccionado"
+                        placeholder="Seleccionar torneo"
+                        (valueChange)="onTorneoChange($event)">
+                    </app-select>
+                </div>
+
+                <div class="form-group" *ngIf="torneoSeleccionado">
+                    <label class="form-label"><app-icon name="stack"></app-icon> Categoría</label>
+                    <app-select
+                        [options]="categoriaOptions"
+                        [value]="categoriaSeleccionada"
+                        (valueChange)="onCategoriaChange($event)">
+                    </app-select>
+                </div>
+
+                <div class="form-group" *ngIf="torneoSeleccionado">
+                    <label class="form-label"><app-icon name="magnifying-glass"></app-icon> Buscar Jugador</label>
+                    <input
+                        type="text"
+                        [(ngModel)]="busquedaJugador"
+                        (input)="filtrarJugadores()"
+                        placeholder="Buscar por nombre..."
+                        class="form-control">
+                </div>
+            </div>
+
+            <!-- Lista de Jugadores Filtrados -->
+            <div class="jugadores-list" *ngIf="jugadoresFiltrados.length > 0 && torneoSeleccionado">
+                <div class="list-header">
+                    <app-icon name="users"></app-icon>
+                    <span>Selecciona un jugador ({{ jugadoresFiltrados.length }} encontrados)</span>
+                </div>
+                <div class="jugadores-grid">
+                    <div *ngFor="let estadistica of jugadoresFiltrados"
+                         class="jugador-card"
+                         [class.selected]="jugadorSeleccionado === estadistica.jugador?.idJugador"
+                         (click)="seleccionarJugador(estadistica)">
+                        <div class="jugador-avatar-small">
+                            <app-icon name="user"></app-icon>
+                        </div>
+                        <div class="jugador-info-small">
+                            <span class="nombre">
+                                {{ estadistica.jugador?.nombre }}
+                                {{ estadistica.jugador?.apellido1 }}
+                                {{ estadistica.jugador?.apellido2 }}
+                            </span>
+                            <div class="jugador-meta">
+                                <span class="rating" *ngIf="estadistica.jugador?.rating">
+                                    <app-icon name="star"></app-icon>
+                                    {{ estadistica.jugador?.rating }}
+                                </span>
+                                <span class="puntos">
+                                    <app-icon name="trophy"></app-icon>
+                                    {{ estadistica.puntos }} pts
+                                </span>
+                            </div>
+                        </div>
+                        <app-icon name="caret-right" class="arrow-icon"></app-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estados vacíos -->
+            <app-empty-state *ngIf="!torneoSeleccionado"
+                icon="trophy" title="Selecciona un Torneo"
+                description="Elige un torneo para ver los jugadores disponibles">
+            </app-empty-state>
+
+            <app-empty-state *ngIf="torneoSeleccionado && jugadoresFiltrados.length === 0 && !busquedaJugador"
+                icon="users" title="Sin Jugadores"
+                description="No hay jugadores inscritos en este torneo/categoría">
+            </app-empty-state>
+
+            <app-empty-state *ngIf="torneoSeleccionado && jugadoresFiltrados.length === 0 && busquedaJugador"
+                icon="magnifying-glass" title="Sin Resultados"
+                [description]="'No se encontraron jugadores con el término &quot;' + busquedaJugador + '&quot;'">
+            </app-empty-state>
+        </div>
+    </div>
+
+    <!-- Contenido del Historial del Jugador Seleccionado -->
+    <div *ngIf="!cargando && !error && jugadorSeleccionado && estadisticaJugador" class="content-wrapper">
+        <div class="jugador-info-card">
+            <div class="jugador-avatar">
+                <app-icon name="user"></app-icon>
+            </div>
+            <div class="jugador-details">
+                <h2 class="jugador-nombre">
+                    {{ estadisticaJugador.jugador?.nombre }}
+                    {{ estadisticaJugador.jugador?.apellido1 }}
+                    {{ estadisticaJugador.jugador?.apellido2 }}
+                </h2>
+                <app-stat-card-grid [stats]="statCardsJugador"></app-stat-card-grid>
+            </div>
+        </div>
+
+        <div class="partidas-section">
+            <div class="section-header">
+                <app-icon name="list"></app-icon>
+                <h3>Historial de Partidas</h3>
+                <span class="badge">{{ partidasHistorial.length }} partidas</span>
+            </div>
+
+            <app-data-table
+                [columns]="columnasPartidas"
+                [rows]="partidasHistorial"
+                emptyIcon="grid-four"
+                emptyTitle="Sin partidas registradas"
+                emptyDescription="Este jugador aún no tiene partidas registradas en el torneo">
+                <ng-template let-partida>
+                    <tr [ngClass]="getResultadoClase(partida)">
+                        <td>R{{ partida.numeroRonda }}</td>
+                        <td>M{{ partida.numeroMesa }}</td>
+                        <td>
+                            <span class="color-badge" [class.color-blanco]="partida.color === 'blanco'" [class.color-negro]="partida.color === 'negro'">
+                                {{ partida.color === 'blanco' ? 'Blancas' : 'Negras' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="rival-nombre">{{ partida.rival }}</span>
+                            <span class="rival-rating" *ngIf="partida.ratingRival">
+                                <app-icon name="star"></app-icon>
+                                {{ partida.ratingRival }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="resultado-badge" [ngClass]="getResultadoClase(partida)">
+                                {{ getResultadoTexto(partida) }}
+                            </span>
+                            <span class="tipo-finalizacion" *ngIf="partida.tipoFinalizacion">
+                                {{ getTipoFinalizacionTexto(partida.tipoFinalizacion) }}
+                            </span>
+                        </td>
+                        <td class="center">{{ partida.puntosObtenidos }}</td>
+                        <td class="center">{{ partida.puntosAcumulados }}</td>
+                    </tr>
+                </ng-template>
+            </app-data-table>
+        </div>
+    </div>
+</div>

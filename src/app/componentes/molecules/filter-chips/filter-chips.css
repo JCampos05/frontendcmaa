@@ -1,0 +1,32 @@
+.filter-buttons {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: var(--space-3) var(--space-6);
+    border: 2px solid var(--color-light-gray);
+    background: var(--color-white);
+    color: var(--color-slate);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: 600;
+    font-family: var(--font-family);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: var(--transition-base);
+}
+
+.filter-btn:hover {
+    border-color: var(--color-brown);
+    color: var(--color-brown);
+}
+
+.filter-btn.active {
+    background: var(--color-brown);
+    color: var(--color-white);
+    border-color: var(--color-brown);
+}

@@ -1,0 +1,328 @@
+<div class="container">
+    <app-page-header icon="trophy" title="Nueva Liga" subtitle="Complete la información para crear una nueva liga de ajedrez">
+        <app-icon-button actions icon="arrow-left" variant="secondary" ariaLabel="Volver a ligas" (clicked)="cancelar()"></app-icon-button>
+    </app-page-header>
+
+    <form [formGroup]="ligaForm" (ngSubmit)="guardarLiga()">
+        <!-- Información General -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('informacionGeneral')">
+                <app-icon name="info" weight="regular"></app-icon>
+                <h2>Información General</h2>
+                <app-icon [name]="seccionesAbiertas.informacionGeneral ? 'caret-up' : 'caret-down'"></app-icon>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.informacionGeneral">
+                <div class="form-group full-width">
+                    <label>
+                        <app-icon name="trophy"></app-icon>
+                        Nombre de la Liga
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" formControlName="nombre" placeholder="Ej: Liga de Ajedrez Los Mochis 2025"
+                        class="form-control" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label>
+                        <app-icon name="file-text"></app-icon>
+                        Descripción
+                    </label>
+                    <textarea formControlName="descripcion" rows="3"
+                        placeholder="Descripción general de la liga..."
+                        class="form-control"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="calendar"></app-icon>
+                            Fecha de Inicio
+                            <span class="required">*</span>
+                        </label>
+                        <input type="date" formControlName="fecha_inicio" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="calendar-x"></app-icon>
+                            Fecha de Finalización
+                        </label>
+                        <input type="date" formControlName="fecha_fin" class="form-control" />
+                        <small class="help-text">
+                            <app-icon name="info" weight="regular"></app-icon>
+                            Opcional: Fecha estimada de finalización
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="clock-clockwise"></app-icon>
+                            Cierre de Inscripciones
+                        </label>
+                        <input type="datetime-local" formControlName="cierre_inscripciones" class="form-control" />
+                        <small class="help-text">
+                            <app-icon name="info" weight="regular"></app-icon>
+                            Fecha y hora límite para inscribirse
+                        </small>
+                        <div class="validation-error" *ngIf="errorCierreInscripciones">
+                            <app-icon name="warning"></app-icon>
+                            {{ errorCierreInscripciones }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="map-pin"></app-icon>
+                            Sede Principal
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" formControlName="lugar" placeholder="Ej: Club de Ajedrez Los Mochis"
+                            class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="buildings"></app-icon>
+                            Dirección Completa
+                        </label>
+                        <input type="text" formControlName="direccion"
+                            placeholder="Ej: Blvd. Rosales #123, Col. Centro" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="tree-structure"></app-icon>
+                            Sistema de la Liga
+                            <span class="required">*</span>
+                        </label>
+                        <select formControlName="tipo_sistema" class="form-control">
+                            <option *ngFor="let tipo of tiposSistema" [value]="tipo.value">
+                                {{ tipo.label }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="users"></app-icon>
+                            Número de Grupos
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" formControlName="num_grupos" min="1" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="trophy"></app-icon>
+                            Clasifican por Grupo
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" formControlName="clasifican_por_grupo" min="1" class="form-control" />
+                        <small class="help-text">
+                            <app-icon name="info" weight="regular"></app-icon>
+                            Cuántos jugadores pasan a la siguiente fase
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="clock"></app-icon>
+                            Ritmo de Juego
+                        </label>
+                        <select formControlName="idRitmoJuego" class="form-control">
+                            <option [value]="null">Seleccione un ritmo...</option>
+                            <option *ngFor="let ritmo of ritmosJuego" [value]="ritmo.idRitmoJuego">
+                                {{ ritmo.nombre }} - {{ ritmo.descripcion }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="hash"></app-icon>
+                            Costo de Inscripción
+                        </label>
+                        <input type="number" formControlName="costo_inscripcion" min="0" step="0.01"
+                            class="form-control" placeholder="0.00" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <app-icon name="users"></app-icon>
+                            Máximo de Jugadores
+                        </label>
+                        <input type="number" formControlName="max_jugadores" min="1" class="form-control"
+                            placeholder="Ilimitado" />
+                        <small class="help-text">
+                            <app-icon name="info" weight="regular"></app-icon>
+                            Dejar vacío para ilimitado
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración de Grupos -->
+        <div class="section" *ngIf="grupos.length > 0">
+            <div class="section-header" (click)="toggleSeccion('grupos')">
+                <app-icon name="stack"></app-icon>
+                <h2>Configuración de Grupos</h2>
+                <app-icon [name]="seccionesAbiertas.grupos ? 'caret-up' : 'caret-down'"></app-icon>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.grupos">
+                <div formArrayName="grupos">
+                    <ng-container *ngFor="let grupo of grupos.controls; let i = index">
+                        <div class="grupo-config" [formGroupName]="i">
+                            <h3 class="grupo-titulo">
+                                <app-icon name="users"></app-icon>
+                                {{ grupo.get('nombre')?.value }}
+                            </h3>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        Nombre del Grupo
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" formControlName="nombre" class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        Máximo de Jugadores
+                                    </label>
+                                    <input type="number" formControlName="max_jugadores" min="1" class="form-control"
+                                        placeholder="Ilimitado" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>
+                                        Número de Rondas
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" formControlName="rondas" min="1" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>
+                                    Descripción del Grupo
+                                </label>
+                                <textarea formControlName="descripcion" rows="2"
+                                    placeholder="Descripción opcional..." class="form-control"></textarea>
+                            </div>
+
+                            <!-- Premios del Grupo -->
+                            <div class="subsection">
+                                <h3>
+                                    <app-icon name="medal"></app-icon>
+                                    Premios del Grupo
+                                </h3>
+
+                                <div formArrayName="premios" class="premios-content">
+                                    <ng-container *ngFor="let premio of getPremios(i).controls; let j = index">
+                                        <div class="premio-lugar" [formGroupName]="j">
+                                            <div class="lugar-header">
+                                                <label>
+                                                    <app-icon name="medal" [ngClass]="{
+                                                        'medal-gold': j === 0,
+                                                        'medal-silver': j === 1,
+                                                        'medal-bronze': j === 2,
+                                                        'medal-other': j > 2
+                                                    }"></app-icon>
+                                                    {{ premio.get('descripcion')?.value || 'Lugar ' + (j + 1) }}
+                                                </label>
+                                                <app-icon-button
+                                                    *ngIf="getPremios(i).length > 1"
+                                                    icon="trash"
+                                                    variant="danger"
+                                                    ariaLabel="Eliminar premio"
+                                                    [disabled]="getPremios(i).length === 1"
+                                                    (clicked)="eliminarPremio(i, j)">
+                                                </app-icon-button>
+                                            </div>
+                                            <input type="text" formControlName="monto" placeholder="$1500 o Trofeo"
+                                                class="form-control" />
+                                        </div>
+                                    </ng-container>
+                                </div>
+
+                                <app-button variant="secondary" icon="plus" [block]="true" (clicked)="agregarPremio(i)">
+                                    Agregar Lugar
+                                </app-button>
+                            </div>
+
+                            <!-- Sistemas de Desempate -->
+                            <div class="subsection desempates-section">
+                                <h3>
+                                    <app-icon name="sliders"></app-icon>
+                                    Sistemas de Desempate
+                                    <span class="required">*</span>
+                                </h3>
+                                <p class="help-text">
+                                    <app-icon name="info" weight="regular"></app-icon>
+                                    Seleccione al menos dos sistemas en orden de prioridad
+                                </p>
+
+                                <div class="desempates-grid">
+                                    <div *ngFor="let sistema of sistemasDesempate" class="desempate-card"
+                                        [ngClass]="{'selected': isDesempateSeleccionado(i, sistema.idDesempate!)}"
+                                        (click)="toggleDesempate(i, sistema.idDesempate!)">
+
+                                        <div class="prioridad-badge" *ngIf="isDesempateSeleccionado(i, sistema.idDesempate!)">
+                                            {{ getPrioridadDesempate(i, sistema.idDesempate!) }}
+                                        </div>
+
+                                        <div class="checkbox-icon">
+                                            <app-icon [name]="isDesempateSeleccionado(i, sistema.idDesempate!) ? 'check-square' : 'square'"></app-icon>
+                                        </div>
+                                        <div class="desempate-info">
+                                            <h4>{{ sistema.nombre }}</h4>
+                                            <p>{{ sistema.descripcion }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notas Adicionales -->
+        <div class="section">
+            <div class="section-header" (click)="toggleSeccion('notas')">
+                <app-icon name="file-text"></app-icon>
+                <h2>Notas Adicionales</h2>
+                <app-icon [name]="seccionesAbiertas.notas ? 'caret-up' : 'caret-down'"></app-icon>
+            </div>
+
+            <div class="section-content" *ngIf="seccionesAbiertas.notas">
+                <textarea formControlName="notas" rows="4"
+                    placeholder="Ingrese información adicional sobre la liga, reglas especiales, información de contacto, etc."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="form-actions">
+            <app-button variant="ghost" icon="x" (clicked)="cancelar()">Cancelar</app-button>
+            <app-button variant="primary" icon="check" type="submit" [loading]="loading" [disabled]="loading || ligaForm.invalid">
+                {{ loading ? 'Guardando...' : 'Crear Liga' }}
+            </app-button>
+        </div>
+
+        <div class="error-message" *ngIf="error">
+            <app-icon name="warning-circle"></app-icon>
+            {{ error }}
+        </div>
+    </form>
+</div>

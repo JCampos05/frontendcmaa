@@ -12,6 +12,7 @@ export * from './ritmo-juego';
 export * from './sistema-competencia';
 export * from './sistema-desempates';
 export * from './sistema-pago';
+export * from './patrocinador';
 
 // Usuarios
 export * from './usuario';

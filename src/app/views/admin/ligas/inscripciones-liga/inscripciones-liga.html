@@ -1,0 +1,411 @@
+<div class="inscripciones-admin-container">
+    <app-toast-noti></app-toast-noti>
+
+    <app-page-header icon="users" [title]="'Inscripciones - ' + (ligaSeleccionada?.nombre || 'Liga')"
+        [subtitle]="formatearFecha(ligaSeleccionada?.fecha_inicio) + ' - ' + (ligaSeleccionada?.lugar || '')"
+        [hasActions]="false">
+    </app-page-header>
+
+    <app-state-message *ngIf="cargando" mode="loading" title="Cargando información..."></app-state-message>
+
+    <div *ngIf="error && !cargando" class="error-container">
+        <app-state-message mode="error" [title]="error"></app-state-message>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarLigaActual()">Reintentar</app-button>
+    </div>
+
+    <app-empty-state *ngIf="sinDatos && !cargando && !error"
+        icon="handshake" [title]="sinDatos" description="Activa una liga para ver sus inscripciones">
+    </app-empty-state>
+
+    <!-- Contenido Principal -->
+    <div *ngIf="!cargando && !error && !sinDatos" class="content-wrapper">
+
+        <!-- Selector de Liga -->
+        <div class="filtros-section">
+            <div class="filtros-header">
+                <app-icon name="tree-structure"></app-icon>
+                <h3>Seleccionar Liga</h3>
+            </div>
+            <div class="filtros-grid">
+                <div class="filtro-item">
+                    <label>
+                        <app-icon name="trophy"></app-icon>
+                        Liga Activa
+                    </label>
+                    <app-select [options]="ligaOptions" [value]="ligaSeleccionada"
+                        (valueChange)="onLigaSeleccionadaChange($event)">
+                    </app-select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas Generales -->
+        <app-stat-card-grid *ngIf="estadisticasGenerales" [stats]="statCards"></app-stat-card-grid>
+
+        <!-- Gráficos por Grupo -->
+        <div class="categorias-section">
+            <div class="section-header">
+                <app-icon name="chart-pie"></app-icon>
+                <h2>Estadísticas por Grupo</h2>
+            </div>
+
+            <app-filter-chips [options]="grupoFilterOptions" [active]="grupoFilterActive"
+                (change)="onGrupoFilterChange($event)">
+            </app-filter-chips>
+
+            <div class="categorias-grid" *ngIf="grupoSeleccionado === null">
+                <div *ngFor="let grupo of estadisticasPorGrupo" class="categoria-stats-card">
+                    <div class="categoria-header-stats">
+                        <app-icon name="users"></app-icon>
+                        <h3>{{ grupo.nombreGrupo }}</h3>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <app-icon name="users"></app-icon>
+                            <span class="stat-label">Inscritos</span>
+                            <span class="stat-value">{{ grupo.totalInscritos }}</span>
+                        </div>
+
+                        <div class="stat-item">
+                            <app-icon name="check-circle"></app-icon>
+                            <span class="stat-label">Pagados</span>
+                            <span class="stat-value">{{ grupo.pagosConfirmados }}</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="getPorcentajePagosPorGrupo(grupo)"></div>
+                        <span class="progress-text">{{ getPorcentajePagosPorGrupo(grupo) | number:'1.0-0' }}%
+                            pagado</span>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <app-icon name="credit-card"></app-icon>
+                            <span class="stat-label">Recaudado</span>
+                            <span class="stat-value">${{ grupo.totalRecaudado | number:'1.2-2' }}</span>
+                        </div>
+
+                        <div class="stat-item">
+                            <app-icon name="chart-line"></app-icon>
+                            <span class="stat-label">Rating Prom.</span>
+                            <span class="stat-value">{{ grupo.promedioRating | number:'1.0-0' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="rating-range" *ngIf="grupo.ratingMasAlto > 0">
+                        <span class="range-label">Rating:</span>
+                        <span class="range-value">{{ grupo.ratingMasBajo }} - {{ grupo.ratingMasAlto }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros-section">
+            <div class="filtros-header">
+                <app-icon name="funnel"></app-icon>
+                <h3>Filtros</h3>
+            </div>
+
+            <div class="filtros-grid">
+                <div class="filtro-item">
+                    <label>
+                        <app-icon name="magnifying-glass"></app-icon>
+                        Buscar por nombre
+                    </label>
+                    <app-search-bar [value]="filtroNombre" placeholder="Nombre del jugador..."
+                        (search)="onFiltroNombreChange($event)">
+                    </app-search-bar>
+                </div>
+
+                <div class="filtro-item">
+                    <label>
+                        <app-icon name="users"></app-icon>
+                        Filtrar por Grupo
+                    </label>
+                    <app-select [options]="grupoFiltroOptions" [value]="filtroGrupo"
+                        (valueChange)="onFiltroGrupoChange($event)">
+                    </app-select>
+                </div>
+
+                <div class="filtro-item">
+                    <label>
+                        <app-icon name="credit-card"></app-icon>
+                        Estado de Pago
+                    </label>
+                    <app-select [options]="estadoPagoOptions" [value]="filtroEstadoPago"
+                        (valueChange)="onFiltroEstadoPagoChange($event)">
+                    </app-select>
+                </div>
+
+                <div class="filtro-item">
+                    <label>
+                        <app-icon name="list"></app-icon>
+                        Estado de Inscripción
+                    </label>
+                    <app-select [options]="estadoInscripcionOptions" [value]="filtroEstadoInscripcion"
+                        (valueChange)="onFiltroEstadoInscripcionChange($event)">
+                    </app-select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Inscripciones -->
+        <div class="tabla-section">
+            <div class="tabla-header">
+                <div class="tabla-titulo">
+                    <app-icon name="table"></app-icon>
+                    <h3>Inscripciones Detalladas</h3>
+                    <span class="badge">{{ inscripcionesFiltradas.length }} registros</span>
+                </div>
+            </div>
+
+            <app-data-table [columns]="columns" [rows]="inscripcionesPaginadas" [sortKey]="columnaOrden"
+                [sortDir]="direccionOrden" emptyIcon="tray" emptyTitle="No se encontraron inscripciones"
+                emptyDescription="Ajusta los filtros aplicados" (sortChange)="onSortChange($event)">
+                <ng-template let-insc>
+                    <tr>
+                        <td class="nombre-cell">
+                            <div class="cell-avatar">
+                                <div class="avatar">
+                                    <app-icon name="user"></app-icon>
+                                </div>
+                                <span>{{ insc.jugador?.nombre }} {{ insc.jugador?.apellido1 }} {{
+                                    insc.jugador?.apellido2 }}</span>
+                            </div>
+                        </td>
+                        <td>{{ formatearTelefono(insc.jugador?.telefono) }}</td>
+                        <td>
+                            <span class="category-badge">{{ insc.grupo?.nombre }}</span>
+                        </td>
+                        <td class="center">
+                            <div class="pago-cell">
+                                <app-badge [status]="getEstadoPagoBadgeStatus(insc)"
+                                    [text]="getEstadoPagoTexto(insc)" [icon]="getEstadoPagoIcono(insc)"></app-badge>
+
+                                <span class="monto-cell">${{ getMontoPagado(insc) | number:'1.2-2' }}</span>
+
+                                <span *ngIf="getEstadoPago(insc) === 'parcial'" class="monto-de">
+                                    de ${{ (ligaSeleccionada?.costo_inscripcion || 0) | number:'1.2-2' }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="center">
+                            <app-badge [status]="getEstadoBadgeStatus(insc.estado)" [text]="insc.estado"></app-badge>
+                        </td>
+                        <td class="center acciones-cell">
+                            <div class="acciones-group">
+                                <app-icon-button icon="eye" variant="info" ariaLabel="Ver detalles"
+                                    (clicked)="verDetalles(insc)">
+                                </app-icon-button>
+                                <app-icon-button icon="pencil-simple" variant="warning" ariaLabel="Editar"
+                                    (clicked)="editarInscripcion(insc)">
+                                </app-icon-button>
+                                <app-icon-button *ngIf="puedePagarInscripcion(insc)" icon="check" variant="success"
+                                    [ariaLabel]="'Confirmar pago de $' + (ligaSeleccionada?.costo_inscripcion || 0)"
+                                    (clicked)="confirmarPago(insc)">
+                                </app-icon-button>
+                                <app-icon-button icon="trash" variant="danger" ariaLabel="Eliminar"
+                                    (clicked)="eliminarInscripcion(insc)">
+                                </app-icon-button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </app-data-table>
+
+            <!-- Controles de Paginación -->
+            <div class="pagination" *ngIf="inscripcionesFiltradas.length > 0">
+                <div class="pagination-info">
+                    <span>
+                        Mostrando
+                        <strong>{{ (paginaActual - 1) * registrosPorPagina + 1 }}</strong>
+                        a
+                        <strong>{{ Math.min(paginaActual * registrosPorPagina, inscripcionesFiltradas.length)
+                            }}</strong>
+                        de
+                        <strong>{{ inscripcionesFiltradas.length }}</strong>
+                        registros
+                    </span>
+                </div>
+
+                <div class="pagination-controls">
+                    <button class="pagination-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(1)"
+                        title="Primera página">«</button>
+
+                    <button class="pagination-btn" [disabled]="paginaActual === 1"
+                        (click)="cambiarPagina(paginaActual - 1)" title="Página anterior">‹</button>
+
+                    <div class="pagination-numbers">
+                        <button *ngFor="let pagina of paginasVisibles" class="pagination-btn"
+                            [class.pagination-btn--active]="pagina === paginaActual"
+                            [class.pagination-btn--dots]="pagina === -1" [disabled]="pagina === -1"
+                            (click)="pagina !== -1 && cambiarPagina(pagina)">
+                            {{ pagina === -1 ? '...' : pagina }}
+                        </button>
+                    </div>
+
+                    <button class="pagination-btn" [disabled]="paginaActual === totalPaginas"
+                        (click)="cambiarPagina(paginaActual + 1)" title="Página siguiente">›</button>
+
+                    <button class="pagination-btn" [disabled]="paginaActual === totalPaginas"
+                        (click)="cambiarPagina(totalPaginas)" title="Última página">»</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="modal-overlay" *ngIf="modalDetallesVisible" (click)="cerrarModal()">
+        <div class="modal-container modal--md" (click)="$event.stopPropagation()">
+            <div class="modal-header modal-header--gradient">
+                <div class="modal-title">
+                    <app-icon class="modal-title-icon" name="user" weight="fill"></app-icon>
+                    <div class="modal-title-text">
+                        <h2>Detalles de Inscripción</h2>
+                    </div>
+                </div>
+                <button class="modal-close modal-close--light" (click)="cerrarModal()">
+                    <app-icon name="x"></app-icon>
+                </button>
+            </div>
+
+            <div class="modal-body" *ngIf="inscripcionSeleccionada">
+                <!-- Información del Jugador -->
+                <div class="modal-section">
+                    <div class="modal-section-title">
+                        <app-icon class="modal-section-title-icon" name="user"></app-icon>
+                        <h3>Información del Jugador</h3>
+                    </div>
+                    <div class="modal-detail-grid">
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Nombre completo:</span>
+                            <span class="modal-detail-value">
+                                {{ inscripcionSeleccionada.jugador?.nombre }}
+                                {{ inscripcionSeleccionada.jugador?.apellido1 }}
+                                {{ inscripcionSeleccionada.jugador?.apellido2 }}
+                            </span>
+                        </div>
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Teléfono:</span>
+                            <span class="modal-detail-value">{{
+                                formatearTelefono(inscripcionSeleccionada.jugador?.telefono) }}</span>
+                        </div>
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Rating:</span>
+                            <span class="modal-detail-value">
+                                <span class="rating-badge"
+                                    *ngIf="inscripcionSeleccionada.jugador?.rating && inscripcionSeleccionada.jugador?.rating! > 0">
+                                    <app-icon name="star"></app-icon>
+                                    {{ inscripcionSeleccionada.jugador?.rating }}
+                                </span>
+                                <span
+                                    *ngIf="!inscripcionSeleccionada.jugador?.rating || inscripcionSeleccionada.jugador?.rating === 0">Sin
+                                    rating</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la Inscripción -->
+                <div class="modal-section">
+                    <div class="modal-section-title">
+                        <app-icon class="modal-section-title-icon" name="file-text"></app-icon>
+                        <h3>Información de la Inscripción</h3>
+                    </div>
+                    <div class="modal-detail-grid">
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Grupo:</span>
+                            <span class="modal-detail-value">
+                                <span class="category-badge">{{ inscripcionSeleccionada.grupo?.nombre
+                                    }}</span>
+                            </span>
+                        </div>
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Fecha de inscripción:</span>
+                            <span class="modal-detail-value">{{
+                                formatearFechaCompleta(inscripcionSeleccionada.fecha_inscripcion) }}</span>
+                        </div>
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Estado de inscripción:</span>
+                            <span class="modal-detail-value">
+                                <app-badge [status]="getEstadoBadgeStatus(inscripcionSeleccionada.estado)"
+                                    [text]="inscripcionSeleccionada.estado || ''"></app-badge>
+                            </span>
+                        </div>
+
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Costo de inscripción:</span>
+                            <span class="modal-detail-value monto-modal">
+                                ${{ (ligaSeleccionada?.costo_inscripcion || 0) | number:'1.2-2' }}
+                            </span>
+                        </div>
+
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Monto pagado:</span>
+                            <span class="modal-detail-value monto-modal">
+                                ${{ getMontoPagado(inscripcionSeleccionada) | number:'1.2-2' }}
+                            </span>
+                        </div>
+
+                        <div class="modal-detail-item">
+                            <span class="modal-detail-label">Estado de pago:</span>
+                            <span class="modal-detail-value">
+                                <app-badge [status]="getEstadoPagoBadgeStatus(inscripcionSeleccionada)"
+                                    [text]="getEstadoPagoTexto(inscripcionSeleccionada)"
+                                    [icon]="getEstadoPagoIcono(inscripcionSeleccionada)"></app-badge>
+                            </span>
+                        </div>
+
+                        <div class="modal-detail-item full-width alert-warning"
+                            *ngIf="getEstadoPago(inscripcionSeleccionada) === 'parcial'">
+                            <div class="alert-warning-title">
+                                <app-icon name="warning-circle"></app-icon>
+                                <span>Pago Parcial Detectado</span>
+                            </div>
+                            <span class="alert-warning-text">
+                                Falta por pagar: ${{ (ligaSeleccionada?.costo_inscripcion || 0) -
+                                getMontoPagado(inscripcionSeleccionada) | number:'1.2-2' }}
+                            </span>
+                        </div>
+
+                        <div class="modal-detail-item full-width" *ngIf="inscripcionSeleccionada.notas">
+                            <span class="modal-detail-label">Notas:</span>
+                            <span class="modal-detail-value">{{ inscripcionSeleccionada.notas }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones en el Modal -->
+            <div class="modal-footer" *ngIf="inscripcionSeleccionada">
+                <app-button *ngIf="!inscripcionSeleccionada.pago_confirmado" variant="success" icon="check-circle"
+                    (clicked)="confirmarPagoModal()">
+                    Confirmar Pago
+                </app-button>
+                <app-button variant="danger" icon="trash" (clicked)="eliminarInscripcionModal()">
+                    Eliminar
+                </app-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Pago -->
+    <app-modal-confirmacion [mostrar]="mostrarModalConfirmacion" [titulo]="'Confirmar Pago'"
+        [mensaje]="getMensajeConfirmacion()" [mensajeSecundario]="getMensajeSecundarioConfirmacion()"
+        [textoConfirmar]="'Confirmar Pago'" [textoCancelar]="'Cancelar'" [tipoBotonPrimario]="'secondary'"
+        [icono]="'fa-circle-dollar-to-slot'" [iconoBotonPrimario]="'fa-check-circle'" (confirmar)="onConfirmarPago()"
+        (cancelar)="onCancelarConfirmacion()">
+    </app-modal-confirmacion>
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <app-modal-confirmacion [mostrar]="mostrarModalEliminacion" [titulo]="'Eliminar Inscripción'"
+        [mensaje]="getMensajeEliminacion()" [mensajeSecundario]="getMensajeSecundarioEliminacion()"
+        [textoConfirmar]="'Eliminar'" [textoCancelar]="'Cancelar'" [tipoBotonPrimario]="'danger'"
+        [icono]="'fa-triangle-exclamation'" [iconoBotonPrimario]="'fa-trash'" [tipoAdvertencia]="true"
+        (confirmar)="onConfirmarEliminacion()" (cancelar)="onCancelarEliminacion()">
+    </app-modal-confirmacion>
+</div>

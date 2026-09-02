@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../environment/enviroment';
 import { Mesa, CreateMesaDto, UpdateMesaDto } from '../models/mesa';
 
 export interface DisponibilidadMesa {

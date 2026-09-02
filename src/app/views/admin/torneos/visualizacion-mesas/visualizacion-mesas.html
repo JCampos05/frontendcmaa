@@ -1,0 +1,252 @@
+<div class="visualizacion-container">
+    <app-page-header icon="grid-four" title="Visualización de Mesas" subtitle="Consulta los resultados de todos los torneos" [hasActions]="false"></app-page-header>
+
+    <app-state-message *ngIf="cargandoTorneos" mode="loading" title="Cargando torneos..."></app-state-message>
+
+    <div *ngIf="error && !cargandoTorneos" class="error-container">
+        <app-state-message mode="error" [title]="error"></app-state-message>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="reintentar()">Reintentar</app-button>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div *ngIf="!cargandoTorneos && !error" class="content-wrapper">
+
+        <!-- Selectores -->
+        <div class="selectores-section">
+            <div class="selector-group">
+                <label>
+                    <app-icon name="trophy"></app-icon>
+                    Torneo
+                </label>
+                <app-select [options]="torneoOptions" [value]="torneoSeleccionado" placeholder="Seleccionar torneo" (valueChange)="onTorneoSelect($event)"></app-select>
+            </div>
+
+            <div class="selector-group">
+                <label>
+                    <app-icon name="stack"></app-icon>
+                    Categoría
+                </label>
+                <app-select
+                    [options]="categoriaOptions"
+                    [value]="categoriaSeleccionada"
+                    placeholder="Seleccionar categoría"
+                    [disabled]="!torneoSeleccionado || cargandoCategorias || categorias.length === 0"
+                    (valueChange)="onCategoriaSelect($event)">
+                </app-select>
+                <span *ngIf="cargandoCategorias" class="loading-mini">
+                    <app-icon name="spinner" [spin]="true"></app-icon>
+                </span>
+            </div>
+
+            <div class="selector-group">
+                <label>
+                    <app-icon name="list-numbers"></app-icon>
+                    Ronda
+                </label>
+                <app-select
+                    [options]="rondaOptions"
+                    [value]="rondaSeleccionada"
+                    placeholder="Seleccionar ronda"
+                    [disabled]="!categoriaSeleccionada || cargandoRondas || rondasDisponibles.length === 0"
+                    (valueChange)="onRondaSelect($event)">
+                </app-select>
+                <span *ngIf="cargandoRondas" class="loading-mini">
+                    <app-icon name="spinner" [spin]="true"></app-icon>
+                </span>
+            </div>
+        </div>
+
+        <!-- Información del Torneo Seleccionado -->
+        <div class="torneo-info" *ngIf="torneoSeleccionado">
+            <div class="info-card-main">
+                <div class="info-header-main">
+                    <app-icon name="info"></app-icon>
+                    <h3>Información del Torneo</h3>
+                </div>
+                <div class="info-body-main">
+                    <div class="info-item-main">
+                        <span class="info-label-main">Nombre:</span>
+                        <span class="info-value-main">{{ torneoSeleccionado.nombre || 'Sin nombre' }}</span>
+                    </div>
+                    <div class="info-item-main">
+                        <span class="info-label-main">Lugar:</span>
+                        <span class="info-value-main">{{ torneoSeleccionado.lugar }}</span>
+                    </div>
+                    <div class="info-item-main">
+                        <span class="info-label-main">Fecha:</span>
+                        <span class="info-value-main">{{ formatearFecha(torneoSeleccionado.fecha) }}</span>
+                    </div>
+                    <div class="info-item-main">
+                        <span class="info-label-main">Hora:</span>
+                        <span class="info-value-main">{{ torneoSeleccionado.hora_inicio | horaAmPm }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info de la Ronda Actual -->
+        <div class="ronda-info" *ngIf="rondaActualData && categoriaSeleccionada">
+            <div class="info-card">
+                <div class="info-header">
+                    <app-icon name="info"></app-icon>
+                    <h3>Estado de la Ronda {{ rondaSeleccionada }}</h3>
+                </div>
+                <div class="info-body">
+                    <div class="info-item">
+                        <span class="info-label">Estado:</span>
+                        <app-badge [status]="getEstadoRondaBadgeStatus(rondaActualData.estado)" [text]="(rondaActualData.estado | uppercase) || ''"></app-badge>
+                    </div>
+                    <div class="info-item" *ngIf="rondaActualData.fecha_inicio">
+                        <span class="info-label">Inicio:</span>
+                        <span>{{ formatearFechaHora(rondaActualData.fecha_inicio) }}</span>
+                    </div>
+                    <div class="info-item" *ngIf="rondaActualData.fecha_fin">
+                        <span class="info-label">Fin:</span>
+                        <span>{{ formatearFechaHora(rondaActualData.fecha_fin) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Mesas:</span>
+                        <span>{{ mesasRonda.length }} totales</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Finalizadas:</span>
+                        <span>{{ getMesasFinalizadas() }} / {{ mesasRonda.length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <app-state-message *ngIf="cargandoMesas" mode="loading" title="Cargando mesas..."></app-state-message>
+
+        <!-- Grid de Mesas (sin tocar: layout operativo, mismos iconos FA que antes) -->
+        <div class="mesas-section" *ngIf="!cargandoMesas && mesasRonda.length > 0">
+            <div class="section-header">
+                <i class="fa-solid fa-chess-board"></i>
+                <h2>Mesas de la Ronda</h2>
+                <span class="badge">{{ mesasRonda.length }} mesas</span>
+            </div>
+
+            <div class="mesas-grid">
+                <div *ngFor="let mesa of mesasRonda"
+                     class="mesa-card"
+                     [ngClass]="getMesaEstadoClase(mesa.estado)">
+
+                    <div class="mesa-header">
+                        <div class="mesa-numero">
+                            <i class="fa-solid fa-chess-board"></i>
+                            <span>Mesa {{ mesa.numeroMesa }}</span>
+                        </div>
+                        <span class="mesa-status" [ngClass]="getMesaEstadoClase(mesa.estado)">
+                            <i class="fa-solid fa-circle"></i>
+                        </span>
+                    </div>
+
+                    <div class="mesa-jugadores">
+                        <!-- Jugador Blanco -->
+                        <div class="jugador-item jugador-blanco">
+                            <div class="jugador-color">
+                                <i class="fa-solid fa-square"></i>
+                            </div>
+                            <div class="jugador-info">
+                                <span class="jugador-nombre">
+                                    {{ mesa.jugador_blanco?.nombre }} {{ mesa.jugador_blanco?.apellido1 }}
+                                </span>
+                                <span class="jugador-rating" *ngIf="mesa.jugador_blanco?.rating">
+                                    <i class="fa-solid fa-star"></i>
+                                    {{ mesa.jugador_blanco?.rating }}
+                                </span>
+                            </div>
+                            <div class="jugador-ilegales" *ngIf="mesa.ilegalesBlanco > 0">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                {{ mesa.ilegalesBlanco }}
+                            </div>
+                        </div>
+
+                        <div class="vs-separator">vs</div>
+
+                        <!-- Jugador Negro -->
+                        <div class="jugador-item jugador-negro">
+                            <div class="jugador-color">
+                                <i class="fa-solid fa-square"></i>
+                            </div>
+                            <div class="jugador-info">
+                                <span class="jugador-nombre">
+                                    {{ mesa.jugador_negro?.nombre }} {{ mesa.jugador_negro?.apellido1 }}
+                                </span>
+                                <span class="jugador-rating" *ngIf="mesa.jugador_negro?.rating">
+                                    <i class="fa-solid fa-star"></i>
+                                    {{ mesa.jugador_negro?.rating }}
+                                </span>
+                            </div>
+                            <div class="jugador-ilegales" *ngIf="mesa.ilegalesNegro > 0">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                {{ mesa.ilegalesNegro }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resultado -->
+                    <div class="mesa-resultado" *ngIf="mesa.partida">
+                        <div class="resultado-badge">
+                            <i class="fa-solid fa-trophy"></i>
+                            {{ mesa.partida.resultado }}
+                        </div>
+                        <div class="resultado-tipo" *ngIf="mesa.partida.tipo_finalizacion">
+                            <i class="fa-solid fa-info-circle"></i>
+                            {{ getTipoFinalizacionTexto(mesa.partida.tipo_finalizacion) }}
+                        </div>
+                    </div>
+
+                    <!-- Estado pendiente -->
+                    <div class="mesa-pendiente-info" *ngIf="!mesa.partida && mesa.estado !== 'finalizada'">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>Partida {{ mesa.estado === 'en_curso' ? 'en curso' : 'pendiente' }}</span>
+                    </div>
+
+                    <!-- Notas -->
+                    <div class="mesa-notas" *ngIf="mesa.notas">
+                        <i class="fa-solid fa-note-sticky"></i>
+                        <span>{{ mesa.notas }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <app-empty-state
+            *ngIf="!cargandoMesas && categoriaSeleccionada && rondaActualData && mesasRonda.length === 0"
+            icon="grid-four"
+            title="No hay mesas en esta ronda"
+            description="Esta ronda aún no tiene mesas configuradas">
+        </app-empty-state>
+
+        <app-empty-state
+            *ngIf="categoriaSeleccionada && !rondaActualData && !cargandoRondas"
+            icon="info"
+            title="No hay rondas disponibles"
+            description="Esta categoría aún no tiene rondas creadas">
+        </app-empty-state>
+
+        <app-empty-state
+            *ngIf="torneoSeleccionado && !categoriaSeleccionada && categorias.length > 0 && !cargandoCategorias"
+            icon="stack"
+            title="Selecciona una categoría"
+            description="Elige una categoría del menú desplegable para ver sus rondas y mesas">
+        </app-empty-state>
+
+        <app-empty-state
+            *ngIf="!torneoSeleccionado && torneos.length > 0"
+            icon="trophy"
+            title="Selecciona un torneo"
+            description="Elige un torneo del menú desplegable para comenzar">
+        </app-empty-state>
+
+        <app-empty-state
+            *ngIf="!torneoSeleccionado && torneos.length === 0"
+            icon="tray"
+            title="No hay torneos disponibles"
+            description="Aún no se han registrado torneos en el sistema">
+        </app-empty-state>
+    </div>
+</div>
+
+<app-toast-noti></app-toast-noti>

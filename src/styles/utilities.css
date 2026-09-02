@@ -1,0 +1,697 @@
+/*
+ * utilities.css — Patrones de UI Reutilizables
+ *
+ * PROBLEMA QUE RESUELVE:
+ * Al analizar los 54 archivos CSS del proyecto se identificaron 8 patrones
+ * de UI copiados literalmente en 5 o más archivos cada uno. Esto significaba
+ * que cambiar el radio de las cards, el padding del header de página, o
+ * el color del estado "confirmado" requería editar más de 10 archivos.
+ *
+ * Este archivo extrae esos patrones como clases globales reutilizables.
+ * Los componentes nuevos usan estas clases directamente en su HTML.
+ * Los componentes existentes se migran al remodelarse cada vista.
+ *
+ * SECCIONES:
+ *   1. Layout de página (page-header, content-wrapper)
+ *   2. Cards / Secciones (section-card, section-header)
+ *   3. Cards de estadísticas (stat-card)
+ *   4. Estados de carga, error y vacío
+ *   5. Formularios (form-control, form-group, form-label)
+ *   6. Badges de estado (status-badge)
+ *   7. Badges genéricos (badge, rating-badge, category-badge)
+ *   8. Avatar
+ *   9. Paginación
+ *  10. Grids responsivos
+ */
+
+/* ================================================================
+ * 1. LAYOUT DE PÁGINA
+ *
+ * Patrón: encabezado blanco con ícono degradado + título + subtítulo.
+ * Duplicado en: torneo-actual, mesas-torneo, inscripciones-torneo,
+ * gestion-jugadores, resultados-torneo, estadisticas-pagos y más.
+ * ================================================================ */
+
+.page-header {
+    background: var(--color-white);
+    padding: var(--space-8);
+    margin-bottom: var(--space-8);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+/* Ícono cuadrado con degradado marrón → navy */
+.page-header-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-dark-navy) 100%);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-white);
+    font-size: var(--text-2xl);
+}
+
+/* Área de texto del header */
+.page-header-text {
+    flex: 1;
+}
+
+.page-header-text h1 {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.page-header-text p {
+    color: var(--color-slate);
+    font-size: var(--text-base);
+    margin: 0;
+}
+
+/* Área opcional de acciones a la derecha del header */
+.page-header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ================================================================
+ * 2. CARDS / SECCIONES
+ *
+ * .section-card — contenedor blanco con sombra (el más repetido)
+ * .section-header — encabezado interno de una sección dentro de card
+ * ================================================================ */
+
+.section-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.section-header {
+    padding: var(--space-6);
+    border-bottom: 2px solid var(--color-light-gray);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.section-header-icon {
+    font-size: var(--text-2xl);
+    color: var(--color-brown);
+}
+
+.section-header h2,
+.section-header h3 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    margin: 0;
+    flex: 1;
+}
+
+.section-body {
+    padding: var(--space-6);
+}
+
+/* Card con hover lift — para cards clicables */
+.card-hoverable {
+    transition: var(--transition-base);
+    cursor: pointer;
+}
+
+.card-hoverable:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Card con borde + hover marrón */
+.card-bordered {
+    border: 2px solid var(--color-light-gray);
+    border-radius: var(--radius-lg);
+    background: var(--color-white);
+    transition: var(--transition-base);
+}
+
+.card-bordered:hover {
+    border-color: var(--color-brown);
+    box-shadow: 0 4px 12px rgba(133, 77, 46, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ================================================================
+ * 3. CARDS DE ESTADÍSTICAS
+ *
+ * Duplicado en: inscripciones-torneo, estadisticas-pagos,
+ * resultados-torneo y otras vistas de resumen.
+ * ================================================================ */
+
+.stat-card {
+    background: var(--color-white);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    transition: var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-white);
+    font-size: var(--text-2xl);
+}
+
+/* Variantes de color para stat-icon */
+.stat-icon--brown   { background: var(--color-brown); }
+.stat-icon--navy    { background: var(--color-dark-navy); }
+.stat-icon--success { background: var(--color-success); }
+.stat-icon--warning { background: var(--color-warning); }
+.stat-icon--info    { background: var(--color-info); }
+.stat-icon--purple  { background: var(--color-purple); }
+.stat-icon--teal    { background: #14b8a6; }
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--color-slate);
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    line-height: 1;
+}
+
+.stat-sub {
+    font-size: var(--text-sm);
+    color: var(--color-brown);
+    font-weight: 600;
+}
+
+/* ================================================================
+ * 4. ESTADOS DE CARGA, ERROR Y VACÍO
+ *
+ * Duplicado en prácticamente todas las vistas.
+ * ================================================================ */
+
+.state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-16) var(--space-8);
+    gap: var(--space-4);
+    text-align: center;
+}
+
+.state-container p {
+    font-size: var(--text-base);
+    color: var(--color-slate);
+    margin: 0;
+}
+
+/* Loading */
+.state-loading .state-icon {
+    font-size: 3rem;
+    color: var(--color-brown);
+}
+
+/* Error */
+.state-error .state-icon {
+    font-size: 3rem;
+    color: var(--color-accent);
+}
+
+/* Vacío */
+.state-empty .state-icon {
+    font-size: 4rem;
+    color: var(--color-gray-400);
+}
+
+.state-empty h3 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    margin: 0;
+}
+
+/* Contenedor blanco con sombra para loading/error */
+.state-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin: var(--space-8) 0;
+}
+
+/* ================================================================
+ * 5. FORMULARIOS
+ *
+ * .form-control duplicado en mesas-torneo, inscripciones-torneo,
+ * configuracion-torneos y más.
+ * ================================================================ */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    font-size: var(--text-sm);
+}
+
+.form-label-icon {
+    color: var(--color-brown);
+    font-size: var(--text-base);
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 2px solid var(--color-light-gray);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-family: var(--font-family);
+    color: var(--color-dark-navy);
+    background: var(--color-white);
+    transition: var(--transition-base);
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: var(--color-brown);
+    box-shadow: 0 0 0 3px rgba(133, 77, 46, 0.10);
+}
+
+.form-control:disabled {
+    background: var(--color-light-gray);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.form-control.is-invalid {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(229, 72, 57, 0.10);
+}
+
+.form-hint {
+    font-size: var(--text-xs);
+    color: var(--color-slate);
+    margin: 0;
+}
+
+.form-error {
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ================================================================
+ * 6. BADGES DE ESTADO
+ *
+ * Duplicado en: inscripciones-torneo, mesas-torneo,
+ * jugadores-torneo, gestion-jugadores.
+ * ================================================================ */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: var(--text-xs);
+    text-transform: capitalize;
+    width: fit-content;
+}
+
+/* Jugador / Inscripción activa o confirmada */
+.status-badge--confirmed,
+.status-badge--active {
+    background: var(--color-success-light);
+    color: var(--color-success-text);
+}
+
+/* Inscripción pendiente de pago / jugador inactivo */
+.status-badge--pending,
+.status-badge--inactive {
+    background: var(--color-warning-light);
+    color: var(--color-warning-text);
+}
+
+/* Inscripción cancelada */
+.status-badge--cancelled {
+    background: var(--color-error-light);
+    color: var(--color-error-text);
+}
+
+/* Pago parcial */
+.status-badge--partial {
+    background: var(--color-warning-light);
+    color: var(--color-warning-text);
+}
+
+/* Ronda / Mesa en curso */
+.status-badge--in-progress {
+    background: var(--color-info-light);
+    color: var(--color-info-text);
+}
+
+/* Ronda / Mesa finalizada */
+.status-badge--finished {
+    background: var(--color-success-light);
+    color: var(--color-success-text);
+}
+
+/* Ronda pendiente de iniciar */
+.status-badge--scheduled {
+    background: var(--color-warning-light);
+    color: var(--color-warning-text);
+}
+
+/* Retirado / archivado */
+.status-badge--retired {
+    background: var(--color-gray-200);
+    color: var(--color-gray-700);
+}
+
+/* ================================================================
+ * 7. BADGES GENÉRICOS
+ *
+ * .badge — contador sobre tabs o headers
+ * .rating-badge — ELO/rating de jugador
+ * .category-badge — nombre de categoría
+ * ================================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-brown);
+    color: var(--color-white);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    min-width: 20px;
+    line-height: 1;
+}
+
+.rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    background: var(--badge-rating-bg);
+    color: var(--badge-rating-text);
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: var(--text-xs);
+}
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    background: var(--badge-category-bg);
+    color: var(--badge-category-text);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: var(--text-xs);
+}
+
+/* ================================================================
+ * 8. AVATAR
+ *
+ * Círculo/cuadrado con ícono o inicial de usuario/jugador.
+ * ================================================================ */
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-white);
+    font-size: var(--text-sm);
+}
+
+.avatar-md { width: 40px; height: 40px; font-size: var(--text-base); }
+.avatar-lg { width: 50px; height: 50px; font-size: var(--text-xl); }
+
+/* ================================================================
+ * 9. PAGINACIÓN
+ *
+ * Duplicado completo en inscripciones-torneo y otros módulos con tabla.
+ * ================================================================ */
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-6);
+    border-top: 2px solid var(--color-light-gray);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.pagination-info {
+    font-size: var(--text-sm);
+    color: var(--color-slate);
+}
+
+.pagination-info strong {
+    color: var(--color-dark-navy);
+    font-weight: 600;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pagination-btn {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--color-light-gray);
+    background: var(--color-white);
+    color: var(--color-dark-navy);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.pagination-btn:hover:not(:disabled):not(.pagination-btn--active) {
+    border-color: var(--color-brown);
+    background: rgba(133, 77, 46, 0.05);
+    color: var(--color-brown);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-btn--active {
+    background: var(--color-brown);
+    color: var(--color-white);
+    border-color: var(--color-brown);
+}
+
+.pagination-btn--dots {
+    border: none;
+    background: transparent;
+    cursor: default;
+    color: var(--color-slate);
+}
+
+/* ================================================================
+ * 10. GRIDS RESPONSIVOS
+ *
+ * Patrones repeat(auto-fit/fill, minmax(...)) usados con variaciones
+ * menores en casi todas las vistas.
+ * ================================================================ */
+
+.grid-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-5);
+}
+
+.grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-5);
+}
+
+.grid-cards-lg {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-5);
+}
+
+.grid-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-6);
+}
+
+.grid-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+}
+
+/* ================================================================
+ * TABLA BASE
+ *
+ * Estructura de tabla usada en inscripciones, jugadores, resultados.
+ * ================================================================ */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.table thead {
+    background: var(--color-gray-50);
+    border-bottom: 2px solid var(--color-gray-200);
+}
+
+.table th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition-fast);
+}
+
+.table th.sortable:hover {
+    background: var(--color-gray-100);
+}
+
+.table th.center,
+.table td.center { text-align: center; }
+
+.table tbody tr {
+    border-bottom: 1px solid var(--color-gray-100);
+    transition: var(--transition-fast);
+}
+
+.table tbody tr:hover {
+    background: var(--color-gray-50);
+}
+
+.table td {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-dark-navy);
+    vertical-align: middle;
+}
+
+/* ================================================================
+ * RESPONSIVE UTILITITES
+ * ================================================================ */
+
+@media (max-width: 768px) {
+
+    .page-header {
+        padding: var(--space-6);
+        gap: var(--space-4);
+    }
+
+    .page-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: var(--text-xl);
+    }
+
+    .page-header-text h1 {
+        font-size: var(--text-2xl);
+    }
+
+    .page-header-actions {
+        margin-left: 0;
+        flex-wrap: wrap;
+    }
+
+    .grid-stats,
+    .grid-cards,
+    .grid-cards-lg,
+    .grid-info,
+    .grid-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .pagination {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pagination-info {
+        text-align: center;
+    }
+
+    .pagination-controls {
+        justify-content: center;
+    }
+}

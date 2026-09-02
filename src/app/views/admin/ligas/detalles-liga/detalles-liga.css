@@ -1,0 +1,291 @@
+.liga-detalle-container {
+    min-height: 100vh;
+    background: var(--color-light-gray);
+}
+
+.liga-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.detalle-section {
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #f3f4f6;
+    transition: all 0.3s ease;
+}
+
+.detalle-section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.section-header.clickable {
+    cursor: pointer;
+}
+
+.section-header.clickable:hover {
+    opacity: 0.8;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--color-slate);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-label app-icon {
+    color: var(--color-brown);
+    font-size: 0.9rem;
+}
+
+.info-value {
+    font-size: 1.05rem;
+    color: var(--color-dark-navy);
+    font-weight: 500;
+}
+
+.grupos-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.grupo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-tan) 0%, #d4b896 100%);
+    border-radius: 10px;
+    color: var(--color-dark-navy);
+    font-weight: 600;
+    border: 2px solid var(--color-brown);
+}
+
+.grupo-badge app-icon {
+    color: var(--color-brown);
+    font-size: 1.2rem;
+}
+
+.grupo-rondas {
+    color: var(--color-brown);
+    margin-left: 0.5rem;
+}
+
+.grupos-config-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.grupo-detalle-card {
+    overflow: hidden;
+}
+
+.config-header {
+    background: linear-gradient(135deg, var(--color-tan) 0%, #d4b896 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 3px solid var(--color-brown);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.config-header:hover {
+    opacity: 0.95;
+}
+
+.config-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.config-title app-icon {
+    font-size: 1.5rem;
+    color: var(--color-brown);
+}
+
+.config-title h3 {
+    margin: 0;
+    color: var(--color-dark-navy);
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.config-content {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.config-subsection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.config-subsection h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-dark-navy);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-light-gray);
+}
+
+.config-subsection h4 app-icon {
+    color: var(--color-brown);
+    font-size: 1.1rem;
+}
+
+.premios-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.premio-detalle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-white);
+    border: 2px solid var(--color-light-gray);
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+}
+
+.premio-detalle app-icon {
+    font-size: 1.5rem;
+}
+
+.medal-gold {
+    color: #FFD700;
+}
+
+.medal-silver {
+    color: #C0C0C0;
+}
+
+.medal-bronze {
+    color: #CD7F32;
+}
+
+.medal-other {
+    color: var(--color-slate);
+}
+
+.desempates-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.desempate-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-white);
+    border: 2px solid var(--color-light-gray);
+    border-radius: 10px;
+}
+
+.desempate-prioridad {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--color-brown);
+    color: var(--color-white);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.desempate-nombre {
+    flex: 1;
+    color: var(--color-dark-navy);
+    font-weight: 600;
+}
+
+.notas-content {
+    padding: 1.5rem;
+    background: var(--color-light-gray);
+    border-radius: 10px;
+    border-left: 4px solid var(--color-brown);
+}
+
+.notas-content pre {
+    margin: 0;
+    font-family: 'ABeeZee', sans-serif;
+    white-space: pre-wrap;
+    color: var(--color-dark-navy);
+    line-height: 1.6;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .liga-content {
+        padding: 1rem;
+    }
+
+    .detalle-section {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .grupo-badge {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .config-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .config-title h3 {
+        font-size: 1.1rem;
+    }
+
+    .config-content {
+        padding: 1.25rem;
+    }
+}

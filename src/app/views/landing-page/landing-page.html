@@ -4,36 +4,36 @@
   <header class="header">
     <div class="header-content">
       <div class="logo-section">
-        <i class="fa-solid fa-chess-knight logo-icon"></i>
+        <span class="chess-icon logo-icon">♞</span>
         <h1 class="logo-text">Comité Municipal de Ajedrez Ahome</h1>
       </div>
       <nav class="nav-menu">
         <a routerLink="/players-stats" class="nav-link">
-          <i class="fa-solid fa-user-group"></i>
+          <i class="ph-bold ph-users ph-icon"></i>
           Jugadores
         </a>
         <a (click)="scrollToSection('torneos')" class="nav-link">
-          <i class="fa-solid fa-trophy"></i>
+          <i class="ph-bold ph-trophy ph-icon"></i>
           Torneos
         </a>
         <a routerLink="/jugador-liga" class="nav-link">
-          <i class="fa-solid fa-ranking-star"></i>
+          <i class="ph-bold ph-medal ph-icon"></i>
           Ligas
         </a>
         <a routerLink="/jugador-resultado" class="nav-link">
-          <i class="fa-solid fa-chess-board"></i>
+          <i class="ph-bold ph-check-square ph-icon"></i>
           Resultados
         </a>
         <a routerLink="/reloj-section" class="nav-link">
-          <i class="fa-solid fa-clock"></i>
+          <i class="ph-bold ph-clock ph-icon"></i>
           Reloj
         </a>
         <a (click)="scrollToSection('contacto')" class="nav-link">
-          <i class="fa-solid fa-envelope"></i>
+          <i class="ph-bold ph-envelope ph-icon"></i>
           Contacto
         </a>
         <a routerLink="/login" class="btn-login">
-          <i class="fa-solid fa-right-to-bracket"></i>
+          <i class="ph-bold ph-sign-in ph-icon"></i>
           Iniciar Sesión
         </a>
       </nav>
@@ -49,18 +49,18 @@
         <div class="hero-buttons">
           <button (click)="scrollToSection('torneos')" class="btn-primary">
             Ver Torneos
-            <i class="fa-solid fa-arrow-down"></i>
+            <i class="ph-bold ph-arrow-down ph-icon"></i>
           </button>
           <button routerLink="/jugador-liga" class="btn-secondary">
             Ver Ligas
-            <i class="fa-solid fa-ranking-star"></i>
+            <i class="ph-bold ph-medal ph-icon"></i>
           </button>
         </div>
       </div>
       <div class="hero-chess-pieces">
-        <i class="fa-solid fa-chess-king piece-1"></i>
-        <i class="fa-solid fa-chess-queen piece-2"></i>
-        <i class="fa-solid fa-chess-rook piece-3"></i>
+        <span class="chess-icon piece-1">♔</span>
+        <span class="chess-icon piece-2">♛</span>
+        <span class="chess-icon piece-3">♜</span>
       </div>
     </div>
     <div class="chess-board-bg"></div>
@@ -71,19 +71,18 @@
     <div class="featured-content">
       <div class="featured-header-row">
         <div class="featured-badge">
-          <i class="fa-solid fa-trophy"></i>
+          <i class="ph-bold ph-trophy ph-icon"></i>
           Próximo Torneo
         </div>
         <button class="btn-info-torneo" (click)="abrirModal(torneoDestacado)" title="Ver detalles completos">
-          <i class="fa-solid fa-circle-info"></i>
+          <i class="ph-bold ph-info ph-icon"></i>
         </button>
       </div>
       <h3 class="featured-title">{{ torneoDestacado.nombre || torneoDestacado.lugar }}</h3>
 
-      <!-- Grid de información principal -->
       <div class="featured-info">
         <div class="info-item">
-          <i class="fa-solid fa-calendar-days"></i>
+          <i class="ph-bold ph-calendar-blank ph-icon"></i>
           <div class="info-content">
             <span class="info-label">Fecha</span>
             <span class="info-value">{{ formatearFecha(torneoDestacado.fecha) }}</span>
@@ -91,7 +90,7 @@
         </div>
 
         <div class="info-item">
-          <i class="fa-solid fa-clock"></i>
+          <i class="ph-bold ph-clock ph-icon"></i>
           <div class="info-content">
             <span class="info-label">Hora de inicio</span>
             <span class="info-value">{{ torneoDestacado.hora_inicio | horaAmPm }}</span>
@@ -99,7 +98,7 @@
         </div>
 
         <div class="info-item">
-          <i class="fa-solid fa-location-dot"></i>
+          <i class="ph-bold ph-map-pin ph-icon"></i>
           <div class="info-content">
             <span class="info-label">Lugar</span>
             <span class="info-value">{{ torneoDestacado.lugar }}</span>
@@ -107,7 +106,7 @@
         </div>
 
         <div class="info-item">
-          <i class="fa-solid fa-chess-board"></i>
+          <i class="ph-bold ph-hash ph-icon"></i>
           <div class="info-content">
             <span class="info-label">Rondas</span>
             <span class="info-value">{{ torneoDestacado.rondas }} rondas</span>
@@ -115,21 +114,20 @@
         </div>
       </div>
 
-      <!-- Información adicional -->
       <div class="featured-extra" *ngIf="torneoDestacado.torneoCategorias && torneoDestacado.torneoCategorias.length > 0">
         <div class="extra-item" *ngIf="getSistemaCompetencia(torneoDestacado) !== 'No especificado'">
-          <i class="fa-solid fa-diagram-project"></i>
+          <i class="ph-bold ph-tree-structure ph-icon"></i>
           <span>{{ getSistemaCompetencia(torneoDestacado) }}</span>
         </div>
 
         <div class="extra-item" *ngIf="torneoDestacado.torneoCategorias.length > 0">
-          <i class="fa-solid fa-layer-group"></i>
+          <i class="ph-bold ph-stack ph-icon"></i>
           <span>{{ torneoDestacado.torneoCategorias.length }} {{ torneoDestacado.torneoCategorias.length === 1 ?
             'categoría' : 'categorías' }}</span>
         </div>
 
         <div class="extra-item" *ngIf="torneoDestacado.cierreInscripciones">
-          <i class="fa-solid fa-door-closed"></i>
+          <i class="ph-bold ph-door ph-icon"></i>
           <span>Cierre: {{ formatearFechaCorta(torneoDestacado.cierreInscripciones) }}</span>
         </div>
       </div>
@@ -137,18 +135,18 @@
       <button (click)="irAInscripcion(torneoDestacado.idTorneo)" class="btn-inscribirse"
         [disabled]="inscripcionesCerradas(torneoDestacado)"
         [class.btn-disabled]="inscripcionesCerradas(torneoDestacado)">
-        <i class="fa-solid" [class.fa-arrow-right]="!inscripcionesCerradas(torneoDestacado)"
-          [class.fa-lock]="inscripcionesCerradas(torneoDestacado)"></i>
+        <i *ngIf="!inscripcionesCerradas(torneoDestacado)" class="ph-bold ph-arrow-right ph-icon"></i>
+        <i *ngIf="inscripcionesCerradas(torneoDestacado)" class="ph-bold ph-lock ph-icon"></i>
         {{ getMensajeInscripcion(torneoDestacado) }}
       </button>
 
       <div class="featured-visual">
-        <i class="fa-solid fa-chess-board board-icon"></i>
+        <span class="chess-icon">♟</span>
       </div>
     </div>
   </section>
 
-  <!-- PRÓXIMOS TORNEOS - Solo se muestra si hay más de un torneo activo -->
+  <!-- PRÓXIMOS TORNEOS -->
   <section class="upcoming-tournaments" *ngIf="proximosTorneos.length > 0">
     <h3 class="section-title">Próximos Torneos</h3>
 
@@ -162,41 +160,41 @@
           <div class="card-title-row">
             <h4 class="card-title">{{ torneo.nombre || torneo.lugar }}</h4>
             <button class="btn-info-card" (click)="abrirModal(torneo)" title="Ver detalles completos">
-              <i class="fa-solid fa-circle-info"></i>
+              <i class="ph-bold ph-info ph-icon"></i>
             </button>
           </div>
           <div class="card-details">
             <span class="card-detail">
-              <i class="fa-solid fa-location-dot"></i>
+              <i class="ph-bold ph-map-pin ph-icon"></i>
               {{ torneo.lugar }}
             </span>
             <span class="card-detail">
-              <i class="fa-solid fa-clock"></i>
+              <i class="ph-bold ph-clock ph-icon"></i>
               {{ torneo.hora_inicio | horaAmPm }}
             </span>
             <span class="card-detail">
-              <i class="fa-solid fa-chess"></i>
+              <i class="ph-bold ph-hash ph-icon"></i>
               {{ torneo.rondas }} rondas
             </span>
           </div>
           <p class="card-system" *ngIf="getSistemaCompetencia(torneo) !== 'No especificado'">
-            <i class="fa-solid fa-diagram-project"></i>
+            <i class="ph-bold ph-tree-structure ph-icon"></i>
             {{ getSistemaCompetencia(torneo) }}
           </p>
         </div>
         <button (click)="irAInscripcion(torneo.idTorneo)" class="btn-card-inscripcion"
           [disabled]="inscripcionesCerradas(torneo)" [class.btn-disabled]="inscripcionesCerradas(torneo)">
-          <i class="fa-solid" [class.fa-lock]="inscripcionesCerradas(torneo)"></i>
+          <i *ngIf="inscripcionesCerradas(torneo)" class="ph-bold ph-lock ph-icon"></i>
           {{ inscripcionesCerradas(torneo) ? 'Cerrado' : 'Inscribirse' }}
         </button>
       </div>
     </div>
   </section>
 
-  <!-- Estado sin torneos - Solo se muestra si no hay ningún torneo -->
+  <!-- Estado sin torneos -->
   <section class="no-tournaments-section" *ngIf="!loading && !torneoDestacado && proximosTorneos.length === 0">
     <div class="no-tournaments">
-      <i class="fa-solid fa-calendar-xmark"></i>
+      <i class="ph-bold ph-calendar-x ph-icon"></i>
       <p>No hay torneos programados próximamente</p>
     </div>
   </section>
@@ -204,7 +202,7 @@
   <!-- Loading -->
   <section class="loading-section" *ngIf="loading">
     <div class="loading-spinner">
-      <i class="fa-solid fa-spinner fa-spin"></i>
+      <i class="ph-bold ph-spinner ph-icon ph-spin"></i>
       <p>Cargando torneos...</p>
     </div>
   </section>
@@ -216,13 +214,14 @@
       <div class="faq-item" *ngFor="let faq of faqs; let i = index" [class.active]="faq.abierto">
         <div class="faq-question" (click)="toggleFaq(i)">
           <span>{{ faq.pregunta }}</span>
-          <i class="fa-solid" [class.fa-chevron-down]="!faq.abierto" [class.fa-chevron-up]="faq.abierto"></i>
+          <i *ngIf="!faq.abierto" class="ph-bold ph-caret-down ph-icon"></i>
+          <i *ngIf="faq.abierto" class="ph-bold ph-caret-up ph-icon"></i>
         </div>
         <div class="faq-answer" *ngIf="faq.abierto">
           <p>{{ faq.respuesta }}</p>
           <button *ngIf="i === 0" routerLink="/players-stats" class="btn-faq-redirect">
             Ver mis estadísticas
-            <i class="fa-solid fa-arrow-right"></i>
+            <i class="ph-bold ph-arrow-right ph-icon"></i>
           </button>
         </div>
       </div>
@@ -232,7 +231,7 @@
   <!-- CLUB SECTION -->
   <section class="club-section">
     <div class="club-content">
-      <i class="fa-solid fa-chess club-icon"></i>
+      <span class="chess-icon club-icon">♞</span>
       <h3 class="club-title">Únete al Club</h3>
       <p class="club-text">
         Forma parte de nuestra comunidad de jugadores apasionados por el ajedrez.
@@ -246,17 +245,12 @@
     <h3 class="section-title">Contacto</h3>
     <div class="contact-grid">
       <div class="contact-card">
-        <i class="fa-solid fa-phone"></i>
+        <i class="ph-bold ph-phone ph-icon"></i>
         <h4>Teléfono</h4>
         <p>+52 668 136 0138</p>
       </div>
-      <!--div class="contact-card">
-        <i class="fa-solid fa-envelope"></i>
-        <h4>Email</h4>
-        <p>contacto@comiteajedrez.mx</p>
-      </!--div-->
       <div class="contact-card">
-        <i class="fa-solid fa-location-dot"></i>
+        <i class="ph-bold ph-map-pin ph-icon"></i>
         <h4>Ubicación</h4>
         <p>Los Mochis, Sinaloa, México</p>
       </div>
@@ -267,18 +261,19 @@
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-logo">
-        <i class="fa-solid fa-chess-knight"></i>
+        <span class="chess-icon footer-chess">♞</span>
         <span>Comité Municipal de Ajedrez Ahome</span>
       </div>
       <p class="footer-text">Promoviendo el ajedrez en la región</p>
       <div class="footer-social">
-        <a href="#" class="social-link"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#" class="social-link"><i class="ph-bold ph-facebook-logo"></i></a>
+        <a href="#" class="social-link"><i class="ph-bold ph-instagram-logo"></i></a>
+        <a href="#" class="social-link"><i class="ph-bold ph-twitter-logo"></i></a>
       </div>
       <p class="footer-copyright">© 2024 Comité Municipal de Ajedrez Ahome. Todos los derechos reservados.</p>
     </div>
   </footer>
+
   <!-- Modal de Detalles del Torneo -->
   <app-torneo-detalle-modal [torneo]="torneoSeleccionado" [isOpen]="modalAbierto" (close)="cerrarModal()">
   </app-torneo-detalle-modal>

@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../environment/enviroment';
 import { Usuario } from '../models/usuario';
+import { Torneo } from '../models/torneo';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -58,6 +59,12 @@ export class UsuarioService {
       { passwordActual, passwordNuevo }
     ).pipe(
       map(() => undefined)
+    );
+  }
+
+  getTorneosAsignados(id: number): Observable<Torneo[]> {
+    return this.http.get<ApiResponse<Torneo[]>>(`${this.apiUrl}/${id}/torneos`).pipe(
+      map(response => response.data || [])
     );
   }
 }

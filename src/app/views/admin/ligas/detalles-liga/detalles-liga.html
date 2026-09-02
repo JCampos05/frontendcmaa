@@ -1,0 +1,259 @@
+<div class="liga-detalle-container">
+    <app-toast-noti></app-toast-noti>
+
+    <app-state-message *ngIf="loading" mode="loading" title="Cargando detalles de la liga..."></app-state-message>
+
+    <!-- Contenido de la liga -->
+    <div *ngIf="!loading && liga">
+        <app-page-header icon="trophy" [title]="liga.nombre" subtitle="Detalles completos de la liga">
+            <app-icon-button actions icon="arrow-left" variant="ghost" ariaLabel="Volver a ligas" (clicked)="volver()"></app-icon-button>
+            <app-button actions *ngIf="liga.activo" icon="pencil-simple" (clicked)="editarLiga()">Editar Liga</app-button>
+        </app-page-header>
+
+        <div class="liga-content">
+            <!-- Información General -->
+            <div class="section-card detalle-section" [class.collapsed]="!seccionesExpandidas.informacionGeneral">
+                <div class="section-header clickable" (click)="toggleSeccion('informacionGeneral')">
+                    <app-icon class="section-header-icon" name="info"></app-icon>
+                    <h2>Información General</h2>
+                    <app-icon-button
+                        [icon]="seccionesExpandidas.informacionGeneral ? 'caret-up' : 'caret-down'"
+                        variant="ghost"
+                        ariaLabel="Expandir o colapsar información general">
+                    </app-icon-button>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.informacionGeneral">
+                    <div class="grid-info">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="stack" weight="regular"></app-icon>
+                                Nombre de la Liga
+                            </span>
+                            <span class="info-value">{{ liga.nombre || 'Sin nombre' }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="map-pin" weight="regular"></app-icon>
+                                Lugar
+                            </span>
+                            <span class="info-value">{{ liga.lugar || 'No especificado' }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="liga.direccion">
+                            <span class="info-label">
+                                <app-icon name="map-pin" weight="regular"></app-icon>
+                                Dirección Completa
+                            </span>
+                            <span class="info-value">{{ liga.direccion }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="calendar" weight="regular"></app-icon>
+                                Fecha de Inicio
+                            </span>
+                            <span class="info-value">{{ formatearFecha(liga.fecha_inicio) }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="liga.fecha_fin">
+                            <span class="info-label">
+                                <app-icon name="calendar-blank" weight="regular"></app-icon>
+                                Fecha de Finalización
+                            </span>
+                            <span class="info-value">{{ formatearFecha(liga.fecha_fin) }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="liga.cierre_inscripciones">
+                            <span class="info-label">
+                                <app-icon name="calendar-x" weight="regular"></app-icon>
+                                Cierre de Inscripciones
+                            </span>
+                            <span class="info-value">{{ formatearFechaHora(liga.cierre_inscripciones) }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="tree-structure" weight="regular"></app-icon>
+                                Sistema de Competencia
+                            </span>
+                            <span class="info-value">{{ getTipoSistema(liga.tipo_sistema) }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="liga.ritmo_juego">
+                            <span class="info-label">
+                                <app-icon name="clock" weight="regular"></app-icon>
+                                Ritmo de Juego
+                            </span>
+                            <span class="info-value">{{ liga.ritmo_juego.nombre || 'No especificado' }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="liga.costo_inscripcion && liga.costo_inscripcion > 0">
+                            <span class="info-label">
+                                <app-icon name="hash" weight="regular"></app-icon>
+                                Costo de Inscripción
+                            </span>
+                            <span class="info-value">${{ liga.costo_inscripcion }}</span>
+                        </div>
+
+                        <div class="info-item" *ngIf="liga.max_jugadores">
+                            <span class="info-label">
+                                <app-icon name="users" weight="regular"></app-icon>
+                                Máximo de Jugadores
+                            </span>
+                            <span class="info-value">{{ liga.max_jugadores }} jugadores</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">
+                                <app-icon name="check-circle" weight="regular"></app-icon>
+                                Estado
+                            </span>
+                            <span class="info-value">
+                                <app-badge
+                                    [status]="liga.activo ? 'active' : 'finished'"
+                                    [text]="liga.activo ? 'Activa' : 'Finalizada'">
+                                </app-badge>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grupos de la Liga -->
+            <div class="section-card detalle-section" [class.collapsed]="!seccionesExpandidas.gruposLiga" *ngIf="grupos.length > 0">
+                <div class="section-header clickable" (click)="toggleSeccion('gruposLiga')">
+                    <app-icon class="section-header-icon" name="users"></app-icon>
+                    <h2>Grupos de la Liga</h2>
+                    <app-icon-button
+                        [icon]="seccionesExpandidas.gruposLiga ? 'caret-up' : 'caret-down'"
+                        variant="ghost"
+                        ariaLabel="Expandir o colapsar grupos de la liga">
+                    </app-icon-button>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.gruposLiga">
+                    <div class="grupos-lista">
+                        <div class="grupo-badge" *ngFor="let grupo of grupos">
+                            <app-icon name="users"></app-icon>
+                            <span>{{ grupo.nombre }}</span>
+                            <span class="grupo-rondas" *ngIf="grupo.rondas">
+                                {{ grupo.rondas }} rondas
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración por Grupo -->
+            <div class="section-card detalle-section" [class.collapsed]="!seccionesExpandidas.configuracionPorGrupo"
+                *ngIf="grupos.length > 0">
+                <div class="section-header clickable" (click)="toggleSeccion('configuracionPorGrupo')">
+                    <app-icon class="section-header-icon" name="gear"></app-icon>
+                    <h2>Configuración por Grupo</h2>
+                    <app-icon-button
+                        [icon]="seccionesExpandidas.configuracionPorGrupo ? 'caret-up' : 'caret-down'"
+                        variant="ghost"
+                        ariaLabel="Expandir o colapsar configuración por grupo">
+                    </app-icon-button>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.configuracionPorGrupo">
+                    <div class="grupos-config-container">
+                        <div *ngFor="let grupo of grupos; let i = index" class="card-bordered grupo-detalle-card"
+                            [class.collapsed]="!gruposExpandidos[i]">
+
+                            <div class="config-header clickable" (click)="toggleGrupo(i)">
+                                <div class="config-title">
+                                    <app-icon name="users"></app-icon>
+                                    <h3>{{ grupo.nombre }}</h3>
+                                </div>
+                                <app-icon-button
+                                    [icon]="gruposExpandidos[i] ? 'caret-up' : 'caret-down'"
+                                    variant="ghost"
+                                    [ariaLabel]="'Expandir o colapsar ' + grupo.nombre">
+                                </app-icon-button>
+                            </div>
+
+                            <div class="config-content" *ngIf="gruposExpandidos[i]">
+                                <!-- Configuración Básica -->
+                                <div class="config-subsection">
+                                    <h4><app-icon name="sliders"></app-icon> Configuración Básica</h4>
+                                    <div class="grid-info">
+                                        <div class="info-item" *ngIf="grupo.rondas">
+                                            <span class="info-label">Número de Rondas</span>
+                                            <span class="info-value">{{ grupo.rondas }}</span>
+                                        </div>
+
+                                        <div class="info-item" *ngIf="grupo.max_jugadores">
+                                            <span class="info-label">Máximo de Jugadores</span>
+                                            <span class="info-value">{{ grupo.max_jugadores }}</span>
+                                        </div>
+
+                                        <div class="info-item full-width" *ngIf="grupo.descripcion">
+                                            <span class="info-label">Descripción</span>
+                                            <span class="info-value">{{ grupo.descripcion }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Premios -->
+                                <div class="config-subsection" *ngIf="grupo.premios">
+                                    <h4><app-icon name="trophy"></app-icon> Premios</h4>
+                                    <div class="premios-lista">
+                                        <div class="premio-detalle"
+                                            *ngFor="let premio of obtenerPremios(grupo.premios); let j = index">
+                                            <app-icon name="medal" [class.medal-gold]="j === 0"
+                                                [class.medal-silver]="j === 1" [class.medal-bronze]="j === 2"
+                                                [class.medal-other]="j > 2"></app-icon>
+                                            <span>{{ premio }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sistemas de Desempate -->
+                                <div class="config-subsection"
+                                    *ngIf="grupo.desempates && obtenerDesempates(grupo.desempates).length > 0">
+                                    <h4><app-icon name="arrows-down-up"></app-icon> Sistemas de Desempate</h4>
+                                    <div class="desempates-lista">
+                                        <div class="desempate-item"
+                                            *ngFor="let desempate of obtenerDesempates(grupo.desempates); let j = index">
+                                            <span class="desempate-prioridad">{{ j + 1 }}</span>
+                                            <span class="desempate-nombre">{{ desempate }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas Adicionales -->
+            <div class="section-card detalle-section" [class.collapsed]="!seccionesExpandidas.notasAdicionales" *ngIf="liga.notas">
+                <div class="section-header clickable" (click)="toggleSeccion('notasAdicionales')">
+                    <app-icon class="section-header-icon" name="file-text"></app-icon>
+                    <h2>Notas Adicionales</h2>
+                    <app-icon-button
+                        [icon]="seccionesExpandidas.notasAdicionales ? 'caret-up' : 'caret-down'"
+                        variant="ghost"
+                        ariaLabel="Expandir o colapsar notas adicionales">
+                    </app-icon-button>
+                </div>
+
+                <div class="section-body" *ngIf="seccionesExpandidas.notasAdicionales">
+                    <div class="notas-content">
+                        <pre>{{ liga.notas }}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="form-actions">
+                <app-button variant="secondary" icon="arrow-left" (clicked)="volver()">Volver a Ligas</app-button>
+                <app-button *ngIf="liga.activo" icon="pencil-simple" (clicked)="editarLiga()">Editar Liga</app-button>
+            </div>
+        </div>
+    </div>
+</div>

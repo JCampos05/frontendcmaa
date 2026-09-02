@@ -1,0 +1,279 @@
+/*
+ * Solo el contenido específico de esta vista. Header, loading/error,
+ * selects, section-card/section-body y tabla ya viven en los componentes
+ * y estilos globales compartidos (componentes/atoms|molecules|organisms,
+ * styles/utilities.css).
+ */
+
+.historial-container {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--color-light-gray);
+}
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-8);
+}
+
+.filtros-section {
+    margin-bottom: var(--space-8);
+}
+
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+}
+
+/* === LISTA DE JUGADORES === */
+.jugadores-list {
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 2px solid var(--color-light-gray);
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    color: var(--color-dark-navy);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.list-header .app-icon {
+    color: var(--color-brown);
+    font-size: var(--text-lg);
+}
+
+.jugadores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-4);
+}
+
+.jugador-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: 2px solid var(--color-light-gray);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-base);
+    background: var(--color-white);
+}
+
+.jugador-card:hover {
+    border-color: var(--color-brown);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(133, 77, 46, 0.15);
+}
+
+.jugador-card.selected {
+    border-color: var(--color-brown);
+    background: rgba(133, 77, 46, 0.05);
+    box-shadow: 0 4px 12px rgba(133, 77, 46, 0.2);
+}
+
+.jugador-avatar-small {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--color-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.jugador-avatar-small .app-icon {
+    font-size: var(--text-xl);
+    color: var(--color-white);
+}
+
+.jugador-info-small {
+    flex: 1;
+    min-width: 0;
+}
+
+.jugador-info-small .nombre {
+    display: block;
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    font-size: var(--text-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jugador-meta {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-slate);
+}
+
+.jugador-meta .rating .app-icon {
+    color: #F59E0B;
+}
+
+.jugador-meta .puntos .app-icon {
+    color: var(--color-brown);
+}
+
+.arrow-icon {
+    color: var(--color-slate);
+    font-size: var(--text-base);
+    transition: var(--transition-base);
+}
+
+.jugador-card:hover .arrow-icon,
+.jugador-card.selected .arrow-icon {
+    color: var(--color-brown);
+    transform: translateX(4px);
+}
+
+/* === HISTORIAL DEL JUGADOR SELECCIONADO === */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.jugador-info-card {
+    background: var(--color-white);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.jugador-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-dark-navy) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.jugador-avatar .app-icon {
+    font-size: var(--text-3xl);
+    color: var(--color-white);
+}
+
+.jugador-details {
+    flex: 1;
+}
+
+.jugador-nombre {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    margin: 0 0 var(--space-4) 0;
+}
+
+.partidas-section {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.badge {
+    padding: 0.375rem 0.875rem;
+    background: var(--color-brown);
+    color: var(--color-white);
+    border-radius: 16px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin-left: auto;
+}
+
+/* === CELDAS DE LA TABLA DE PARTIDAS === */
+.color-badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.color-badge.color-blanco {
+    background: #F9FAFB;
+    border: 2px solid var(--color-dark-navy);
+    color: var(--color-dark-navy);
+}
+
+.color-badge.color-negro {
+    background: var(--color-dark-navy);
+    color: var(--color-white);
+}
+
+.rival-nombre {
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    display: block;
+}
+
+.rival-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--text-xs);
+    color: var(--color-slate);
+}
+
+.rival-rating .app-icon {
+    color: #F59E0B;
+}
+
+.resultado-badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: var(--text-sm);
+}
+
+.tipo-finalizacion {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--color-slate);
+    margin-top: 0.125rem;
+}
+
+tr.resultado-victoria .resultado-badge {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+tr.resultado-empate .resultado-badge {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+tr.resultado-derrota .resultado-badge {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+@media (max-width: 768px) {
+    .jugador-info-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}

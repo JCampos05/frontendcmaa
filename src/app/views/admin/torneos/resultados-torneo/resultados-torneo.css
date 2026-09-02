@@ -1,0 +1,167 @@
+/*
+ * Estilos específicos de "Resultados del Torneo" sin equivalente
+ * en las clases globales (page-header, section-card, section-header,
+ * section-body, grid-info, form-control, form-group, form-label, stat-card,
+ * pagination, table, table-wrapper, badge, rating-badge, modal-overlay,
+ * modal-container, state-container ya viven en src/styles/*.css).
+ */
+
+.resultados-container {
+    width: 100%;
+    min-height: 100vh;
+}
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.export-buttons {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.export-buttons app-button {
+    flex: 1;
+}
+
+.section-header .badge {
+    margin-right: auto;
+}
+
+/* Filas destacadas del podio */
+.fila-resultado.top-1 {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, transparent 100%);
+    border-left: 4px solid var(--color-gold, #F59E0B);
+}
+
+.fila-resultado.top-2 {
+    background: linear-gradient(90deg, rgba(156, 163, 175, 0.08) 0%, transparent 100%);
+    border-left: 4px solid var(--color-silver, #9CA3AF);
+}
+
+.fila-resultado.top-3 {
+    background: linear-gradient(90deg, rgba(133, 77, 46, 0.08) 0%, transparent 100%);
+    border-left: 4px solid var(--color-bronze, #854D2E);
+}
+
+.fila-resultado.top-4,
+.fila-resultado.top-5 {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%);
+    border-left: 4px solid #3B82F6;
+}
+
+.posicion-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-light-gray);
+    font-weight: 700;
+    font-size: var(--text-base);
+}
+
+.posicion-badge.podio {
+    background: transparent;
+    font-size: var(--text-2xl);
+}
+
+.posicion-badge .gold {
+    color: var(--color-gold, #F59E0B);
+}
+
+.posicion-badge .silver {
+    color: var(--color-silver, #9CA3AF);
+}
+
+.posicion-badge .bronze {
+    color: var(--color-bronze, #854D2E);
+}
+
+.jugador-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.jugador-cell .avatar {
+    width: 40px;
+    height: 40px;
+}
+
+.jugador-nombre-table {
+    font-weight: 600;
+    color: var(--color-dark-navy);
+}
+
+.sin-rating {
+    color: var(--color-slate);
+    font-size: var(--text-xs);
+}
+
+.puntos-valor {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--color-brown);
+}
+
+.stat-victoria {
+    color: var(--color-success, #10B981);
+    font-weight: 700;
+}
+
+.stat-empate {
+    color: var(--color-warning, #F59E0B);
+    font-weight: 700;
+}
+
+.stat-derrota {
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
+.desempate-valor {
+    font-weight: 600;
+    color: var(--color-dark-navy);
+    font-size: var(--text-sm);
+}
+
+.cambio-posicion {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: 700;
+    font-size: var(--text-xs);
+}
+
+.cambio-posicion .subida {
+    color: var(--color-success, #10B981);
+}
+
+.cambio-posicion .bajada {
+    color: var(--color-accent);
+}
+
+.sin-cambio {
+    color: var(--color-slate);
+}
+
+@media (max-width: 768px) {
+    .export-buttons {
+        flex-direction: column;
+    }
+
+    .section-header {
+        flex-wrap: wrap;
+    }
+}

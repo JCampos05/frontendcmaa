@@ -1,0 +1,171 @@
+/*
+ * tokens.css — Sistema de Design Tokens
+ *
+ * ÚNICA fuente de verdad para todos los valores del sistema de diseño.
+ * Todos los archivos CSS del proyecto deben consumir estas variables.
+ * PROHIBIDO hardcodear colores, sombras, radios o z-index fuera de aquí.
+ *
+ * PROBLEMA QUE RESUELVE:
+ * styles.css original tenía 5 tokens con valores incorrectos, lo que
+ * obligaba a 10+ componentes a redefinir :root localmente para corregirlos.
+ * Este archivo centraliza y corrige todos esos valores de una vez.
+ */
+
+:root {
+
+    /* ================================================================
+     * COLORES DE MARCA
+     * ================================================================ */
+
+    --color-black:        #000000;
+    --color-dark-navy:    #212129;   /* Carbón muy oscuro — fondo header, login, footer */
+    --color-slate:        #3E464B;   /* Gris oscuro — complementa gradientes con --color-dark-navy */
+    --color-brown:        #854D2E;
+    --color-dark-brown:   #633017;
+    --color-tan:          #E4C091;
+    --color-beige:        #EBD2AA;
+    --color-light-gray:   #E3E1DD;
+    --color-white:        #FFFFFF;   /* Era #FFFEFF en styles.css (off-white con tono morado) */
+    --color-accent:       #EA4759;   /* Rojo-rosa de acento — CTAs y badges */
+
+    /* ================================================================
+     * COLORES SEMÁNTICOS
+     * Estos colores estaban hardcodeados en 20+ archivos CSS como valores
+     * literales. Al tokenizarlos, un solo cambio propaga a todo el sistema.
+     * ================================================================ */
+
+    /* Éxito / Verde */
+    --color-success:         #10B981;
+    --color-success-dark:    #059669;
+    --color-success-light:   #D1FAE5;
+    --color-success-text:    #065F46;
+
+    /* Advertencia / Ámbar */
+    --color-warning:         #F59E0B;
+    --color-warning-dark:    #D97706;
+    --color-warning-light:   #FEF3C7;
+    --color-warning-text:    #92400E;
+
+    /* Error / Rojo (distinto de --color-accent que es el rojo-rosa de marca) */
+    --color-error:           #EF4444;
+    --color-error-dark:      #DC2626;
+    --color-error-light:     #FECACA;
+    --color-error-text:      #991B1B;
+
+    /* Información / Azul */
+    --color-info:            #3B82F6;
+    --color-info-dark:       #2563EB;
+    --color-info-light:      #DBEAFE;
+    --color-info-text:       #1E40AF;
+
+    /* Púrpura */
+    --color-purple:          #8B5CF6;
+    --color-purple-dark:     #7C3AED;
+
+    /* ================================================================
+     * ESCALA DE GRISES NEUTROS
+     * Para tablas, bordes, textos secundarios y fondos sutiles.
+     * ================================================================ */
+
+    --color-gray-50:    #F9FAFB;   /* Fondo header de tabla */
+    --color-gray-100:   #F3F4F6;   /* Hover de fila */
+    --color-gray-200:   #E5E7EB;   /* Bordes de tabla */
+    --color-gray-300:   #D1D5DB;
+    --color-gray-400:   #9CA3AF;   /* Texto deshabilitado */
+    --color-gray-500:   #6B7280;   /* Texto de encabezado de tabla */
+    --color-gray-700:   #374151;
+
+    /* ================================================================
+     * COLORES DE BADGES ESPECÍFICOS
+     * Para rating y categoría — usados en tablas de inscripciones.
+     * ================================================================ */
+
+    --badge-rating-bg:       #FEF3C7;
+    --badge-rating-text:     #92400E;
+    --badge-category-bg:     #E0E7FF;
+    --badge-category-text:   #3730A3;
+
+    /* ================================================================
+     * SISTEMA DE ESPACIADO
+     * Escala de 4px. Uso: padding, margin, gap.
+     * ================================================================ */
+
+    --space-1:    0.25rem;   /*  4px */
+    --space-2:    0.5rem;    /*  8px */
+    --space-3:    0.75rem;   /* 12px */
+    --space-4:    1rem;      /* 16px */
+    --space-5:    1.25rem;   /* 20px */
+    --space-6:    1.5rem;    /* 24px */
+    --space-8:    2rem;      /* 32px */
+    --space-10:   2.5rem;    /* 40px */
+    --space-12:   3rem;      /* 48px */
+    --space-16:   4rem;      /* 64px */
+
+    /* ================================================================
+     * BORDER RADIUS
+     * ================================================================ */
+
+    --radius-sm:    6px;
+    --radius-md:    8px;
+    --radius-lg:    12px;
+    --radius-xl:    16px;
+    --radius-2xl:   20px;
+    --radius-full:  9999px;
+
+    /* ================================================================
+     * SOMBRAS
+     * ================================================================ */
+
+    --shadow-sm:       0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md:       0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-hover:    0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-header:   0 2px 10px rgba(0, 0, 0, 0.10);
+    --shadow-modal:    0 10px 40px rgba(0, 0, 0, 0.30);
+    --shadow-modal-lg: 0 20px 60px rgba(0, 0, 0, 0.30);
+    --shadow-brown:    0 4px 12px rgba(133, 77, 46, 0.30);
+    --shadow-brown-lg: 0 6px 20px rgba(133, 77, 46, 0.30);
+
+    /* ================================================================
+     * TRANSICIONES
+     * ================================================================ */
+
+    --transition-fast: all 0.2s ease;
+    --transition-base: all 0.3s ease;
+    --transition-slow: all 0.5s ease;
+
+    /* ================================================================
+     * Z-INDEX
+     * Jerarquía de capas del sistema — nunca usar valores literales.
+     * ================================================================ */
+
+    --z-dropdown:        100;
+    --z-sidebar-overlay: 899;
+    --z-sidebar:         900;
+    --z-header:          1000;
+    --z-modal:           9999;
+    --z-toast:           10000;
+
+    /* ================================================================
+     * LAYOUT
+     * ================================================================ */
+
+    --sidebar-width:           260px;
+    --sidebar-collapsed-width:  70px;
+    --header-height:            70px;
+    --content-max-width:      1400px;
+
+    /* ================================================================
+     * TIPOGRAFÍA
+     * ================================================================ */
+
+    --font-family: 'ABeeZee', sans-serif;
+
+    --text-xs:   0.75rem;    /* 12px */
+    --text-sm:   0.875rem;   /* 14px */
+    --text-base: 1rem;       /* 16px */
+    --text-lg:   1.125rem;   /* 18px */
+    --text-xl:   1.25rem;    /* 20px */
+    --text-2xl:  1.5rem;     /* 24px */
+    --text-3xl:  1.875rem;   /* 30px */
+    --text-4xl:  2.5rem;     /* 40px */
+}

@@ -1,0 +1,121 @@
+/*
+ * animations.css — Keyframes Centralizados
+ *
+ * PROBLEMA QUE RESUELVE:
+ * @keyframes fadeIn y @keyframes slideUp estaban copiados literalmente
+ * en más de 10 archivos CSS distintos. Si se necesitaba ajustar el
+ * timing o el easing, había que editar cada archivo por separado.
+ *
+ * Al centralizar aquí, una sola definición es accesible globalmente
+ * porque este archivo se carga antes que cualquier componente.
+ * Los archivos CSS de componentes solo necesitan usar el nombre
+ * de la animación, sin redefinirla.
+ *
+ * ANIMACIONES DISPONIBLES:
+ *   fadeIn       — aparición con opacidad (overlays, dropdowns)
+ *   slideUp      — entrada desde abajo (modales, cards)
+ *   slideDown    — entrada desde arriba (dropdowns del header)
+ *   slideInRight — entrada desde la derecha (toasts)
+ *   float        — flotación suave (decoración login)
+ *   spin         — rotación 360° (íconos de carga)
+ *   pulse        — parpadeo de opacidad (skeleton loaders, futuros)
+ */
+
+/* Aparición con opacidad — overlays y transiciones sutiles */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Entrada desde abajo — modales y cards que aparecen */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Entrada desde abajo más pronunciada — modales grandes */
+@keyframes slideUpLg {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Entrada desde arriba — dropdowns del header/perfil */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Entrada desde la derecha — toasts/notificaciones */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Flotación suave — decoración de fondo en login */
+@keyframes float {
+    0%,  100% { transform: translateY(0)     rotate(0deg);  }
+    25%        { transform: translateY(-20px) rotate(5deg);  }
+    75%        { transform: translateY(10px)  rotate(-3deg); }
+}
+
+/* Rotación — íconos fa-spin / ph spin en estados de carga */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Font Awesome trae su propia .fa-spin; Phosphor no, así que se define aquí
+   para que app-icon/app-button puedan animar un ícono de carga sin CSS propio. */
+.ph-spin {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* Entrada desde arriba — login card */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Vibración horizontal — mensajes de error en formularios */
+@keyframes shake {
+    0%,  100% { transform: translateX(0);    }
+    25%         { transform: translateX(-8px); }
+    75%         { transform: translateX(8px);  }
+}
+
+/* Parpadeo de opacidad — skeleton loaders o indicadores activos */
+@keyframes pulse {
+    0%,  100% { opacity: 1;   }
+    50%        { opacity: 0.4; }
+}

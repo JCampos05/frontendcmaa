@@ -1,0 +1,160 @@
+<div class="listas-container">
+    <app-toast-noti></app-toast-noti>
+
+    <app-page-header
+        icon="list-numbers"
+        [title]="'Listas de Jugadores - ' + (torneoSeleccionado?.nombre || 'Torneo')"
+        [subtitle]="formatearFecha(torneoSeleccionado?.fecha) + ' - ' + (torneoSeleccionado?.lugar || '')"
+        [hasActions]="false">
+    </app-page-header>
+
+    <app-state-message *ngIf="cargando" mode="loading" title="Cargando información..."></app-state-message>
+
+    <div *ngIf="error && !cargando" class="error-container">
+        <app-state-message mode="error" [title]="error"></app-state-message>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarTorneoActual()">Reintentar</app-button>
+    </div>
+
+    <app-empty-state *ngIf="sinDatos && !cargando && !error"
+        icon="trophy" [title]="sinDatos" description="Activa un torneo para ver sus listas de jugadores">
+    </app-empty-state>
+
+    <div *ngIf="!cargando && !error && !sinDatos" class="content-wrapper">
+
+        <div class="carga-ratings-section">
+            <div class="carga-header">
+                <div class="header-info">
+                    <app-icon name="file-text"></app-icon>
+                    <div>
+                        <h3>Cargar Archivo FENAMAC</h3>
+                        <p>Selecciona el archivo Excel con los datos de ratings</p>
+                    </div>
+                </div>
+                <div class="archivo-status" *ngIf="archivoSeleccionado">
+                    <app-icon name="check-circle"></app-icon>
+                    <span>{{ datosFenamac.length }} jugadores cargados</span>
+                </div>
+            </div>
+
+            <div class="carga-actions">
+                <label class="btn-cargar-archivo">
+                    <app-icon name="upload-simple"></app-icon>
+                    <span>{{ archivoSeleccionado ? 'Cambiar Archivo' : 'Seleccionar Archivo Excel' }}</span>
+                    <input type="file" accept=".xls,.xlsx" (change)="onFileSelected($event)" style="display: none;">
+                </label>
+
+                <app-button
+                    variant="primary"
+                    [icon]="procesando ? 'spinner' : 'arrow-clockwise'"
+                    [disabled]="!archivoSeleccionado || procesando"
+                    (clicked)="actualizarRatings()">
+                    {{ procesando ? 'Procesando...' : 'Actualizar Ratings' }}
+                </app-button>
+            </div>
+
+            <div class="alerta-info">
+                <app-icon name="info"></app-icon>
+                <div>
+                    <strong>Instrucciones:</strong>
+                    <ol>
+                        <li>Primero carga el archivo Excel con los datos actualizados de FENAMAC</li>
+                        <li>Verifica que los datos se hayan cargado correctamente</li>
+                        <li>Presiona "Actualizar Ratings" para actualizar TODOS los jugadores inscritos</li>
+                        <li>Los jugadores no encontrados tendrán rating = 0</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="categorias-section">
+            <div class="section-header">
+                <div class="header-left">
+                    <app-icon name="users"></app-icon>
+                    <h2>Jugadores Inscritos</h2>
+                </div>
+                <div class="header-actions">
+                    <app-button variant="success" icon="file-text" (clicked)="exportarExcel()">Exportar Listas</app-button>
+                    <app-button
+                        *ngIf="archivoSeleccionado"
+                        variant="purple"
+                        [icon]="mostrarDetalleCoincidencias ? 'eye-slash' : 'eye'"
+                        (clicked)="toggleDetalleCoincidencias()">
+                        {{ mostrarDetalleCoincidencias ? 'Ocultar Detalle' : 'Ver Detalle' }}
+                    </app-button>
+                </div>
+            </div>
+
+            <app-filter-chips
+                [options]="categoriaFilterOptions"
+                [active]="categoriaFilterActive"
+                (change)="onCategoriaFilterChange($event)">
+            </app-filter-chips>
+
+            <app-data-table
+                [columns]="columnasTabla"
+                [rows]="jugadoresFiltrados"
+                emptyIcon="tray"
+                emptyTitle="No hay jugadores en esta categoría"
+                emptyDescription="">
+                <ng-template let-jugador>
+                    <tr [class.sin-rating]="jugador.rating === 0"
+                        [class.rating-actualizado]="jugador.rating !== jugador.ratingAnterior && archivoSeleccionado">
+                        <td class="col-numero">{{ jugadoresFiltrados.indexOf(jugador) + 1 }}</td>
+                        <td class="col-nombre">
+                            <div class="nombre-completo">{{ jugador.nombreCompleto }}</div>
+                        </td>
+                        <td class="col-telefono">{{ jugador.telefono || '-' }}</td>
+                        <td class="col-categoria" *ngIf="categoriaSeleccionada === null">
+                            <span class="categoria-badge">{{ jugador.categoria }}</span>
+                        </td>
+                        <td class="col-rating">
+                            <div class="rating-container">
+                                <span class="rating-value" [class.rating-cero]="jugador.rating === 0">
+                                    {{ jugador.rating }}
+                                </span>
+                                <span class="rating-cambio" *ngIf="jugador.rating !== jugador.ratingAnterior && archivoSeleccionado">
+                                    <app-icon name="arrow-right"></app-icon>
+                                    {{ jugador.ratingAnterior }}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="col-nombre" *ngIf="mostrarDetalleCoincidencias && archivoSeleccionado">
+                            <div class="fenamac-detalle">
+                                <span *ngIf="jugador.encontrado" class="fenamac-encontrado">{{ jugador.nombreEncontradoFEN }}</span>
+                                <span *ngIf="!jugador.encontrado" class="fenamac-no-encontrado">No encontrado en FENAMAC</span>
+                                <span *ngIf="jugador.encontrado && jugador.scoreCoincidencia"
+                                    class="categoria-badge"
+                                    [class.score-alto]="jugador.scoreCoincidencia >= 85"
+                                    [class.score-bajo]="jugador.scoreCoincidencia < 85">
+                                    <app-icon name="check-circle"></app-icon>
+                                    Encontrado - {{ jugador.scoreCoincidencia }}% coincidencia
+                                </span>
+                            </div>
+                        </td>
+                        <td class="col-estado">
+                            <app-badge
+                                [status]="getEstadoBadgeStatus(jugador.estadoInscripcion)"
+                                [text]="jugador.estadoInscripcion === 'confirmado' ? 'Confirmado' : jugador.estadoInscripcion === 'cancelado' ? 'Cancelado' : 'Pendiente'">
+                            </app-badge>
+                        </td>
+                    </tr>
+                </ng-template>
+            </app-data-table>
+        </div>
+
+        <div class="resumen-section" *ngIf="archivoSeleccionado">
+            <div class="resumen-header">
+                <app-icon name="chart-pie"></app-icon>
+                <h3>Resumen de Actualización</h3>
+            </div>
+            <app-stat-card-grid [stats]="resumenStats"></app-stat-card-grid>
+        </div>
+    </div>
+    <app-modal-confirmacion [mostrar]="mostrarModalConfirmacion" titulo="Confirmar actualización"
+        mensaje="¿Estás seguro de actualizar los ratings de TODOS los jugadores inscritos?"
+        mensajeSecundario="Esta acción actualizará los ratings de todos los jugadores con la información del archivo FENAMAC cargado."
+        textoConfirmar="Actualizar" textoCancelar="Cancelar" icono="fa-triangle-exclamation"
+        iconoBotonPrimario="fa-sync-alt" tipoBotonPrimario="primary" (confirmar)="confirmarActualizacion()"
+        (cancelar)="cancelarActualizacion()">
+    </app-modal-confirmacion>
+</div>

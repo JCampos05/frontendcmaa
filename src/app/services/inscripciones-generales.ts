@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../environment/enviroment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,19 +12,17 @@ export class InscripcionesGeneralesService {
 
   constructor(private http: HttpClient) {}
 
-  getResumenGeneral(periodo: 'dia' | 'semana' | 'mes' | 'anio' = 'mes'): Observable<any> {
-    const params = new HttpParams().set('periodo', periodo);
+  getResumenGeneral(periodo?: 'dia' | 'semana' | 'mes' | 'anio'): Observable<any> {
+    const params = periodo ? new HttpParams().set('periodo', periodo) : new HttpParams();
     return this.http.get<any>(`${this.apiUrl}/resumen`, { params }).pipe(
       map(response => response.data || response),
       catchError(this.handleError)
     );
   }
 
-  getEvolucionTemporal(periodo: 'dia' | 'semana' | 'mes' | 'anio', fechaInicio?: string, fechaFin?: string): Observable<any[]> {
-    let params = new HttpParams().set('periodo', periodo);
-    if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
-    if (fechaFin) params = params.set('fechaFin', fechaFin);
-
+  /** Sin periodo: histórico completo por año. Con periodo: agrupado según el período elegido. */
+  getEvolucionTemporal(periodo?: 'dia' | 'semana' | 'mes' | 'anio'): Observable<any[]> {
+    const params = periodo ? new HttpParams().set('periodo', periodo) : new HttpParams();
     return this.http.get<any>(`${this.apiUrl}/evolucion-temporal`, { params }).pipe(
       map(response => response.data || response || []),
       catchError(this.handleError)

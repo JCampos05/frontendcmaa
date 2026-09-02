@@ -1,0 +1,11 @@
+.admin-list-page {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: var(--space-8);
+}
+
+@media (max-width: 768px) {
+    .admin-list-page {
+        padding: var(--space-5);
+    }
+}

@@ -1,0 +1,283 @@
+<div class="gestion-jugadores-container">
+    <app-page-header icon="user-gear" title="Gestión de Jugadores" subtitle="Busca y administra información de jugadores">
+        <app-button actions variant="secondary" icon="arrow-left" (clicked)="volver()">Volver</app-button>
+    </app-page-header>
+
+    <!-- Sección de Búsqueda -->
+    <div class="busqueda-section">
+        <div class="busqueda-header">
+            <app-icon name="magnifying-glass"></app-icon>
+            <h2>Buscar Jugador</h2>
+        </div>
+
+        <div class="busqueda-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label"><app-icon name="user" class="form-label-icon"></app-icon> Nombre</label>
+                    <input type="text" [(ngModel)]="nombreBusqueda" placeholder="Nombre del jugador..."
+                        class="form-control" (keyup.enter)="buscarJugador()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><app-icon name="text-aa" class="form-label-icon"></app-icon> Primer Apellido</label>
+                    <input type="text" [(ngModel)]="apellido1Busqueda" placeholder="Primer apellido..."
+                        class="form-control" (keyup.enter)="buscarJugador()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><app-icon name="text-aa" class="form-label-icon"></app-icon> Segundo Apellido</label>
+                    <input type="text" [(ngModel)]="apellido2Busqueda" placeholder="Segundo apellido (opcional)..."
+                        class="form-control" (keyup.enter)="buscarJugador()">
+                </div>
+            </div>
+
+            <div class="busqueda-actions">
+                <app-button variant="primary" [icon]="buscando ? 'spinner' : 'magnifying-glass'" [loading]="buscando" (clicked)="buscarJugador()">
+                    {{ buscando ? 'Buscando...' : 'Buscar' }}
+                </app-button>
+                <app-button variant="secondary" icon="broom" (clicked)="limpiarBusqueda()">Limpiar</app-button>
+            </div>
+        </div>
+
+        <!-- Resultados de búsqueda múltiple -->
+        <div class="resultados-busqueda" *ngIf="resultadosBusqueda.length > 1">
+            <div class="resultados-header">
+                <app-icon name="list"></app-icon>
+                <span>{{ resultadosBusqueda.length }} jugadores encontrados</span>
+            </div>
+            <div class="jugadores-grid">
+                <div *ngFor="let jugador of resultadosBusqueda" class="jugador-card"
+                    (click)="seleccionarJugador(jugador)">
+                    <div class="jugador-avatar-small">
+                        <app-icon name="user"></app-icon>
+                    </div>
+                    <div class="jugador-info-small">
+                        <span class="nombre">
+                            {{ jugador.nombre }} {{ jugador.apellido1 }} {{ jugador.apellido2 }}
+                        </span>
+                        <div class="jugador-meta">
+                            <span class="rating-badge" *ngIf="jugador.rating">
+                                <app-icon name="star"></app-icon>
+                                {{ jugador.rating }}
+                            </span>
+                            <span class="estado">
+                                {{ jugador.estado }}
+                            </span>
+                        </div>
+                    </div>
+                    <app-icon name="caret-right" class="arrow-icon"></app-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Jugador Seleccionado -->
+    <div *ngIf="jugadorSeleccionado" class="jugador-detalle-section">
+        <div class="jugador-info-card">
+            <div class="card-header">
+                <div class="header-left">
+                    <div class="jugador-avatar">
+                        <app-icon name="user"></app-icon>
+                    </div>
+                    <div class="jugador-info">
+                        <h2 class="jugador-nombre">
+                            {{ jugadorSeleccionado.nombre }}
+                            {{ jugadorSeleccionado.apellido1 }}
+                            {{ jugadorSeleccionado.apellido2 }}
+                        </h2>
+                        <div class="jugador-badges">
+                            <span class="rating-badge" *ngIf="jugadorSeleccionado.rating">
+                                <app-icon name="star"></app-icon>
+                                {{ jugadorSeleccionado.rating }}
+                            </span>
+                            <app-badge [status]="jugadorSeleccionado.estado === 'activo' ? 'active' : 'inactive'" [text]="jugadorSeleccionado.estado || ''"></app-badge>
+                        </div>
+                    </div>
+                </div>
+                <app-button variant="warning" icon="pencil-simple" *ngIf="!modoEdicion" (clicked)="activarEdicion()">Editar</app-button>
+            </div>
+
+            <!-- Modo visualización -->
+            <div class="datos-grid" *ngIf="!modoEdicion">
+                <div class="dato-item">
+                    <app-icon name="phone"></app-icon>
+                    <div class="dato-content">
+                        <span class="dato-label">Teléfono</span>
+                        <span class="dato-value">{{ formatearTelefono(jugadorSeleccionado.telefono) }}</span>
+                    </div>
+                </div>
+                <div class="dato-item">
+                    <app-icon name="cake"></app-icon>
+                    <div class="dato-content">
+                        <span class="dato-label">Fecha de Nacimiento</span>
+                        <span class="dato-value">{{ formatearFecha(jugadorSeleccionado.fechaNacimiento) }}</span>
+                    </div>
+                </div>
+                <div class="dato-item">
+                    <app-icon name="calendar"></app-icon>
+                    <div class="dato-content">
+                        <span class="dato-label">Fecha de Registro</span>
+                        <span class="dato-value">{{ formatearFecha(jugadorSeleccionado.fechaRegistro) }}</span>
+                    </div>
+                </div>
+                <div class="dato-item full-width" *ngIf="jugadorSeleccionado.notas">
+                    <app-icon name="file-text"></app-icon>
+                    <div class="dato-content">
+                        <span class="dato-label">Notas</span>
+                        <span class="dato-value">{{ jugadorSeleccionado.notas }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modo edición -->
+            <div class="edicion-form" *ngIf="modoEdicion">
+                <div class="form-grid-edit">
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="user" class="form-label-icon"></app-icon> Nombre</label>
+                        <input type="text" [(ngModel)]="jugadorEditado.nombre" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="text-aa" class="form-label-icon"></app-icon> Primer Apellido</label>
+                        <input type="text" [(ngModel)]="jugadorEditado.apellido1" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="text-aa" class="form-label-icon"></app-icon> Segundo Apellido</label>
+                        <input type="text" [(ngModel)]="jugadorEditado.apellido2" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="phone" class="form-label-icon"></app-icon> Teléfono</label>
+                        <input type="tel" [(ngModel)]="jugadorEditado.telefono" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="cake" class="form-label-icon"></app-icon> Fecha de Nacimiento</label>
+                        <input type="date" [(ngModel)]="jugadorEditado.fechaNacimiento" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="star" class="form-label-icon"></app-icon> Rating</label>
+                        <input type="number" [(ngModel)]="jugadorEditado.rating" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="toggle-right" class="form-label-icon"></app-icon> Estado</label>
+                        <select [(ngModel)]="jugadorEditado.estado" class="form-control">
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                            <option value="retirado">Retirado</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label"><app-icon name="file-text" class="form-label-icon"></app-icon> Notas</label>
+                        <textarea [(ngModel)]="jugadorEditado.notas" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="edicion-actions">
+                    <app-button variant="success" icon="floppy-disk" [loading]="cargando" (clicked)="guardarCambios()">Guardar Cambios</app-button>
+                    <app-button variant="secondary" icon="x" (clicked)="cancelarEdicion()">Cancelar</app-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial por Torneo -->
+        <div class="historial-section" *ngIf="historialTorneos.length > 0">
+            <div class="section-header">
+                <app-icon name="clock-clockwise"></app-icon>
+                <h2>Historial de Torneos</h2>
+                <span class="badge">{{ historialTorneos.length }} torneos</span>
+            </div>
+
+            <div class="torneos-list">
+                <div *ngFor="let historial of historialTorneos" class="torneo-card">
+                    <div class="torneo-header" (click)="seleccionarTorneo(historial.torneo.idTorneo!)">
+                        <div class="torneo-info">
+                            <app-icon name="trophy"></app-icon>
+                            <div>
+                                <h3 class="torneo-nombre">{{ historial.torneo.nombre || historial.torneo.lugar }}</h3>
+                                <p class="torneo-fecha">{{ formatearFecha(historial.torneo.fecha) }}</p>
+                            </div>
+                        </div>
+                        <div class="torneo-stats">
+                            <div class="stat-mini victoria">
+                                <app-icon name="check-circle"></app-icon>
+                                <span>{{ historial.estadisticas.victorias }}</span>
+                            </div>
+                            <div class="stat-mini empate">
+                                <app-icon name="circle-half"></app-icon>
+                                <span>{{ historial.estadisticas.empates }}</span>
+                            </div>
+                            <div class="stat-mini derrota">
+                                <app-icon name="x-circle"></app-icon>
+                                <span>{{ historial.estadisticas.derrotas }}</span>
+                            </div>
+                            <div class="stat-puntos">
+                                <app-icon name="trophy"></app-icon>
+                                <span>{{ historial.estadisticas.puntos }} pts</span>
+                            </div>
+                        </div>
+                        <app-icon name="caret-down" class="toggle-icon" [class.rotated]="torneoSeleccionado === historial.torneo.idTorneo"></app-icon>
+                    </div>
+
+                    <!-- Detalles del torneo expandido -->
+                    <div class="torneo-details" *ngIf="torneoSeleccionado === historial.torneo.idTorneo">
+                        <div class="partidas-grid">
+                            <div *ngFor="let partida of historial.partidas" class="partida-card"
+                                [ngClass]="getResultadoClase(partida.puntosObtenidos)">
+                                <div class="partida-header">
+                                    <div class="partida-ronda">
+                                        <app-icon name="flag"></app-icon>
+                                        <span>Ronda {{ partida.numeroRonda }}</span>
+                                    </div>
+                                    <div class="partida-mesa">
+                                        <app-icon name="grid-four"></app-icon>
+                                        <span>Mesa {{ partida.numeroMesa }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="partida-body">
+                                    <div class="color-badge" [class.color-blanco]="partida.color === 'blanco'"
+                                        [class.color-negro]="partida.color === 'negro'">
+                                        <app-icon name="square"></app-icon>
+                                        <span>{{ partida.color === 'blanco' ? 'Blancas' : 'Negras' }}</span>
+                                    </div>
+
+                                    <div class="vs-separator">vs</div>
+
+                                    <div class="rival-info">
+                                        <span class="rival-nombre">{{ partida.rival }}</span>
+                                        <span class="rival-rating" *ngIf="partida.ratingRival">
+                                            <app-icon name="star"></app-icon>
+                                            {{ partida.ratingRival }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="partida-resultado">
+                                    <div class="resultado-badge">
+                                        <app-icon [name]="partida.puntosObtenidos === 1 ? 'trophy' : partida.puntosObtenidos === 0.5 ? 'handshake' : 'x'"></app-icon>
+                                        <span>{{ getResultadoTexto(partida.puntosObtenidos) }}</span>
+                                        <span class="puntos-badge">{{ partida.puntosObtenidos }} pts</span>
+                                    </div>
+                                </div>
+
+                                <div class="partida-footer" *ngIf="partida.tipoFinalizacion">
+                                    <app-icon name="info"></app-icon>
+                                    <span>{{ getTipoFinalizacionTexto(partida.tipoFinalizacion) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <app-empty-state
+            *ngIf="!cargandoHistorial && historialTorneos.length === 0"
+            icon="tray"
+            title="Sin historial de torneos"
+            description="Este jugador aún no tiene participaciones registradas">
+        </app-empty-state>
+
+        <app-state-message *ngIf="cargandoHistorial" mode="loading" title="Cargando historial..."></app-state-message>
+    </div>
+</div>
+
+<app-toast-noti></app-toast-noti>

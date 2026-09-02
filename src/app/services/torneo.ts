@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../environment/enviroment';
 import { Torneo } from '../models/torneo';
 
 @Injectable({
@@ -194,6 +194,26 @@ export class TorneoService {
    */
   toggleActive(id: number, activo: boolean): Observable<Torneo> {
     return this.http.patch<any>(`${this.apiUrl}/${id}/toggle`, { activo }).pipe(
+      map(response => response.data || response),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * POST /api/torneos/:id/admins - Asignar adminTorneo a un torneo
+   */
+  assignAdmin(idTorneo: number, idUsuario: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${idTorneo}/admins`, { idUsuario }).pipe(
+      map(response => response.data || response),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * DELETE /api/torneos/:id/admins/:idUsuario - Quitar adminTorneo de un torneo
+   */
+  removeAdmin(idTorneo: number, idUsuario: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${idTorneo}/admins/${idUsuario}`).pipe(
       map(response => response.data || response),
       catchError(this.handleError)
     );

@@ -1,0 +1,257 @@
+/*
+ * buttons.css — Sistema Unificado de Botones
+ *
+ * PROBLEMA QUE RESUELVE:
+ * La app tiene más de 25 clases de botón distintas con nombres locales:
+ * .btn-nuevo-torneo, .btn-accion, .btn-retry, .btn-action, .btn-ver,
+ * .btn-editar, .btn-eliminar, .btn-export, .btn-rating, .btn-crear-ronda,
+ * .btn-modal, .btn-accion-icon, etc. Todos son variaciones del mismo
+ * patrón pero sin sistema ni consistencia.
+ *
+ * Este archivo establece un sistema con 2 dimensiones:
+ *   - Variante semántica (primary, secondary, danger, success, info…)
+ *   - Tamaño (sm, base, lg, xl, icon)
+ *
+ * Los componentes nuevos usan este sistema.
+ * Los existentes se migran progresivamente al remodelar cada vista.
+ *
+ * USO:
+ *   <button class="btn btn-primary">Guardar</button>
+ *   <button class="btn btn-danger btn-sm">Eliminar</button>
+ *   <button class="btn btn-icon btn-info"><ph-pencil /></button>
+ */
+
+/* ================================================================
+ * BASE
+ * ================================================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition-base);
+    outline: none;
+}
+
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn:focus-visible {
+    outline: 3px solid var(--color-brown);
+    outline-offset: 2px;
+}
+
+/* ================================================================
+ * VARIANTES DE COLOR
+ * ================================================================ */
+
+/* Primary — acción principal de la página, marrón del sistema */
+.btn-primary {
+    background: var(--color-brown);
+    color: var(--color-white);
+    border-color: var(--color-brown);
+}
+.btn-primary:hover:not(:disabled) {
+    background: var(--color-dark-brown);
+    border-color: var(--color-dark-brown);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-brown);
+}
+
+/* Secondary — acción secundaria, fondo gris claro */
+.btn-secondary {
+    background: var(--color-light-gray);
+    color: var(--color-dark-navy);
+    border-color: var(--color-light-gray);
+}
+.btn-secondary:hover:not(:disabled) {
+    background: var(--color-slate);
+    color: var(--color-white);
+    border-color: var(--color-slate);
+}
+
+/* Ghost — borde visible, fondo transparente */
+.btn-ghost {
+    background: transparent;
+    color: var(--color-brown);
+    border-color: var(--color-brown);
+}
+.btn-ghost:hover:not(:disabled) {
+    background: var(--color-brown);
+    color: var(--color-white);
+}
+
+/* Dark — acciones de export/sistema sobre fondo oscuro */
+.btn-dark {
+    background: var(--color-dark-navy);
+    color: var(--color-white);
+    border-color: var(--color-dark-navy);
+}
+.btn-dark:hover:not(:disabled) {
+    background: var(--color-slate);
+    border-color: var(--color-slate);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(17, 34, 57, 0.3);
+}
+
+/* Danger — eliminar, cancelar */
+.btn-danger {
+    background: var(--color-accent);
+    color: var(--color-white);
+    border-color: var(--color-accent);
+}
+.btn-danger:hover:not(:disabled) {
+    background: var(--color-error-dark);
+    border-color: var(--color-error-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Success — confirmar pago, iniciar ronda */
+.btn-success {
+    background: var(--color-success);
+    color: var(--color-white);
+    border-color: var(--color-success);
+}
+.btn-success:hover:not(:disabled) {
+    background: var(--color-success-dark);
+    border-color: var(--color-success-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Info — acciones de cargar/importar */
+.btn-info {
+    background: var(--color-info);
+    color: var(--color-white);
+    border-color: var(--color-info);
+}
+.btn-info:hover:not(:disabled) {
+    background: var(--color-info-dark);
+    border-color: var(--color-info-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Warning — editar, modificar */
+.btn-warning {
+    background: var(--color-warning);
+    color: var(--color-white);
+    border-color: var(--color-warning);
+}
+.btn-warning:hover:not(:disabled) {
+    background: var(--color-warning-dark);
+    border-color: var(--color-warning-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* Purple — emparejamiento manual, acciones especiales */
+.btn-purple {
+    background: var(--color-purple);
+    color: var(--color-white);
+    border-color: var(--color-purple);
+}
+.btn-purple:hover:not(:disabled) {
+    background: var(--color-purple-dark);
+    border-color: var(--color-purple-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* ================================================================
+ * TAMAÑOS
+ * ================================================================ */
+
+.btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+}
+
+/* Base ya definido en .btn */
+
+.btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: 1.1rem;
+    border-radius: var(--radius-md);
+}
+
+.btn-xl {
+    padding: var(--space-4) var(--space-10);
+    font-size: 1.1rem;
+    border-radius: var(--radius-lg);
+}
+
+.btn-block {
+    width: 100%;
+}
+
+/* ================================================================
+ * BOTONES ÍCONO (cuadrados, sin texto)
+ *
+ * Usados en tablas para acciones por fila: editar, eliminar, ver.
+ * Aparecen en grupos con .btn-actions-group.
+ * ================================================================ */
+
+.btn-icon {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.btn-icon:hover:not(:disabled) {
+    transform: scale(1.1);
+}
+
+.btn-icon-md {
+    width: 36px;
+    height: 36px;
+}
+
+.btn-icon-lg {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+}
+
+/* ================================================================
+ * GRUPOS DE ACCIONES
+ * Contenedor para botones de fila en tablas.
+ * ================================================================ */
+
+.btn-actions-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    justify-content: center;
+}
+
+/* ================================================================
+ * RESPONSIVE
+ * ================================================================ */
+
+@media (max-width: 768px) {
+    .btn-block-mobile {
+        width: 100%;
+        justify-content: center;
+    }
+}

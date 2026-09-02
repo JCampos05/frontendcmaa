@@ -1,7 +1,7 @@
 <div class="modal-overlay" *ngIf="mostrar" (click)="onCancelar()">
     <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <i class="fa-solid" [ngClass]="icono"></i>
+            <i class="ph-bold" [ngClass]="icono"></i>
             <h3>{{ titulo }}</h3>
         </div>
         <div class="modal-body">
@@ -11,14 +11,14 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn-modal-cancel" (click)="onCancelar()">
-                <i class="fa-solid fa-xmark"></i>
+                <i class="ph-bold ph-x"></i>
                 {{ textoCancelar }}
             </button>
             <button type="button" class="btn-modal-primary" [ngClass]="{
               'btn-modal-danger': tipoBotonPrimario === 'danger',
               'btn-modal-secondary': tipoBotonPrimario === 'secondary'
             }" (click)="onConfirmar()">
-                <i class="fa-solid" [ngClass]="iconoBotonPrimario"></i>
+                <i class="ph-bold" [ngClass]="iconoBotonPrimario"></i>
                 {{ textoConfirmar }}
             </button>
         </div>

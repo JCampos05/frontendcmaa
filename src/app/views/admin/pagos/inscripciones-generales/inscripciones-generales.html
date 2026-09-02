@@ -1,0 +1,217 @@
+<div class="inscripciones-generales-container">
+    <!-- Toast Notifications -->
+    <app-toast-noti></app-toast-noti>
+
+    <!-- Export Modal -->
+    <app-export-modal (exportar)="onExportar($event)"></app-export-modal>
+
+    <!-- Header -->
+    <app-page-header icon="chart-pie" title="Vista General de Inscripciones" subtitle="Resumen de actividad y estadísticas del módulo">
+        <app-button actions icon="file-text" (clicked)="exportarReporte()">Exportar</app-button>
+    </app-page-header>
+
+    <!-- Loading -->
+    <app-state-message *ngIf="cargando" mode="loading" title="Cargando información..."></app-state-message>
+
+    <!-- Error -->
+    <div *ngIf="error && !cargando" class="error-container">
+        <app-icon name="warning-circle"></app-icon>
+        <p>{{ error }}</p>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarDatos()">Reintentar</app-button>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div *ngIf="!cargando && !error" class="content-wrapper">
+
+        <!-- Selector de Periodo -->
+        <div class="periodo-selector">
+            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'dia'"
+                (click)="cambiarPeriodo('dia')">
+                <app-icon name="calendar"></app-icon>
+                Último Día
+            </button>
+            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'semana'"
+                (click)="cambiarPeriodo('semana')">
+                <app-icon name="calendar"></app-icon>
+                Última Semana
+            </button>
+            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'mes'"
+                (click)="cambiarPeriodo('mes')">
+                <app-icon name="calendar"></app-icon>
+                Último Mes
+            </button>
+            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'anio'"
+                (click)="cambiarPeriodo('anio')">
+                <app-icon name="calendar-blank"></app-icon>
+                Último Año
+            </button>
+
+            <label class="periodo-filtro-checkbox">
+                <input type="checkbox" [(ngModel)]="filtroPeriodoActivo">
+                Aplicar filtro de período
+            </label>
+            <app-button icon="funnel" (clicked)="aplicarFiltroPeriodo()">Aplicar</app-button>
+        </div>
+
+        <!-- Resumen General -->
+        <app-stat-card-grid *ngIf="resumenGeneral" [stats]="resumenStats"></app-stat-card-grid>
+
+        <!-- Evolución Temporal -->
+        <div class="grafica-section">
+            <div class="grafica-header">
+                <app-icon name="chart-pie"></app-icon>
+                <h3>Evolución Temporal de Inscripciones</h3>
+            </div>
+            <div class="grafica-body">
+                <canvas id="chartEvolucion" #canvasEvolucion></canvas>
+            </div>
+        </div>
+
+        <!-- Resumen de Torneos -->
+        <div class="torneos-resumen" *ngIf="resumenTorneos">
+            <div class="section-header">
+                <app-icon name="grid-four"></app-icon>
+                <h3>Resumen de Torneos</h3>
+            </div>
+
+            <div class="torneos-grid">
+                <!-- Torneos Pasados -->
+                <div class="torneo-card pasado">
+                    <div class="torneo-icon">
+                        <app-icon name="calendar-x"></app-icon>
+                    </div>
+                    <div class="torneo-info">
+                        <span class="torneo-label">Torneos Realizados</span>
+                        <span class="torneo-value">{{ resumenTorneos.torneosPasados }}</span>
+                    </div>
+                </div>
+
+                <!-- Torneo Actual -->
+                <div class="torneo-card actual" *ngIf="resumenTorneos.torneoActual">
+                    <div class="torneo-icon">
+                        <app-icon name="trophy"></app-icon>
+                    </div>
+                    <div class="torneo-info">
+                        <span class="torneo-label">Torneo Actual</span>
+                        <span class="torneo-value">{{ resumenTorneos.torneoActual.nombre || resumenTorneos.torneoActual.lugar }}</span>
+                        <span class="torneo-detail">{{ resumenTorneos.torneoActual.totalInscripciones }} inscritos</span>
+                    </div>
+                </div>
+
+                <!-- Sin Torneo Actual -->
+                <div class="torneo-card sin-actual" *ngIf="!resumenTorneos.torneoActual">
+                    <div class="torneo-icon">
+                        <app-icon name="calendar-x"></app-icon>
+                    </div>
+                    <div class="torneo-info">
+                        <span class="torneo-label">Torneo Actual</span>
+                        <span class="torneo-value">Sin torneo hoy</span>
+                    </div>
+                </div>
+
+                <!-- Próximos Torneos -->
+                <div class="torneo-card proximo">
+                    <div class="torneo-icon">
+                        <app-icon name="calendar"></app-icon>
+                    </div>
+                    <div class="torneo-info">
+                        <span class="torneo-label">Próximos Torneos</span>
+                        <span class="torneo-value">{{ resumenTorneos.torneosProximos.length }}</span>
+                        <span class="torneo-detail" *ngIf="resumenTorneos.torneosProximos.length > 0">
+                            Próximo: {{ formatearFecha(resumenTorneos.torneosProximos[0].fecha) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Próximos Torneos -->
+            <div class="proximos-lista" *ngIf="resumenTorneos.torneosProximos.length > 0">
+                <h4>
+                    <app-icon name="list-numbers"></app-icon>
+                    Próximos Eventos
+                </h4>
+                <div class="proximos-items">
+                    <div class="proximo-item" *ngFor="let torneo of resumenTorneos.torneosProximos">
+                        <div class="proximo-fecha">
+                            <app-icon name="calendar"></app-icon>
+                            <span>{{ formatearFecha(torneo.fecha) }}</span>
+                        </div>
+                        <div class="proximo-nombre">
+                            <strong>{{ torneo.nombre || torneo.lugar }}</strong>
+                            <span class="proximo-lugar">
+                                <app-icon name="map-pin"></app-icon>
+                                {{ torneo.lugar }}
+                            </span>
+                        </div>
+                        <div class="proximo-inscritos">
+                            <app-icon name="users"></app-icon>
+                            {{ torneo.totalInscripciones }} inscritos
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inscripciones por Torneo -->
+        <div class="grafica-section">
+            <div class="grafica-header">
+                <app-icon name="chart-pie"></app-icon>
+                <h3>Top 10 Torneos con Más Inscritos</h3>
+            </div>
+            <div class="grafica-body">
+                <canvas id="chartPorTorneo" #canvasPorTorneo></canvas>
+            </div>
+        </div>
+
+        <!-- Selector de Torneo y Distribución por Categoría -->
+        <div class="distribucion-section">
+            <div class="section-header">
+                <app-icon name="funnel"></app-icon>
+                <h3>Distribución por Categoría</h3>
+            </div>
+
+            <div class="selector-container">
+                <label>
+                    <app-icon name="grid-four"></app-icon>
+                    Seleccionar Torneo
+                </label>
+                <select class="form-control" [(ngModel)]="torneoSeleccionado" (change)="onTorneoChange()">
+                    <option *ngFor="let torneo of torneos" [value]="torneo.idTorneo">
+                        {{ torneo.nombre || torneo.lugar }} - {{ formatearFecha(torneo.fecha) }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="distribucion-grid" *ngIf="distribucionCategorias.length > 0">
+                <div class="distribucion-grafica">
+                    <canvas id="chartDistribucion" #canvasDistribucion></canvas>
+                </div>
+                <div class="distribucion-tabla">
+                    <table class="tabla-categorias">
+                        <thead>
+                            <tr>
+                                <th>Categoría</th>
+                                <th class="center">Inscritos</th>
+                                <th class="right">Costo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let cat of distribucionCategorias">
+                                <td>{{ cat.categoria }}</td>
+                                <td class="center">
+                                    <span class="badge-inscritos">{{ cat.total }}</span>
+                                </td>
+                                <td class="right">${{ cat.costo | number:'1.2-2' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <app-empty-state *ngIf="distribucionCategorias.length === 0"
+                icon="tray" title="Sin inscripciones" description="No hay inscripciones en este torneo">
+            </app-empty-state>
+        </div>
+
+    </div>
+</div>
