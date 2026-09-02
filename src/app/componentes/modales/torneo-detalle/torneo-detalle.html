@@ -44,6 +44,10 @@
                         <div class="info-content">
                             <span class="info-label">Dirección</span>
                             <span class="info-value">{{ torneo.direccion }}</span>
+                            <a *ngIf="torneo.url_maps" [href]="torneo.url_maps" target="_blank" rel="noopener" class="maps-link">
+                                <i class="fa-solid fa-diamond-turn-right"></i>
+                                Cómo llegar
+                            </a>
                         </div>
                     </div>
 

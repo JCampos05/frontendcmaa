@@ -4,11 +4,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { SistemaPagoService } from '../../../../services/sistema-pago';
 import { SistemaPago } from '../../../../models/sistema-pago';
 import { ToastNoti } from '../../../../componentes/modales/toast-noti/toast-noti';
+import { PageHeaderComponent } from '../../../../componentes/organisms/page-header/page-header';
+import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 
 @Component({
   selector: 'app-sistemas-pago',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastNoti],
+  imports: [CommonModule, ReactiveFormsModule, ToastNoti, PageHeaderComponent, ButtonComponent],
   templateUrl: './sistemas-pago.html',
   styleUrls: ['./sistemas-pago.css']
 })

@@ -6,7 +6,7 @@
     <app-export-modal (exportar)="onExportar($event)"></app-export-modal>
 
     <!-- Header -->
-    <app-page-header icon="chart-pie" title="Vista General de Inscripciones" subtitle="Resumen de actividad y estadísticas del módulo">
+    <app-page-header icon="chart-pie" title="Inscripciones Generales" subtitle="Resumen de actividad y estadísticas del módulo">
         <app-button actions icon="file-text" (clicked)="exportarReporte()">Exportar</app-button>
     </app-page-header>
 
@@ -25,32 +25,16 @@
 
         <!-- Selector de Periodo -->
         <div class="periodo-selector">
-            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'dia'"
-                (click)="cambiarPeriodo('dia')">
-                <app-icon name="calendar"></app-icon>
-                Último Día
-            </button>
-            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'semana'"
-                (click)="cambiarPeriodo('semana')">
-                <app-icon name="calendar"></app-icon>
-                Última Semana
-            </button>
-            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'mes'"
-                (click)="cambiarPeriodo('mes')">
-                <app-icon name="calendar"></app-icon>
-                Último Mes
-            </button>
-            <button class="btn-periodo" [class.active]="periodoSeleccionado === 'anio'"
-                (click)="cambiarPeriodo('anio')">
-                <app-icon name="calendar-blank"></app-icon>
-                Último Año
-            </button>
+            <app-filter-chips [options]="periodoOptions" [active]="periodoSeleccionado"
+                (change)="onPeriodoChipChange($event)"></app-filter-chips>
 
-            <label class="periodo-filtro-checkbox">
-                <input type="checkbox" [(ngModel)]="filtroPeriodoActivo">
-                Aplicar filtro de período
-            </label>
-            <app-button icon="funnel" (clicked)="aplicarFiltroPeriodo()">Aplicar</app-button>
+            <div class="periodo-filtro-acciones">
+                <label class="periodo-filtro-checkbox">
+                    <input type="checkbox" [(ngModel)]="filtroPeriodoActivo">
+                    Aplicar filtro de período
+                </label>
+                <app-button icon="funnel" (clicked)="aplicarFiltroPeriodo()">Aplicar</app-button>
+            </div>
         </div>
 
         <!-- Resumen General -->
@@ -74,55 +58,7 @@
                 <h3>Resumen de Torneos</h3>
             </div>
 
-            <div class="torneos-grid">
-                <!-- Torneos Pasados -->
-                <div class="torneo-card pasado">
-                    <div class="torneo-icon">
-                        <app-icon name="calendar-x"></app-icon>
-                    </div>
-                    <div class="torneo-info">
-                        <span class="torneo-label">Torneos Realizados</span>
-                        <span class="torneo-value">{{ resumenTorneos.torneosPasados }}</span>
-                    </div>
-                </div>
-
-                <!-- Torneo Actual -->
-                <div class="torneo-card actual" *ngIf="resumenTorneos.torneoActual">
-                    <div class="torneo-icon">
-                        <app-icon name="trophy"></app-icon>
-                    </div>
-                    <div class="torneo-info">
-                        <span class="torneo-label">Torneo Actual</span>
-                        <span class="torneo-value">{{ resumenTorneos.torneoActual.nombre || resumenTorneos.torneoActual.lugar }}</span>
-                        <span class="torneo-detail">{{ resumenTorneos.torneoActual.totalInscripciones }} inscritos</span>
-                    </div>
-                </div>
-
-                <!-- Sin Torneo Actual -->
-                <div class="torneo-card sin-actual" *ngIf="!resumenTorneos.torneoActual">
-                    <div class="torneo-icon">
-                        <app-icon name="calendar-x"></app-icon>
-                    </div>
-                    <div class="torneo-info">
-                        <span class="torneo-label">Torneo Actual</span>
-                        <span class="torneo-value">Sin torneo hoy</span>
-                    </div>
-                </div>
-
-                <!-- Próximos Torneos -->
-                <div class="torneo-card proximo">
-                    <div class="torneo-icon">
-                        <app-icon name="calendar"></app-icon>
-                    </div>
-                    <div class="torneo-info">
-                        <span class="torneo-label">Próximos Torneos</span>
-                        <span class="torneo-value">{{ resumenTorneos.torneosProximos.length }}</span>
-                        <span class="torneo-detail" *ngIf="resumenTorneos.torneosProximos.length > 0">
-                            Próximo: {{ formatearFecha(resumenTorneos.torneosProximos[0].fecha) }}
-                        </span>
-                    </div>
-                </div>
-            </div>
+            <app-stat-card-grid [stats]="resumenTorneosStats"></app-stat-card-grid>
 
             <!-- Lista de Próximos Torneos -->
             <div class="proximos-lista" *ngIf="resumenTorneos.torneosProximos.length > 0">
@@ -175,11 +111,8 @@
                     <app-icon name="grid-four"></app-icon>
                     Seleccionar Torneo
                 </label>
-                <select class="form-control" [(ngModel)]="torneoSeleccionado" (change)="onTorneoChange()">
-                    <option *ngFor="let torneo of torneos" [value]="torneo.idTorneo">
-                        {{ torneo.nombre || torneo.lugar }} - {{ formatearFecha(torneo.fecha) }}
-                    </option>
-                </select>
+                <app-select [options]="torneoOptions" [value]="torneoSeleccionado"
+                    (valueChange)="onTorneoSeleccionadoChange($event)"></app-select>
             </div>
 
             <div class="distribucion-grid" *ngIf="distribucionCategorias.length > 0">
@@ -187,24 +120,18 @@
                     <canvas id="chartDistribucion" #canvasDistribucion></canvas>
                 </div>
                 <div class="distribucion-tabla">
-                    <table class="tabla-categorias">
-                        <thead>
+                    <app-data-table [columns]="distribucionColumns" [rows]="distribucionCategorias"
+                        emptyIcon="tray" emptyTitle="Sin categorías" emptyDescription="">
+                        <ng-template let-cat>
                             <tr>
-                                <th>Categoría</th>
-                                <th class="center">Inscritos</th>
-                                <th class="right">Costo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let cat of distribucionCategorias">
                                 <td>{{ cat.categoria }}</td>
                                 <td class="center">
                                     <span class="badge-inscritos">{{ cat.total }}</span>
                                 </td>
                                 <td class="right">${{ cat.costo | number:'1.2-2' }}</td>
                             </tr>
-                        </tbody>
-                    </table>
+                        </ng-template>
+                    </app-data-table>
                 </div>
             </div>
 

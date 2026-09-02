@@ -22,13 +22,14 @@ import { PageHeaderComponent } from '../../../../componentes/organisms/page-head
 import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 import { IconButtonComponent } from '../../../../componentes/atoms/icon-button/icon-button';
 import { IconComponent } from '../../../../componentes/atoms/icon/icon';
+import { DatetimeInputComponent } from '../../../../componentes/atoms/datetime-input/datetime-input';
 
 @Component({
   selector: 'app-nuevo-torneo',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent
+    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent, DatetimeInputComponent
   ],
   templateUrl: './nuevo-torneo.html',
   styleUrls: ['./nuevo-torneo.css']
@@ -71,6 +72,7 @@ export class NuevoTorneoComponent implements OnInit {
       nombre: ['', Validators.required],
       lugar: ['', Validators.required],
       direccion: ['', Validators.required],
+      url_maps: ['', [Validators.pattern(/^https?:\/\/.+/)]],
       fecha: ['', Validators.required],
       hora_inicio: ['', Validators.required],
       hora_fin: ['', Validators.required],
@@ -320,6 +322,9 @@ export class NuevoTorneoComponent implements OnInit {
         nombre: formValue.nombre,
         lugar: formValue.lugar,
         direccion: formValue.direccion,
+        // undefined (no null): el backend valida url_maps con z.string().url().optional(),
+        // que acepta ausencia del campo pero no null.
+        url_maps: formValue.url_maps || undefined,
         fecha: formValue.fecha,
         hora_inicio: formValue.hora_inicio,
         hora_fin: formValue.hora_fin,
@@ -377,7 +382,7 @@ export class NuevoTorneoComponent implements OnInit {
 
   private cierreAntesDelTorneoValidator(formGroup: AbstractControl): ValidationErrors | null {
     const fechaControl = formGroup.get('fecha');
-    const horaControl = formGroup.get('hora');
+    const horaControl = formGroup.get('hora_inicio');
     const cierreControl = formGroup.get('cierreInscripciones');
 
     if (!fechaControl || !horaControl || !cierreControl) {

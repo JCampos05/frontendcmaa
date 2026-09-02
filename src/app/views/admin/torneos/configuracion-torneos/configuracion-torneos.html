@@ -1,14 +1,10 @@
 <div class="config-container">
     <app-toast-noti></app-toast-noti>
-    <div class="header-section">
-        <div class="header-content">
-            <i class="ph-bold ph-sliders ph-icon"></i>
-            <div class="header-text">
-                <h1>Configuración de Torneos</h1>
-                <p>Gestiona categorías, sistemas de competencia, ritmos de juego y sistemas de desempate</p>
-            </div>
-        </div>
-    </div>
+    <app-page-header icon="sliders" title="Configuración de Torneos"
+        subtitle="Gestiona categorías, sistemas de competencia, ritmos de juego y sistemas de desempate"
+        [hasActions]="!mostrandoFormularioActivo">
+        <app-button actions icon="plus" (clicked)="nuevoItem()">{{ tituloNuevo }}</app-button>
+    </app-page-header>
 
     <div class="tabs-container">
         <button class="tab-button" [class.active]="tabActiva === 'categorias'" (click)="cambiarTab('categorias')">
@@ -35,10 +31,6 @@
         <div *ngIf="tabActiva === 'categorias'" class="tab-content">
             <div class="section-header">
                 <h2>Categorías de Torneos</h2>
-                <button class="btn-add" (click)="mostrarFormularioCategoria()" *ngIf="!mostrandoFormCategoria">
-                    <i class="ph-bold ph-plus ph-icon"></i>
-                    Nueva Categoría
-                </button>
             </div>
 
             <div class="form-card" *ngIf="mostrandoFormCategoria">
@@ -164,10 +156,6 @@
         <div *ngIf="tabActiva === 'sistemas'" class="tab-content">
             <div class="section-header">
                 <h2>Sistemas de Competencia</h2>
-                <button class="btn-add" (click)="mostrarFormularioSistema()" *ngIf="!mostrandoFormSistema">
-                    <i class="ph-bold ph-plus ph-icon"></i>
-                    Nuevo Sistema
-                </button>
             </div>
 
             <div class="form-card" *ngIf="mostrandoFormSistema">
@@ -230,10 +218,6 @@
         <div *ngIf="tabActiva === 'ritmos'" class="tab-content">
             <div class="section-header">
                 <h2>Ritmos de Juego</h2>
-                <button class="btn-add" (click)="mostrarFormularioRitmo()" *ngIf="!mostrandoFormRitmo">
-                    <i class="ph-bold ph-plus ph-icon"></i>
-                    Nuevo Ritmo
-                </button>
             </div>
 
             <div class="form-card" *ngIf="mostrandoFormRitmo">
@@ -316,10 +300,6 @@
         <div *ngIf="tabActiva === 'desempates'" class="tab-content">
             <div class="section-header">
                 <h2>Sistemas de Desempate</h2>
-                <button class="btn-add" (click)="mostrarFormularioDesempate()" *ngIf="!mostrandoFormDesempate">
-                    <i class="ph-bold ph-plus ph-icon"></i>
-                    Nuevo Sistema
-                </button>
             </div>
 
             <div class="form-card" *ngIf="mostrandoFormDesempate">

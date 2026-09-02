@@ -392,6 +392,22 @@
     color: var(--color-white);
 }
 
+.maps-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-tan);
+    text-decoration: none;
+    width: fit-content;
+}
+
+.maps-link:hover {
+    text-decoration: underline;
+}
+
 /* Información adicional */
 .featured-extra {
     display: flex;
@@ -673,6 +689,19 @@
 .card-detail i,
 .card-detail .ph-icon {
     color: var(--color-brown);
+}
+
+.maps-link-inline {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.15rem;
+    color: var(--color-brown);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.maps-link-inline:hover {
+    opacity: 1;
 }
 
 .card-system {

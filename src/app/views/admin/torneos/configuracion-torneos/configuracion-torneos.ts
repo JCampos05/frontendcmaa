@@ -10,11 +10,13 @@ import { SistemaCompetencia } from '../../../../models/sistema-competencia';
 import { RitmoJuego } from '../../../../models/ritmo-juego';
 import { SistemaDesempate } from '../../../../models/sistema-desempates';
 import { ToastNoti } from '../../../../componentes/modales/toast-noti/toast-noti';
+import { PageHeaderComponent } from '../../../../componentes/organisms/page-header/page-header';
+import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 
 @Component({
   selector: 'app-configuracion-torneos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastNoti],
+  imports: [CommonModule, ReactiveFormsModule, ToastNoti, PageHeaderComponent, ButtonComponent],
   templateUrl: './configuracion-torneos.html',
   styleUrls: ['./configuracion-torneos.css']
 })
@@ -57,6 +59,36 @@ export class ConfiguracionTorneosComponent implements OnInit {
   ngOnInit(): void {
     this.initForms();
     this.cargarDatos();
+  }
+
+  /** Etiqueta del botón "Nuevo" del header, según la pestaña activa. */
+  get tituloNuevo(): string {
+    switch (this.tabActiva) {
+      case 'categorias': return 'Nueva Categoría';
+      case 'sistemas': return 'Nuevo Sistema';
+      case 'ritmos': return 'Nuevo Ritmo';
+      case 'desempates': return 'Nuevo Sistema de Desempate';
+    }
+  }
+
+  /** Oculta el botón del header mientras el formulario de la pestaña activa está abierto. */
+  get mostrandoFormularioActivo(): boolean {
+    switch (this.tabActiva) {
+      case 'categorias': return this.mostrandoFormCategoria;
+      case 'sistemas': return this.mostrandoFormSistema;
+      case 'ritmos': return this.mostrandoFormRitmo;
+      case 'desempates': return this.mostrandoFormDesempate;
+    }
+  }
+
+  /** Botón "Nuevo" único en el header: despacha al formulario de la pestaña activa. */
+  nuevoItem(): void {
+    switch (this.tabActiva) {
+      case 'categorias': this.mostrarFormularioCategoria(); break;
+      case 'sistemas': this.mostrarFormularioSistema(); break;
+      case 'ritmos': this.mostrarFormularioRitmo(); break;
+      case 'desempates': this.mostrarFormularioDesempate(); break;
+    }
   }
 
   initForms(): void {

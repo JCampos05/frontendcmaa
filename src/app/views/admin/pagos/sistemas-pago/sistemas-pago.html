@@ -1,25 +1,12 @@
 <div class="config-container">
     <app-toast-noti></app-toast-noti>
 
-    <div class="header-section">
-        <div class="header-content">
-            <i class="ph-bold ph-credit-card ph-icon"></i>
-            <div class="header-text">
-                <h1>Sistemas de Pago</h1>
-                <p>Gestiona las cuentas bancarias para recibir pagos de inscripciones</p>
-            </div>
-        </div>
-    </div>
+    <app-page-header icon="credit-card" title="Sistemas de Pago"
+        subtitle="Gestiona las cuentas bancarias para recibir pagos de inscripciones" [hasActions]="!mostrandoForm">
+        <app-button actions icon="plus" (clicked)="mostrarFormulario()">Nueva Cuenta</app-button>
+    </app-page-header>
 
     <div class="content-section">
-        <div class="section-header">
-            <h2>Cuentas Bancarias</h2>
-            <button class="btn-add" (click)="mostrarFormulario()" *ngIf="!mostrandoForm">
-                <i class="ph-bold ph-plus ph-icon"></i>
-                Nueva Cuenta
-            </button>
-        </div>
-
         <div class="form-card" *ngIf="mostrandoForm">
             <div class="form-card-header">
                 <h3>{{ editando ? 'Editar' : 'Nueva' }} Cuenta Bancaria</h3>

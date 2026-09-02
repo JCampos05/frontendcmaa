@@ -11,6 +11,9 @@ import { IconComponent } from '../../../../componentes/atoms/icon/icon';
 import { StateMessageComponent } from '../../../../componentes/molecules/state-message/state-message';
 import { EmptyStateComponent } from '../../../../componentes/molecules/empty-state/empty-state';
 import { StatCardGridComponent, StatCardInput } from '../../../../componentes/organisms/stat-card-grid/stat-card-grid';
+import { FilterChipsComponent, FilterChipOption } from '../../../../componentes/molecules/filter-chips/filter-chips';
+import { SelectComponent, SelectOption } from '../../../../componentes/atoms/select/select';
+import { DataTableComponent, DataTableColumn } from '../../../../componentes/organisms/data-table/data-table';
 
 Chart.register(...registerables);
 
@@ -19,7 +22,8 @@ Chart.register(...registerables);
   standalone: true,
   imports: [
     CommonModule, FormsModule, ExportModalComponent, ToastNoti,
-    PageHeaderComponent, ButtonComponent, IconComponent, StateMessageComponent, EmptyStateComponent, StatCardGridComponent
+    PageHeaderComponent, ButtonComponent, IconComponent, StateMessageComponent, EmptyStateComponent, StatCardGridComponent,
+    FilterChipsComponent, SelectComponent, DataTableComponent
   ],
   templateUrl: './inscripciones-generales.html',
   styleUrls: ['./inscripciones-generales.css']
@@ -50,12 +54,20 @@ export class InscripcionesGeneralesComponent implements OnInit, AfterViewChecked
   periodoSeleccionado: 'dia' | 'semana' | 'mes' | 'anio' = 'mes';
   filtroPeriodoActivo = false;
 
+  readonly periodoOptions: FilterChipOption[] = [
+    { value: 'dia', label: 'Último Día', icon: 'calendar' },
+    { value: 'semana', label: 'Última Semana', icon: 'calendar' },
+    { value: 'mes', label: 'Último Mes', icon: 'calendar' },
+    { value: 'anio', label: 'Último Año', icon: 'calendar-blank' }
+  ];
+
   // Evolución Temporal
   evolucionTemporal: any[] = [];
   chartEvolucion: Chart | null = null;
 
   // Resumen de Torneos
   resumenTorneos: any = null;
+  resumenTorneosStats: StatCardInput[] = [];
 
   // Inscripciones por Torneo
   inscripcionesPorTorneo: any[] = [];
@@ -63,9 +75,16 @@ export class InscripcionesGeneralesComponent implements OnInit, AfterViewChecked
 
   // Selector de Torneo y Categoría
   torneos: any[] = [];
+  torneoOptions: SelectOption<number>[] = [];
   torneoSeleccionado: number | null = null;
   distribucionCategorias: any[] = [];
   chartDistribucion: Chart | null = null;
+
+  readonly distribucionColumns: DataTableColumn[] = [
+    { key: 'categoria', label: 'Categoría', icon: 'stack' },
+    { key: 'total', label: 'Inscritos', icon: 'users', align: 'center' },
+    { key: 'costo', label: 'Costo', icon: 'currency-circle-dollar' }
+  ];
 
   constructor(private inscripcionesService: InscripcionesGeneralesService) {}
 
@@ -142,11 +161,38 @@ export class InscripcionesGeneralesComponent implements OnInit, AfterViewChecked
       this.inscripcionesService.getResumenTorneos().subscribe({
         next: (data) => {
           this.resumenTorneos = data;
+          this.actualizarResumenTorneosStats();
           resolve();
         },
         error: (err) => reject(err)
       });
     });
+  }
+
+  private actualizarResumenTorneosStats(): void {
+    if (!this.resumenTorneos) {
+      this.resumenTorneosStats = [];
+      return;
+    }
+    const r = this.resumenTorneos;
+    const torneoActual = r.torneoActual;
+    const proximo = r.torneosProximos?.[0];
+
+    this.resumenTorneosStats = [
+      { icon: 'calendar-x', variant: 'navy', label: 'Torneos Realizados', value: r.torneosPasados },
+      torneoActual
+        ? {
+            icon: 'trophy', variant: 'brown', label: 'Torneo Actual',
+            value: torneoActual.nombre || torneoActual.lugar,
+            sub: `${torneoActual.totalInscripciones} inscritos`
+          }
+        : { icon: 'calendar-x', variant: 'warning', label: 'Torneo Actual', value: 'Sin torneo hoy' },
+      {
+        icon: 'calendar', variant: 'purple', label: 'Próximos Torneos',
+        value: r.torneosProximos?.length ?? 0,
+        sub: proximo ? `Próximo: ${this.formatearFecha(proximo.fecha)}` : undefined
+      }
+    ];
   }
 
   cargarInscripcionesPorTorneo(): Promise<void> {
@@ -167,6 +213,10 @@ export class InscripcionesGeneralesComponent implements OnInit, AfterViewChecked
       this.inscripcionesService.getTorneosParaSelector().subscribe({
         next: (data) => {
           this.torneos = data;
+          this.torneoOptions = this.torneos.map(t => ({
+            value: t.idTorneo,
+            label: `${t.nombre || t.lugar} - ${this.formatearFecha(t.fecha)}`
+          }));
           if (this.torneos.length > 0) {
             this.torneoSeleccionado = this.torneos[0].idTorneo;
             this.cargarDistribucionCategorias();
@@ -204,8 +254,14 @@ export class InscripcionesGeneralesComponent implements OnInit, AfterViewChecked
     this.cargarEvolucionTemporal();
   }
 
-  onTorneoChange(): void {
+  onTorneoSeleccionadoChange(idTorneo: number): void {
+    this.torneoSeleccionado = idTorneo;
     this.cargarDistribucionCategorias();
+  }
+
+  /** Adaptador de tipos para el (change) de app-filter-chips (emite string). */
+  onPeriodoChipChange(value: string): void {
+    this.cambiarPeriodo(value as 'dia' | 'semana' | 'mes' | 'anio');
   }
 
   // Gráficas

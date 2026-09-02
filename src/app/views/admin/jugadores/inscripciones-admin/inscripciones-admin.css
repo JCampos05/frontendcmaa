@@ -1,20 +1,19 @@
 .container {
     max-width: 1200px;
-    margin: 2rem auto;
-    padding: 2rem;
+    margin: 0 auto;
+    padding: var(--space-4);
     background-color: var(--color-light-gray);
 }
 
-/* Header */
 /* Mensajes */
 .mensaje-exito,
 .mensaje-error {
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
+    padding: var(--space-4) var(--space-6);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-6);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: var(--space-4);
     position: relative;
     animation: slideDown 0.3s ease;
 }
@@ -31,8 +30,8 @@
     color: #721c24;
 }
 
-.mensaje-exito i,
-.mensaje-error i {
+.mensaje-exito app-icon,
+.mensaje-error app-icon {
     font-size: 1.5rem;
 }
 
@@ -46,7 +45,7 @@
     cursor: pointer;
     color: inherit;
     font-size: 1.2rem;
-    padding: 0.25rem;
+    padding: var(--space-1);
     opacity: 0.7;
     transition: opacity 0.3s;
 }
@@ -66,60 +65,63 @@
     }
 }
 
-/* Secciones */
+/* Secciones — mismo patrón que el resto del sistema (card blanca + header con
+ * ícono/título/borde inferior), no la barra de degradado que tenía antes. */
 .section {
     background: var(--color-white);
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-6);
+    box-shadow: var(--shadow-md);
     overflow: visible;
 }
 
 .section-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
-    background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-slate) 100%);
-    color: var(--color-white);
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border-bottom: 2px solid var(--color-light-gray);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s;
 }
 
 .section-header:hover {
-    background: linear-gradient(135deg, var(--color-slate) 0%, var(--color-brown) 100%);
+    background-color: #f9fafb;
 }
 
-.section-header i:first-child {
-    font-size: 1.3rem;
+.section-header app-icon:first-child {
+    color: var(--color-brown);
+    font-size: 1.5rem;
 }
 
 .section-header h2 {
     flex: 1;
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.125rem;
     font-weight: 600;
+    color: var(--color-dark-navy);
 }
 
-.section-header i:last-child {
-    transition: transform 0.3s ease;
+.section-header app-icon:last-child {
+    color: var(--color-slate);
+    font-size: 1.25rem;
 }
 
 .section-content {
-    padding: 1.5rem;
+    padding: var(--space-6);
 }
 
 /* Tipo de Inscripción */
 .tipo-seleccion {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 .tipo-card {
-    padding: 1.5rem;
+    padding: var(--space-6);
     border: 2px solid var(--color-light-gray);
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -129,7 +131,7 @@
 .tipo-card:hover {
     border-color: var(--color-brown);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .tipo-card.selected {
@@ -137,14 +139,14 @@
     background: linear-gradient(135deg, rgba(133, 77, 46, 0.05) 0%, rgba(62, 70, 75, 0.05) 100%);
 }
 
-.tipo-card i {
+.tipo-card app-icon {
     font-size: 3rem;
     color: var(--color-brown);
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--space-3);
 }
 
 .tipo-card h3 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 var(--space-2) 0;
     color: var(--color-dark-navy);
     font-size: 1.2rem;
 }
@@ -159,8 +161,8 @@
 .modo-jugador {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
 }
 
 .radio-card {
@@ -173,9 +175,9 @@
 }
 
 .radio-content {
-    padding: 1rem 1.5rem;
+    padding: var(--space-4) var(--space-6);
     border: 2px solid var(--color-light-gray);
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     text-align: center;
     transition: all 0.3s ease;
     background: var(--color-white);
@@ -184,7 +186,7 @@
 .radio-card:hover .radio-content {
     border-color: var(--color-brown);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .radio-card.selected .radio-content {
@@ -192,10 +194,10 @@
     background: linear-gradient(135deg, rgba(133, 77, 46, 0.1) 0%, rgba(62, 70, 75, 0.1) 100%);
 }
 
-.radio-content i {
+.radio-content app-icon {
     font-size: 2rem;
     color: var(--color-brown);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .radio-content span {
@@ -206,7 +208,7 @@
 
 /* Búsqueda de Jugador */
 .busqueda-jugador {
-    margin-top: 1.5rem;
+    margin-top: var(--space-6);
     position: relative;
     z-index: 100;
 }
@@ -217,7 +219,7 @@
 
 .btn-limpiar-busqueda {
     position: absolute;
-    right: 0.5rem;
+    right: var(--space-2);
     top: 50%;
     transform: translateY(-50%);
     background: var(--color-accent);
@@ -225,9 +227,12 @@
     border: none;
     width: 30px;
     height: 30px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-limpiar-busqueda:hover {
@@ -242,16 +247,16 @@
     background: var(--color-white);
     border: 2px solid var(--color-brown);
     border-top: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     max-height: 300px;
     overflow-y: auto;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-hover);
     margin-top: -2px;
 }
 
 .jugador-item {
-    padding: 1rem;
+    padding: var(--space-4);
     border-bottom: 1px solid var(--color-light-gray);
     cursor: pointer;
     transition: background 0.3s;
@@ -271,7 +276,7 @@
 .jugador-info strong {
     display: block;
     color: var(--color-dark-navy);
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--space-1);
 }
 
 .jugador-info small {
@@ -279,13 +284,13 @@
     font-size: 0.85rem;
 }
 
-.jugador-item i.fa-check {
+.jugador-item app-icon {
     color: var(--color-brown);
     font-size: 1.2rem;
 }
 
 .lista-jugadores.vacia {
-    padding: 1.5rem;
+    padding: var(--space-6);
     text-align: center;
 }
 
@@ -296,37 +301,39 @@
 
 /* Jugador Seleccionado */
 .jugador-seleccionado {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
 }
 
 .jugador-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
+    gap: var(--space-4);
+    padding: var(--space-4);
     background: linear-gradient(135deg, rgba(133, 77, 46, 0.05) 0%, rgba(62, 70, 75, 0.05) 100%);
     border: 2px solid var(--color-brown);
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
 }
 
-.jugador-card i.fa-user-circle {
+.jugador-card > app-icon {
     font-size: 3rem;
     color: var(--color-brown);
 }
 
 .jugador-datos h4 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 var(--space-2) 0;
     color: var(--color-dark-navy);
 }
 
 .jugador-datos p {
-    margin: 0.25rem 0;
+    margin: var(--space-1) 0;
     color: var(--color-slate);
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
 }
 
-.jugador-datos p i {
-    width: 20px;
+.jugador-datos p app-icon {
     color: var(--color-brown);
 }
 
@@ -334,8 +341,8 @@
 .form-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
 }
 
 .form-group {
@@ -350,34 +357,19 @@
 .form-group label {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
     color: var(--color-dark-navy);
     font-weight: 600;
     font-size: 0.95rem;
 }
 
-.form-group label i {
+.form-group label app-icon {
     color: var(--color-brown);
 }
 
 .required {
     color: var(--color-accent);
-}
-
-.form-control {
-    padding: 0.75rem;
-    border: 2px solid var(--color-light-gray);
-    border-radius: 4px;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--color-brown);
-    box-shadow: 0 0 0 3px rgba(133, 77, 46, 0.1);
 }
 
 select.form-control {
@@ -392,13 +384,13 @@ textarea.form-control {
 .help-text {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
     font-size: 0.85rem;
     color: var(--color-slate);
 }
 
-.help-text i {
+.help-text app-icon {
     color: var(--color-brown);
 }
 
@@ -406,7 +398,7 @@ textarea.form-control {
 .fecha-grid {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 /* Checkbox */
@@ -418,11 +410,11 @@ textarea.form-control {
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
     cursor: pointer;
-    padding: 0.75rem;
+    padding: var(--space-3);
     border: 2px solid var(--color-light-gray);
-    border-radius: 4px;
+    border-radius: var(--radius-md);
     transition: all 0.3s ease;
 }
 
@@ -435,17 +427,18 @@ textarea.form-control {
     width: 18px;
     height: 18px;
     cursor: pointer;
+    accent-color: var(--color-brown);
 }
 
 .checkbox-label span {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     font-weight: 600;
     color: var(--color-dark-navy);
 }
 
-.checkbox-label span i {
+.checkbox-label span app-icon {
     color: var(--color-brown);
 }
 
@@ -453,16 +446,16 @@ textarea.form-control {
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
     border-top: 2px solid var(--color-light-gray);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: var(--space-4);
     }
 
     .tipo-seleccion,
@@ -485,7 +478,7 @@ textarea.form-control {
 
 @media (max-width: 480px) {
     .section-header {
-        padding: 1rem;
+        padding: var(--space-4);
     }
 
     .section-header h2 {
@@ -493,15 +486,15 @@ textarea.form-control {
     }
 
     .section-content {
-        padding: 1rem;
+        padding: var(--space-4);
     }
 
     .tipo-card,
     .radio-content {
-        padding: 1rem;
+        padding: var(--space-4);
     }
 
-    .tipo-card i {
+    .tipo-card app-icon {
         font-size: 2.5rem;
     }
 

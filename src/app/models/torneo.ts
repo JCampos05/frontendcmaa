@@ -15,7 +15,7 @@ export interface Torneo {
     fecha: Date | string;
     hora_inicio: string;
     hora_fin: string;
-    urlMaps?: string;
+    url_maps?: string;
     notas?: string;
     rondas: number;
 

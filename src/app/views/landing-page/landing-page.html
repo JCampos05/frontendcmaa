@@ -102,6 +102,10 @@
           <div class="info-content">
             <span class="info-label">Lugar</span>
             <span class="info-value">{{ torneoDestacado.lugar }}</span>
+            <a *ngIf="torneoDestacado.url_maps" [href]="torneoDestacado.url_maps" target="_blank" rel="noopener" class="maps-link">
+              <i class="ph-bold ph-navigation-arrow ph-icon"></i>
+              Cómo llegar
+            </a>
           </div>
         </div>
 
@@ -167,6 +171,10 @@
             <span class="card-detail">
               <i class="ph-bold ph-map-pin ph-icon"></i>
               {{ torneo.lugar }}
+              <a *ngIf="torneo.url_maps" [href]="torneo.url_maps" target="_blank" rel="noopener"
+                class="maps-link-inline" title="Cómo llegar" (click)="$event.stopPropagation()">
+                <i class="ph-bold ph-navigation-arrow ph-icon"></i>
+              </a>
             </span>
             <span class="card-detail">
               <i class="ph-bold ph-clock ph-icon"></i>

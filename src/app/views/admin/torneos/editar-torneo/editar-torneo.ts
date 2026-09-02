@@ -27,13 +27,14 @@ import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 import { IconButtonComponent } from '../../../../componentes/atoms/icon-button/icon-button';
 import { IconComponent } from '../../../../componentes/atoms/icon/icon';
 import { StateMessageComponent } from '../../../../componentes/molecules/state-message/state-message';
+import { DatetimeInputComponent } from '../../../../componentes/atoms/datetime-input/datetime-input';
 
 @Component({
   selector: 'app-editar-torneo',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent, StateMessageComponent
+    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent, StateMessageComponent, DatetimeInputComponent
   ],
   templateUrl: './editar-torneo.html',
   styleUrls: ['./editar-torneo.css']
@@ -83,6 +84,7 @@ export class EditarTorneoComponent implements OnInit {
       nombre: ['', Validators.required],
       lugar: ['', Validators.required],
       direccion: ['', Validators.required],
+      url_maps: ['', [Validators.pattern(/^https?:\/\/.+/)]],
       fecha: ['', Validators.required],
       hora_inicio: ['', Validators.required],
       hora_fin: ['', Validators.required],
@@ -159,6 +161,7 @@ export class EditarTorneoComponent implements OnInit {
       nombre: torneo.nombre || '',
       lugar: torneo.lugar || '',
       direccion: torneo.direccion || '',
+      url_maps: torneo.url_maps || '',
       fecha: fechaISO,
       hora_inicio: torneo.hora_inicio || '',
       hora_fin: torneo.hora_fin || '',
@@ -488,6 +491,7 @@ export class EditarTorneoComponent implements OnInit {
       nombre: this.torneoOriginal.nombre || '',
       lugar: this.torneoOriginal.lugar || '',
       direccion: this.torneoOriginal.direccion || '',
+      url_maps: this.torneoOriginal.url_maps || '',
       fecha: fechaISO,
       hora_inicio: this.torneoOriginal.hora_inicio || '',
       hora_fin: this.torneoOriginal.hora_fin || '',
@@ -555,6 +559,9 @@ export class EditarTorneoComponent implements OnInit {
         nombre: formValue.nombre,
         lugar: formValue.lugar,
         direccion: formValue.direccion,
+        // undefined (no null): el backend valida url_maps con z.string().url().optional(),
+        // que acepta ausencia del campo pero no null.
+        url_maps: formValue.url_maps || undefined,
         fecha: formValue.fecha,
         hora_inicio: formValue.hora_inicio,
         hora_fin: formValue.hora_fin,
@@ -609,7 +616,7 @@ export class EditarTorneoComponent implements OnInit {
 
   private cierreAntesDelTorneoValidator(formGroup: AbstractControl): ValidationErrors | null {
     const fechaControl = formGroup.get('fecha');
-    const horaControl = formGroup.get('hora');
+    const horaControl = formGroup.get('hora_inicio');
     const cierreControl = formGroup.get('cierreInscripciones');
 
     if (!fechaControl || !horaControl || !cierreControl) {

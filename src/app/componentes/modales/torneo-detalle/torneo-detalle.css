@@ -203,6 +203,22 @@
     word-break: break-word;
 }
 
+.maps-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-brown);
+    text-decoration: none;
+    width: fit-content;
+}
+
+.maps-link:hover {
+    text-decoration: underline;
+}
+
 .categorias-lista {
     display: flex;
     flex-direction: column;

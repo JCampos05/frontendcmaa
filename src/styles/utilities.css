@@ -157,6 +157,8 @@
  * ================================================================ */
 
 .stat-card {
+    height: 100%;
+    box-sizing: border-box;
     background: var(--color-white);
     padding: var(--space-6);
     border-radius: var(--radius-lg);
