@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import flatpickr from 'flatpickr';
 
 import { EstadisticasPagoService } from '../../../../services/estadisticas-pago';
+import { AuthService } from '../../../../services/auth';
 import { ToastNoti } from '../../../../componentes/modales/toast-noti/toast-noti';
 import { GraficasEstadisticasComponent } from './graficas-estadisticas/graficas-estadisticas';
 import { ExportadorReportesComponent } from './exportar-reportes/exportar-reportes';
@@ -86,7 +87,17 @@ export class EstadisticasPagosComponent implements OnInit, AfterViewChecked {
   evolucionTemporal: any[] = [];
   comparativaAnual: any[] = [];
 
-  constructor(private estadisticasService: EstadisticasPagoService) { }
+  constructor(
+    private estadisticasService: EstadisticasPagoService,
+    private authService: AuthService
+  ) { }
+
+  /** adminTorneo solo tiene acceso a su(s) propio(s) torneo(s) asignado(s) —
+   * la opción "Todos los torneos" (agregando entre varios) no aplica y solo
+   * genera confusión sobre qué está viendo. */
+  get esAdminGral(): boolean {
+    return this.authService.currentUserValue?.rol === 'adminGral';
+  }
 
   ngOnInit(): void {
     this.cargarTorneos();

@@ -16,6 +16,7 @@ import { ModalSesionCerradaComponent } from './componentes/modales/sesion-cerrad
 export class AppComponent implements OnInit, OnDestroy {
   title = 'chess-admin';
   mostrarModalSesionCerrada$!: Observable<boolean>;
+  motivoModalSesionCerrada$!: Observable<'remota' | 'rol' | 'torneo'>;
 
   constructor(
     private sessionMonitor: SessionMonitorService,
@@ -23,8 +24,9 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Inicializar el observable del modal
+    // Inicializar los observables del modal
     this.mostrarModalSesionCerrada$ = this.sessionMonitor.mostrarModal$;
+    this.motivoModalSesionCerrada$ = this.sessionMonitor.motivoModal$;
     
     // Si ya hay una sesión activa al cargar la app, verificar e iniciar monitoreo
     if (this.authService.isAuthenticated()) {
@@ -75,6 +77,21 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onModalContinuar(): void {
+    const motivo = this.sessionMonitor.motivoActual;
+
+    if (motivo === 'torneo') {
+      // Un torneo nuevo asignado no requiere reautenticar — la sesión
+      // sigue siendo válida, solo hace falta refrescar los datos en
+      // memoria (sidebar, torneo actual, etc.).
+      this.sessionMonitor.cerrarModalSinCerrarSesion();
+      window.location.reload();
+      return;
+    }
+
+    // 'rol' y 'remota' sí cierran sesión y mandan a login: un cambio de rol
+    // cambia qué rutas/menús le corresponden al usuario, y la forma
+    // confiable de que todo (guards, sidebar, roleGuard) se reconstruya
+    // consistente es una reautenticación real, no solo un reload.
     this.sessionMonitor.cerrarModalYRedirigir();
   }
 

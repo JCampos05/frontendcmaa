@@ -4,6 +4,7 @@
     padding: 20px;
     background-color: var(--color-light-gray);
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 .section {
@@ -397,6 +398,7 @@ textarea.form-control {
     align-items: center;
     justify-content: center;
     z-index: var(--z-modal);
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     animation: fadeIn 0.2s ease;
 }

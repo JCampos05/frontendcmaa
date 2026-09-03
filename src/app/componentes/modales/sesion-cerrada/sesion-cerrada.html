@@ -1,18 +1,34 @@
-<div class="modal-overlay" *ngIf="mostrar" [@fadeIn]>
-    <div class="modal-content" [@slideUp]>
-        <div class="modal-icon">
-            <i class="fa-solid fa-circle-xmark"></i>
+<div class="modal-overlay" *ngIf="mostrar">
+    <div class="modal-content">
+        <div class="modal-icon" [class.icon-informativo]="esAvisoAmigable">
+            <i class="fa-solid" [class.fa-circle-xmark]="!esAvisoAmigable" [class.fa-user-gear]="motivo === 'rol'"
+                [class.fa-trophy]="motivo === 'torneo'"></i>
         </div>
-        <h2>Sesión Cerrada</h2>
+        <h2>
+            <ng-container [ngSwitch]="motivo">
+                <ng-container *ngSwitchCase="'rol'">Tu Rol ha Cambiado</ng-container>
+                <ng-container *ngSwitchCase="'torneo'">¡Torneo Asignado!</ng-container>
+                <ng-container *ngSwitchDefault>Sesión Cerrada</ng-container>
+            </ng-container>
+        </h2>
         <p class="mensaje-principal">
-            Tu sesión ha sido cerrada remotamente por un administrador.
+            <ng-container [ngSwitch]="motivo">
+                <ng-container *ngSwitchCase="'rol'">Un administrador actualizó tus permisos.</ng-container>
+                <ng-container *ngSwitchCase="'torneo'">Un administrador te asignó un torneo.</ng-container>
+                <ng-container *ngSwitchDefault>Tu sesión ha sido cerrada remotamente por un administrador.</ng-container>
+            </ng-container>
         </p>
         <p class="mensaje-secundario">
-            Por favor, inicia sesión nuevamente para continuar.
+            <ng-container *ngIf="!requiereReautenticacion; else mensajeReautenticar">
+                Tu sesión sigue activa — solo hace falta refrescar la página para verlo.
+            </ng-container>
+            <ng-template #mensajeReautenticar>
+                Por favor, inicia sesión nuevamente para continuar.
+            </ng-template>
         </p>
         <button class="btn-continuar" (click)="onContinuar()">
-            <i class="fa-solid fa-right-to-bracket"></i>
-            Ir al Login
+            <i class="fa-solid" [class.fa-right-to-bracket]="requiereReautenticacion" [class.fa-arrow-rotate-right]="!requiereReautenticacion"></i>
+            {{ requiereReautenticacion ? 'Ir al Login' : 'Actualizar Ahora' }}
         </button>
     </div>
 </div>

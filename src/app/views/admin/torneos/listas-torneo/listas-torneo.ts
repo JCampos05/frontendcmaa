@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import * as XLSX from 'xlsx';
 
 import { TorneoService } from '../../../../services/torneo';
+import { AuthService } from '../../../../services/auth';
+import { TorneoContextService } from '../../../../services/torneo-context';
 import { InscripcionService } from '../../../../services/inscripcion';
 import { JugadorService } from '../../../../services/jugador';
 import { Torneo } from '../../../../models/torneo';
@@ -20,6 +22,7 @@ import { FilterChipsComponent, FilterChipOption } from '../../../../componentes/
 import { DataTableComponent, DataTableColumn } from '../../../../componentes/organisms/data-table/data-table';
 import { BadgeComponent, BadgeStatus } from '../../../../componentes/atoms/badge/badge';
 import { StatCardGridComponent, StatCardInput } from '../../../../componentes/organisms/stat-card-grid/stat-card-grid';
+import { AvisoTorneoSeleccionadoComponent } from '../../../../componentes/molecules/aviso-torneo-seleccionado/aviso-torneo-seleccionado';
 
 
 interface DatosFenamac {
@@ -66,7 +69,7 @@ interface EstadisticasCategoria {
   imports: [
     CommonModule, FormsModule, ToastNoti, ModalConfirmacionComponent,
     PageHeaderComponent, StateMessageComponent, EmptyStateComponent, ButtonComponent, IconComponent,
-    FilterChipsComponent, DataTableComponent, BadgeComponent, StatCardGridComponent
+    FilterChipsComponent, DataTableComponent, BadgeComponent, StatCardGridComponent, AvisoTorneoSeleccionadoComponent
   ],
   templateUrl: './listas-torneo.html',
   styleUrls: ['./listas-torneo.css']
@@ -75,6 +78,9 @@ export class ListasTorneoComponent implements OnInit {
   @ViewChild(ToastNoti) toast!: ToastNoti;
 
   torneoSeleccionado: Torneo | null = null;
+  // Solo para saber si mostrar el aviso "cambia de torneo en Torneo Actual"
+  // (no tiene sentido si el admin únicamente tiene uno asignado).
+  totalTorneosAsignados = 0;
   inscripciones: Inscripcion[] = [];
   datosFenamac: DatosFenamac[] = [];
   estadisticasPorCategoria: EstadisticasCategoria[] = [];
@@ -91,6 +97,8 @@ export class ListasTorneoComponent implements OnInit {
 
   constructor(
     private torneoService: TorneoService,
+    private authService: AuthService,
+    private torneoContext: TorneoContextService,
     private inscripcionService: InscripcionService,
     private jugadorService: JugadorService,
     private http: HttpClient
@@ -105,23 +113,41 @@ export class ListasTorneoComponent implements OnInit {
     this.error = null;
     this.sinDatos = null;
 
-    this.torneoService.getActivos().subscribe({
+    // adminTorneo: la asignación ya acota server-side, no hay que filtrar
+    // además por activo (un torneo asignado pero finalizado/inactivo sigue
+    // siendo válido para consultar sus listas).
+    const esAdminTorneo = this.authService.currentUserValue?.rol === 'adminTorneo';
+    this.torneoService.getAll(esAdminTorneo ? undefined : true).subscribe({
       next: (torneos) => {
+        this.totalTorneosAsignados = torneos?.length || 0;
         if (torneos && torneos.length > 0) {
           const torneosOrdenados = torneos.sort((a, b) => {
             return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
           });
 
-          const hoy = new Date();
-          const tresDiasDespues = new Date();
-          tresDiasDespues.setDate(hoy.getDate() + 3);
+          // Respetar el torneo elegido en el contexto compartido (p.ej. desde
+          // "Torneo Actual" u otra vista hermana) si sigue entre los propios.
+          const seleccionActual = this.torneoContext.torneoSeleccionadoValue;
+          const seleccionVigente = seleccionActual
+            ? torneosOrdenados.find(t => t.idTorneo === seleccionActual.idTorneo)
+            : undefined;
 
-          const torneoEnRango = torneosOrdenados.find(t => {
-            const fechaTorneo = new Date(t.fecha);
-            return fechaTorneo >= hoy && fechaTorneo <= tresDiasDespues;
-          });
+          if (seleccionVigente) {
+            this.torneoSeleccionado = seleccionVigente;
+          } else {
+            const hoy = new Date();
+            const tresDiasDespues = new Date();
+            tresDiasDespues.setDate(hoy.getDate() + 3);
 
-          this.torneoSeleccionado = torneoEnRango || torneosOrdenados[0];
+            const torneoEnRango = torneosOrdenados.find(t => {
+              const fechaTorneo = new Date(t.fecha);
+              return fechaTorneo >= hoy && fechaTorneo <= tresDiasDespues;
+            });
+
+            this.torneoSeleccionado = torneoEnRango || torneosOrdenados[0];
+          }
+
+          this.torneoContext.seleccionar(this.torneoSeleccionado);
 
           if (this.torneoSeleccionado?.idTorneo) {
             this.cargarInscripciones(this.torneoSeleccionado.idTorneo);

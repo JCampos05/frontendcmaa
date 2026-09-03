@@ -1,6 +1,7 @@
 .estadisticas-container {
     width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     background: var(--color-light-gray);
     padding: 2rem;
 }
@@ -921,6 +922,7 @@
 .estadisticas-container {
     width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     background: var(--color-light-gray);
     padding: 2rem;
 }

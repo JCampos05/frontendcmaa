@@ -2,11 +2,12 @@
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth';
+import { IconComponent } from '../../atoms/icon/icon';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './header.html',
   styleUrls: ['./header.css']
 })

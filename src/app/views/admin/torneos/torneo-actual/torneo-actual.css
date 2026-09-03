@@ -98,6 +98,14 @@
     gap: var(--space-1);
 }
 
+.info-item--selector {
+    align-items: center;
+}
+
+.info-content--full {
+    flex: 1;
+}
+
 .info-label {
     font-size: 0.8rem;
     color: var(--color-slate);

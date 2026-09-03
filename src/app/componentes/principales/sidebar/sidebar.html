@@ -4,7 +4,7 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed && !esMobile" [class.mobile-open]="esMobile && isMobileOpen">
     <!-- Sidebar Content -->
     <div class="sidebar-content">
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" *ngIf="!sinTorneoAsignado">
             <!-- PRINCIPAL -->
             <div class="menu-section">
                 <div class="section-title" *ngIf="!isCollapsed || esMobile">PRINCIPAL</div>
@@ -13,12 +13,12 @@
                 <div class="nav-item" (click)="cargarTorneoActual()"
                     [class.active]="esRutaActiva('/main-view/torneo-actual')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-trophy nav-icon"></i>
+                        <app-icon name="trophy" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Torneo Actual</span>
                     </div>
                     <button type="button" class="btn-submenu-toggle" *ngIf="!isCollapsed || esMobile"
                         (click)="toggleSubmenuTorneoActual($event)" [class.expanded]="submenuTorneoActualExpandido">
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <app-icon name="caret-down"></app-icon>
                     </button>
                 </div>
 
@@ -28,28 +28,28 @@
                     <div class="nav-item submenu-item" (click)="cargarInscripcionesTorneo()"
                         [class.active]="esRutaActiva('/main-view/inscripciones-torneo')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-user-plus nav-icon"></i>
+                            <app-icon name="user-plus" class="nav-icon"></app-icon>
                             <span class="nav-label">Inscripciones</span>
                         </div>
                     </div>
                     <div class="nav-item submenu-item" (click)="cargarListas()"
                         [class.active]="esRutaActiva('/main-view/listas')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-list-ol nav-icon"></i>
+                            <app-icon name="list-numbers" class="nav-icon"></app-icon>
                             <span class="nav-label">Listas</span>
                         </div>
                     </div>
                     <div class="nav-item submenu-item" (click)="cargarMesas()"
                         [class.active]="esRutaActiva('/main-view/mesas-torneo')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-table-cells nav-icon"></i>
+                            <app-icon name="grid-four" class="nav-icon"></app-icon>
                             <span class="nav-label">Mesas</span>
                         </div>
                     </div>
                     <div class="nav-item submenu-item" (click)="cargarResultados()"
                         [class.active]="esRutaActiva('/main-view/resultados-torneo')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-ranking-star nav-icon"></i>
+                            <app-icon name="medal" class="nav-icon"></app-icon>
                             <span class="nav-label">Resultados</span>
                         </div>
                     </div>
@@ -58,12 +58,12 @@
                 <div class="nav-item" (click)="cargarInscripcionesGenerales()"
                     [class.active]="esRutaActiva('/main-view/inscripciones-generales')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-user-plus nav-icon"></i>
+                        <app-icon name="user-plus" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Inscripciones</span>
                     </div>
                     <button type="button" class="btn-submenu-toggle" *ngIf="!isCollapsed || esMobile"
                         (click)="toggleSubmenuInscripciones($event)" [class.expanded]="submenuInscripcionesExpandido">
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <app-icon name="caret-down"></app-icon>
                     </button>
                 </div>
 
@@ -73,33 +73,33 @@
                     <div class="nav-item submenu-item" (click)="cargarJugadoresPorTorneo()"
                         [class.active]="esRutaActiva('/main-view/jugadores-torneo')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-users-gear nav-icon"></i>
+                            <app-icon name="users" class="nav-icon"></app-icon>
                             <span class="nav-label">Jugadores por Torneo</span>
                         </div>
                     </div>
                     <div class="nav-item submenu-item" (click)="cargarEstadisticasPago()"
                         [class.active]="esRutaActiva('/main-view/estadisticas-pago')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-chart-line nav-icon"></i>
+                            <app-icon name="chart-line" class="nav-icon"></app-icon>
                             <span class="nav-label">Estadísticas de Pago</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- GESTIÓN TORNEOS -->
-            <div class="menu-section">
+            <!-- GESTIÓN TORNEOS (solo adminGral — adminTorneo ya tiene su torneo en "Torneo Actual") -->
+            <div class="menu-section" *ngIf="esAdminGral">
                 <div class="section-title" *ngIf="!isCollapsed || esMobile">GESTIÓN TORNEOS</div>
                 <div class="section-divider" *ngIf="isCollapsed && !esMobile"></div>
 
                 <div class="nav-item" (click)="cargarTorneos()" [class.active]="esRutaActiva('/main-view/torneos')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-chess-board nav-icon"></i>
+                        <app-icon name="trophy" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Torneos</span>
                     </div>
                     <button type="button" class="btn-submenu-toggle" *ngIf="!isCollapsed || esMobile"
                         (click)="toggleSubmenuTorneos($event)" [class.expanded]="submenuTorneosExpandido">
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <app-icon name="caret-down"></app-icon>
                     </button>
                 </div>
 
@@ -108,14 +108,14 @@
                     <div class="nav-item submenu-item" (click)="verDetalleTorneo()"
                         [class.active]="esRutaActiva('/main-view/detalle-torneo')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-eye nav-icon"></i>
+                            <app-icon name="eye" class="nav-icon"></app-icon>
                             <span class="nav-label">Ver Detalles</span>
                         </div>
                     </div>
                     <div class="nav-item submenu-item" (click)="editarTorneoActual()"
                         [class.active]="esRutaActiva('/main-view/editar-torneo')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-pen-to-square nav-icon"></i>
+                            <app-icon name="pencil-simple" class="nav-icon"></app-icon>
                             <span class="nav-label">Editar Torneo</span>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                 <div class="nav-item" (click)="verResultadosTorneos()"
                     [class.active]="esRutaActiva('/main-view/resultado-todos-torneos')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-chart-column nav-icon"></i>
+                        <app-icon name="chart-bar" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Resultados Torneos</span>
                     </div>
                 </div>
@@ -132,33 +132,33 @@
                 <div class="nav-item" (click)="verResultadosMesas()"
                     [class.active]="esRutaActiva('/main-view/visualizacion-mesas')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-table-cells nav-icon"></i>
+                        <app-icon name="grid-four" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Resultados mesas</span>
                     </div>
                 </div>
 
                 <div class="nav-item" (click)="nuevoTorneo()" [class.active]="esRutaActiva('/main-view/nuevo-torneo')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-plus nav-icon"></i>
+                        <app-icon name="plus" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Agregar Torneo</span>
                     </div>
                 </div>
 
             </div>
 
-            <!-- GESTIÓN LIGA -->
-            <div class="menu-section">
+            <!-- GESTIÓN LIGA (solo adminGral) -->
+            <div class="menu-section" *ngIf="esAdminGral">
                 <div class="section-title" *ngIf="!isCollapsed || esMobile">GESTIÓN LIGA</div>
                 <div class="section-divider" *ngIf="isCollapsed && !esMobile"></div>
 
                 <div class="nav-item" (click)="cargarLigas()" [class.active]="esRutaActiva('/main-view/ligas')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-layer-group nav-icon"></i>
+                        <app-icon name="stack" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Ligas</span>
                     </div>
                     <button type="button" class="btn-submenu-toggle" *ngIf="!isCollapsed || esMobile"
                         (click)="toggleSubmenuLigas($event)" [class.expanded]="submenuLigasExpandido">
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <app-icon name="caret-down"></app-icon>
                     </button>
                 </div>
 
@@ -167,22 +167,22 @@
                     <div class="nav-item submenu-item" (click)="verDetalleLiga()"
                         [class.active]="esRutaActiva('/main-view/detalle-liga')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-eye nav-icon"></i>
+                            <app-icon name="eye" class="nav-icon"></app-icon>
                             <span class="nav-label">Ver Detalles</span>
                         </div>
                     </div>
                     <div class="nav-item submenu-item" (click)="editarLigaActual()"
                         [class.active]="esRutaActiva('/main-view/editar-liga')">
                         <div class="nav-item-content">
-                            <i class="fa-solid fa-pen-to-square nav-icon"></i>
+                            <app-icon name="pencil-simple" class="nav-icon"></app-icon>
                             <span class="nav-label">Editar Liga</span>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="nav-item" (click)="nuevaLiga()" [class.active]="esRutaActiva('/main-view/nueva-liga')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-plus nav-icon"></i>
+                        <app-icon name="plus" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Agregar Liga</span>
                     </div>
                 </div>
@@ -190,7 +190,7 @@
                 <div class="nav-item" (click)="cargarInscripcionesLiga()"
                     [class.active]="esRutaActiva('/main-view/inscripciones-liga')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-user-plus nav-icon"></i>
+                        <app-icon name="user-plus" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Inscripciones por Liga</span>
                     </div>
                 </div>
@@ -198,7 +198,7 @@
                 <div class="nav-item" (click)="verResultadosMesasLiga()"
                     [class.active]="esRutaActiva('/main-view/mesas-liga')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-table-cells nav-icon"></i>
+                        <app-icon name="grid-four" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Resultados Mesas</span>
                     </div>
                 </div>
@@ -206,21 +206,21 @@
                 <div class="nav-item" (click)="verResultadosLigas()"
                     [class.active]="esRutaActiva('/main-view/resultado-todas-ligas')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-chart-column nav-icon"></i>
+                        <app-icon name="chart-bar" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Resultados Ligas</span>
                     </div>
                 </div>
             </div>
 
-            <!-- GESTIÓN JUGADORES -->
-            <div class="menu-section">
+            <!-- GESTIÓN JUGADORES (solo adminGral) -->
+            <div class="menu-section" *ngIf="esAdminGral">
                 <div class="section-title" *ngIf="!isCollapsed || esMobile">GESTIÓN JUGADORES</div>
                 <div class="section-divider" *ngIf="isCollapsed && !esMobile"></div>
 
                 <div class="nav-item" (click)="cargarGestionJugadores()"
                     [class.active]="esRutaActiva('/main-view/gestion-jugadores')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-user-gear nav-icon"></i>
+                        <app-icon name="user-gear" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Gestión de Jugadores</span>
                     </div>
                 </div>
@@ -228,15 +228,15 @@
                 <div class="nav-item" (click)="cargarInscripcionesAdmin()"
                     [class.active]="esRutaActiva('/main-view/inscripcion-admin')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-user-plus nav-icon"></i>
+                        <app-icon name="user-plus" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Inscripciones Generales</span>
                     </div>
                 </div>
 
-                <div class="nav-item" (click)="cargarHistorialJugador()"
+                <div class="nav-item" *ngIf="esAdminGral" (click)="cargarHistorialJugador()"
                     [class.active]="esRutaActiva('/main-view/historial-jugador-torneo')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
+                        <app-icon name="clock-counter-clockwise" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Historial Jugador</span>
                     </div>
                 </div>
@@ -250,7 +250,7 @@
                 <div class="nav-item" (click)="cargarConfiguracion()"
                     [class.active]="esRutaActiva('/main-view/configuracion')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-gear nav-icon"></i>
+                        <app-icon name="gear" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Configuración</span>
                     </div>
                 </div>
@@ -258,7 +258,7 @@
                 <div class="nav-item" (click)="cargarConfiguracionTorneos()"
                     [class.active]="esRutaActiva('/main-view/configuracion-torneos')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-sliders nav-icon"></i>
+                        <app-icon name="sliders" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Config. Torneos</span>
                     </div>
                 </div>
@@ -266,7 +266,7 @@
                 <div class="nav-item" (click)="cargarSistemasPago()"
                     [class.active]="esRutaActiva('/main-view/sistemas-pago')">
                     <div class="nav-item-content">
-                        <i class="fa-solid fa-credit-card nav-icon"></i>
+                        <app-icon name="credit-card" class="nav-icon"></app-icon>
                         <span class="nav-label" *ngIf="!isCollapsed || esMobile">Sistemas de Pago</span>
                     </div>
                 </div>

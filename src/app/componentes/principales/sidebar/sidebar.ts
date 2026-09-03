@@ -3,12 +3,15 @@ import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { AuthService } from '../../../services/auth';
+import { TorneoService } from '../../../services/torneo';
+import { IconComponent } from '../../atoms/icon/icon';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.css']
 })
@@ -24,6 +27,14 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   submenuInscripcionesExpandido = false;
   submenuLigasExpandido = false;
   private routerSubscription?: Subscription;
+  private breakpointSubscription?: Subscription;
+
+  // Detectar si es móvil — reactivo a resize real vía BreakpointObserver
+  esMobile = false;
+
+  // adminTorneo sin ningún torneo asignado — el sidebar no debe mostrar
+  // navegación alguna hasta que un adminGral le asigne uno.
+  sinTorneoAsignado = false;
 
   ngOnChanges(): void {
     if (this.esMobile) {
@@ -31,12 +42,12 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  // Detectar si es móvil
-  get esMobile(): boolean {
-    return window.innerWidth <= 768;
-  }
-
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private torneoService: TorneoService,
+    private breakpointObserver: BreakpointObserver
+  ) { }
 
   get esAdminGral(): boolean {
     return this.authService.currentUserValue?.rol === 'adminGral';
@@ -52,11 +63,34 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
         this.rutaActual = event.url;
         this.actualizarSubmenusSegunRuta();
       });
+
+    this.breakpointSubscription = this.breakpointObserver
+      .observe('(max-width: 768px)')
+      .subscribe(result => {
+        this.esMobile = result.matches;
+      });
+
+    if (!this.esAdminGral) {
+      // Sin filtro de activo: lo que importa es la ASIGNACIÓN, no si el
+      // torneo sigue activo (p.ej. uno finalizado sigue siendo un torneo
+      // asignado válido — el sidebar no debe ocultar el menú por eso).
+      this.torneoService.getAll().subscribe({
+        next: (torneos) => {
+          this.sinTorneoAsignado = !torneos || torneos.length === 0;
+        },
+        error: () => {
+          this.sinTorneoAsignado = false;
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
+    }
+    if (this.breakpointSubscription) {
+      this.breakpointSubscription.unsubscribe();
     }
   }
 
@@ -100,6 +134,13 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   cargarInscripcionesGenerales(): void {
+    // adminTorneo no tiene acceso al dashboard agregado (multi-torneo) —
+    // para ese rol el encabezado solo expande el submenú (Jugadores por
+    // Torneo / Estadísticas de Pago), no navega a inscripciones-generales.
+    if (!this.esAdminGral) {
+      this.submenuInscripcionesExpandido = !this.submenuInscripcionesExpandido;
+      return;
+    }
     this.router.navigate(['/main-view/inscripciones-generales']);
     if (this.esMobile) this.cerrarSidebarMovil();
   }

@@ -1,12 +1,12 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from './auth';
+import { SessionMonitorService } from './session-monitor';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const router = inject(Router);
+  const sessionMonitor = inject(SessionMonitorService);
   const token = authService.getToken();
 
   let authReq = req;
@@ -23,21 +23,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        const errorMessage = error.error?.message || '';
-        //console.error('❌ Error 401: No autorizado -', errorMessage);
-        
-        // Verificar si es por sesión inválida o expirada
-        if (errorMessage.includes('Sesión inválida') || 
-            errorMessage.includes('Sesión expirada') ||
-            errorMessage.includes('Token expirado')) {
-          console.warn('⚠️ Sesión cerrada remotamente o expirada');
-        }
-        
-        // CRÍTICO: No llamar a logout() que hace petición HTTP
-        // Solo limpiar localmente para evitar bucle infinito
-        authService.logoutLocal();
-        router.navigate(['/login']);
+      // Solo tratar el 401 como "sesión inválida" si la petición SÍ llevaba
+      // token (una petición autenticada que el backend rechazó). Un 401 sin
+      // token es, por ejemplo, credenciales incorrectas en /auth/login —
+      // eso lo maneja el propio formulario de login, no este modal.
+      if (error.status === 401 && token) {
+        // Sesión inválida por el motivo que sea (expiración, cierre remoto,
+        // cambio de password, cambio de rol) — mostrar el modal explicativo
+        // en vez de redirigir en silencio. Mismo punto único que usa el
+        // polling de SessionMonitorService.
+        sessionMonitor.mostrarModalPorSesionInvalida('remota');
       }
       return throwError(() => error);
     })

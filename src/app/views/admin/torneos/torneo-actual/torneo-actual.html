@@ -20,6 +20,21 @@
     <!-- Contenido Principal -->
     <div *ngIf="!cargando && !error && torneoActual" class="content-wrapper">
 
+        <!-- Selector de torneo — solo si el admin tiene más de uno asignado -->
+        <div class="torneo-info-card" *ngIf="torneos.length > 1">
+            <div class="card-body">
+                <div class="info-item info-item--selector">
+                    <app-icon name="grid-four"></app-icon>
+                    <div class="info-content info-content--full">
+                        <span class="info-label">Seleccionar Torneo</span>
+                        <app-select [options]="torneoOptions" [value]="torneoActual"
+                            (valueChange)="onTorneoSeleccionadoChange($event)">
+                        </app-select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Información del Torneo -->
         <div class="torneo-info-card">
             <div class="card-header">

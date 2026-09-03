@@ -136,6 +136,7 @@
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     min-width: 260px;
+    max-width: calc(100vw - 2rem);
     animation: slideDown 0.2s ease-out;
     overflow: hidden;
 }
@@ -214,7 +215,7 @@
     background: var(--color-light-gray);
 }
 
-.menu-item i {
+.menu-item .app-icon {
     font-size: 1.1rem;
     color: var(--color-brown);
     width: 20px;
@@ -224,7 +225,7 @@
     color: var(--color-accent);
 }
 
-.menu-item.danger i {
+.menu-item.danger .app-icon {
     color: var(--color-accent);
 }
 

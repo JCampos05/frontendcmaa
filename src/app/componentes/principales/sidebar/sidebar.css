@@ -2,6 +2,7 @@
     width: 260px;
     background: var(--color-white);
     height: calc(100vh - 70px);
+    height: calc(100dvh - 70px);
     position: fixed;
     left: 0;
     top: 70px;
@@ -24,6 +25,7 @@
     left: 0;
     width: 100%;
     height: calc(100vh - 70px);
+    height: calc(100dvh - 70px);
     background: rgba(0, 0, 0, 0.5);
     z-index: 899;
     animation: fadeIn 0.3s ease;
@@ -247,11 +249,11 @@
     color: var(--color-brown);
 }
 
-.btn-submenu-toggle.expanded i {
+.btn-submenu-toggle.expanded .app-icon {
     transform: rotate(180deg);
 }
 
-.btn-submenu-toggle i {
+.btn-submenu-toggle .app-icon {
     transition: transform 0.3s ease;
 }
 
@@ -415,8 +417,8 @@
     }
     
     .toggle-btn {
-        width: 28px;
-        height: 28px;
+        width: 44px;
+        height: 44px;
         font-size: 0.8rem;
     }
 }

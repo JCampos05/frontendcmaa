@@ -3,7 +3,7 @@
     <div class="header-left">
       <!-- Botón Toggle Sidebar -->
       <button class="sidebar-toggle-btn" (click)="onToggleSidebar()">
-        <i class="fa-solid fa-bars"></i>
+        <app-icon name="list"></app-icon>
       </button>
 
       <div class="logo-section">
@@ -17,21 +17,20 @@
       <div class="profile-container">
         <button class="profile-button" (click)="toggleProfileMenu()" [disabled]="cerrando">
           <div class="profile-avatar">
-            <i class="fa-solid fa-user"></i>
+            <app-icon name="user" weight="regular"></app-icon>
           </div>
           <div class="profile-info">
             <span class="profile-name">Administrador</span>
             <span class="profile-role">{{ currentUser?.telefono || 'Usuario' }}</span>
           </div>
-          <i class="fa-solid fa-chevron-down profile-arrow" 
-             [class.rotated]="showProfileMenu"></i>
+          <app-icon name="caret-down" class="profile-arrow" [class.rotated]="showProfileMenu"></app-icon>
         </button>
 
         <!-- Menú desplegable -->
         <div class="profile-menu" *ngIf="showProfileMenu">
           <div class="menu-header">
             <div class="menu-avatar">
-              <i class="fa-solid fa-user"></i>
+              <app-icon name="user" weight="regular"></app-icon>
             </div>
             <div class="menu-user-info">
               <span class="menu-name">Administrador</span>
@@ -42,14 +41,14 @@
           <div class="menu-divider"></div>
 
           <button class="menu-item" (click)="goToConfig()" [disabled]="cerrando">
-            <i class="fa-solid fa-gear"></i>
+            <app-icon name="gear"></app-icon>
             <span>Configuración</span>
           </button>
 
           <div class="menu-divider"></div>
 
           <button class="menu-item danger" (click)="logout()" [disabled]="cerrando">
-            <i class="fa-solid" [class.fa-right-from-bracket]="!cerrando" [class.fa-spinner]="cerrando" [class.fa-spin]="cerrando"></i>
+            <app-icon [name]="cerrando ? 'spinner' : 'sign-out'" [spin]="cerrando"></app-icon>
             <span>{{ cerrando ? 'Cerrando sesión...' : 'Cerrar Sesión' }}</span>
           </button>
         </div>

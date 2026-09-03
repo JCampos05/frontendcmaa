@@ -25,6 +25,6 @@ export const roleGuard: CanActivateChildFn = (route: ActivatedRouteSnapshot) => 
     return true;
   }
 
-  router.navigate(['/main-view']);
+  router.navigate(['/main-view/no-autorizado']);
   return false;
 };

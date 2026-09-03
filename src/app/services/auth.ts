@@ -43,6 +43,17 @@ export class AuthService {
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
+  /**
+   * Actualiza el usuario cacheado (localStorage + BehaviorSubject) SIN
+   * cerrar sesión — usado cuando algo cambió en caliente (ej. el rol) pero
+   * la sesión/token sigue siendo válida, solo hace falta refrescar el
+   * snapshot local para que roleGuard/sidebar/etc. reflejen el dato nuevo.
+   */
+  public actualizarUsuarioLocal(usuario: Usuario): void {
+    localStorage.setItem('currentUser', JSON.stringify(usuario));
+    this.currentUserSubject.next(usuario);
+  }
+
   public get currentUserValue(): Usuario | null {
     return this.currentUserSubject.value;
   }

@@ -58,6 +58,7 @@
     max-width: 500px;
     width: 100%;
     max-height: 90vh;
+    max-height: 90dvh;
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow-modal);
@@ -72,6 +73,7 @@
 .modal-container.modal--fullscreen {
     max-width: 1200px;
     max-height: 95vh;
+    max-height: 95dvh;
 }
 
 /* ================================================================
@@ -266,6 +268,7 @@
 
     .modal-container {
         max-height: 92vh;
+        max-height: 92dvh;
         border-radius: var(--radius-xl) var(--radius-xl) 0 0;
         animation: slideUp 0.35s ease;
         max-width: 100%;

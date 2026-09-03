@@ -88,7 +88,7 @@ export class VisualizacionMesasComponent implements OnInit {
     this.cargandoTorneos = true;
     this.error = null;
 
-    this.torneoService.getTodosPublico().subscribe({
+    this.torneoService.getAll().subscribe({
       next: (torneos) => {
         this.torneos = torneos || [];
         this.actualizarOpcionesSelect();

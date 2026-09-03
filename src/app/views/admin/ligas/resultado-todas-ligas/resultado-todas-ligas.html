@@ -1,0 +1,147 @@
+<div class="resultados-container">
+    <app-toast-noti></app-toast-noti>
+
+    <app-page-header icon="trophy" title="Resultados de Liga"
+        [subtitle]="(ligaSeleccionada?.nombre || 'Liga') + ' - ' + formatearFecha(ligaSeleccionada?.fecha_inicio)">
+    </app-page-header>
+
+    <app-state-message *ngIf="cargando" mode="loading" title="Cargando información..."></app-state-message>
+
+    <div *ngIf="error && !cargando" class="error-container">
+        <app-state-message mode="error" [title]="error"></app-state-message>
+        <app-button variant="secondary" icon="arrow-clockwise" (clicked)="cargarLigas()">Reintentar</app-button>
+    </div>
+
+    <app-empty-state *ngIf="sinDatos && !cargando && !error" icon="trophy" [title]="sinDatos"
+        description="No hay ninguna liga registrada en este momento">
+    </app-empty-state>
+
+    <!-- Contenido Principal -->
+    <div *ngIf="!cargando && !error && !sinDatos" class="content-wrapper">
+
+        <!-- Selectores -->
+        <div class="section-card">
+            <div class="section-body">
+                <div class="grid-info">
+                    <div class="form-group">
+                        <label class="form-label"><app-icon name="trophy" class="form-label-icon"></app-icon>
+                            Liga</label>
+                        <app-select [options]="ligaOptions" [value]="ligaSeleccionada"
+                            placeholder="Seleccionar liga" (valueChange)="onLigaSelectChange($event)">
+                        </app-select>
+                    </div>
+
+                    <div class="form-group" *ngIf="grupos.length > 0">
+                        <label class="form-label"><app-icon name="stack" class="form-label-icon"></app-icon>
+                            Grupo</label>
+                        <app-select [options]="grupoOptions" [value]="grupoSeleccionado"
+                            (valueChange)="onGrupoSelectChange($event)">
+                        </app-select>
+                    </div>
+
+                    <div class="form-group" *ngIf="tabla.length > 0">
+                        <label class="form-label"><app-icon name="download" class="form-label-icon"></app-icon>
+                            Exportar Resultados</label>
+                        <div class="export-buttons">
+                            <app-button variant="danger" icon="file-pdf" (clicked)="exportarPDF()">PDF</app-button>
+                            <app-button variant="success" icon="file-arrow-down"
+                                (clicked)="exportarExcel()">Excel</app-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas Generales -->
+        <app-stat-card-grid *ngIf="grupoSeleccionado && estadisticasGenerales" [stats]="statCardsGenerales">
+        </app-stat-card-grid>
+
+        <!-- Tabla de Posiciones -->
+        <div class="section-card" *ngIf="grupoSeleccionado">
+            <div class="section-header">
+                <app-icon name="chart-pie" class="section-header-icon"></app-icon>
+                <h2>Tabla de Posiciones</h2>
+                <span class="badge">{{ grupoSeleccionado.nombre }}</span>
+                <app-button variant="secondary" size="sm"
+                    [icon]="ordenActual === 'posicion' ? 'sliders' : 'arrows-down-up'" (clicked)="toggleOrden()">
+                    Ordenar por {{ ordenActual === 'posicion' ? 'Posición' : 'Nombre' }}
+                </app-button>
+            </div>
+
+            <app-data-table [columns]="columnasTabla" [rows]="filasTabla" emptyIcon="tray"
+                emptyTitle="No hay jugadores en este grupo"
+                emptyDescription="Este grupo no tiene jugadores inscritos o no hay datos disponibles">
+                <ng-template let-jl>
+                    <tr class="fila-resultado" [class.top-1]="jl.posicionMostrada === 1"
+                        [class.top-2]="jl.posicionMostrada === 2" [class.top-3]="jl.posicionMostrada === 3"
+                        [class.top-4]="jl.posicionMostrada === 4" [class.top-5]="jl.posicionMostrada === 5">
+
+                        <td class="col-posicion">
+                            <div class="posicion-badge" [class.podio]="jl.posicionMostrada <= 3">
+                                <app-icon *ngIf="jl.posicionMostrada === 1" name="medal" weight="fill" class="gold"></app-icon>
+                                <app-icon *ngIf="jl.posicionMostrada === 2" name="medal" weight="fill" class="silver"></app-icon>
+                                <app-icon *ngIf="jl.posicionMostrada === 3" name="medal" weight="fill" class="bronze"></app-icon>
+                                <span *ngIf="jl.posicionMostrada > 3">
+                                    {{ jl.posicionMostrada }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="col-jugador">
+                            <div class="jugador-cell">
+                                <div class="avatar">
+                                    <app-icon name="user"></app-icon>
+                                </div>
+                                <span class="jugador-nombre-table">
+                                    {{ jl.jugador?.nombre }} {{ jl.jugador?.apellido1 }} {{ jl.jugador?.apellido2 }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="center">
+                            <span class="rating-badge" *ngIf="jl.jugador?.rating">{{ jl.jugador?.rating }}</span>
+                            <span class="sin-rating" *ngIf="!jl.jugador?.rating">S/R</span>
+                        </td>
+
+                        <td class="center">
+                            <span class="puntos-valor">{{ jl.puntos }}</span>
+                        </td>
+
+                        <td class="center">{{ jl.partidas_jugadas }}</td>
+                        <td class="center"><span class="stat-victoria">{{ jl.victorias }}</span></td>
+                        <td class="center"><span class="stat-empate">{{ jl.empates }}</span></td>
+                        <td class="center"><span class="stat-derrota">{{ jl.derrotas }}</span></td>
+                    </tr>
+                </ng-template>
+            </app-data-table>
+
+            <!-- Paginación -->
+            <div class="pagination" *ngIf="totalPaginas > 1">
+                <span class="pagination-info">
+                    Página {{ paginaActual }} de {{ totalPaginas }} ({{ tabla.length }} jugadores)
+                </span>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" [disabled]="paginaActual === 1"
+                        (click)="cambiarPagina(paginaActual - 1)">
+                        <app-icon name="caret-left"></app-icon>
+                    </button>
+
+                    <button *ngFor="let pagina of paginasArray" class="pagination-btn"
+                        [class.pagination-btn--active]="pagina === paginaActual" (click)="cambiarPagina(pagina)">
+                        {{ pagina }}
+                    </button>
+
+                    <button class="pagination-btn" [disabled]="paginaActual === totalPaginas"
+                        (click)="cambiarPagina(paginaActual + 1)">
+                        <app-icon name="caret-right"></app-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado vacío - Sin grupos -->
+        <app-empty-state *ngIf="ligaSeleccionada && grupos.length === 0" icon="stack" title="Esta liga no tiene grupos activos"
+            description="No hay grupos activos configurados para esta liga"></app-empty-state>
+
+    </div>
+</div>

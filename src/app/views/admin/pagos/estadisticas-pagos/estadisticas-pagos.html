@@ -19,7 +19,7 @@
                 </label>
                 <select class="form-control selector-torneo-input" [(ngModel)]="torneoSeleccionado"
                     (change)="onTorneoChange()">
-                    <option [value]="null">Todos los torneos</option>
+                    <option *ngIf="esAdminGral" [value]="null">Todos los torneos</option>
                     <option *ngFor="let torneo of torneos" [value]="torneo.idTorneo">
                         {{ torneo.nombre }} - {{ formatearFecha(torneo.fecha_inicio) }}
                     </option>

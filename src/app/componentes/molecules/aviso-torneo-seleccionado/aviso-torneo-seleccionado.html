@@ -1,0 +1,14 @@
+<div class="aviso-torneo">
+    <div class="aviso-torneo-icono">
+        <app-icon name="trophy"></app-icon>
+    </div>
+    <div class="aviso-torneo-texto">
+        <span class="aviso-torneo-titulo">Viendo: {{ torneoNombre }}</span>
+        <span class="aviso-torneo-subtitulo">Tienes más de un torneo asignado — para ver otro, cámbialo desde
+            aquí.</span>
+    </div>
+    <button type="button" class="aviso-torneo-btn" (click)="irATorneoActual()">
+        Torneo Actual
+        <app-icon name="arrow-right" weight="regular"></app-icon>
+    </button>
+</div>

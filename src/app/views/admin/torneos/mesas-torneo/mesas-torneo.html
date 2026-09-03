@@ -5,6 +5,9 @@
         [hasActions]="false">
     </app-page-header>
 
+    <app-aviso-torneo-seleccionado *ngIf="totalTorneosAsignados > 1 && !cargando" [torneoNombre]="torneoActual?.nombre">
+    </app-aviso-torneo-seleccionado>
+
     <!-- Loading -->
     <app-state-message *ngIf="cargando" mode="loading" title="Cargando información...">
     </app-state-message>

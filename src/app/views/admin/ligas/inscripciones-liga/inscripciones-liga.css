@@ -8,6 +8,7 @@
 .inscripciones-admin-container {
     width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     background: var(--color-light-gray);
 }
 

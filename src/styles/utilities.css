@@ -512,6 +512,12 @@
     gap: var(--space-2);
 }
 
+.pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
 .pagination-btn {
     width: 36px;
     height: 36px;

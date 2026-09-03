@@ -1,0 +1,11 @@
+<div class="error-page">
+    <div class="error-content">
+        <div class="error-icon">
+            <app-icon [name]="icon" weight="fill"></app-icon>
+        </div>
+        <h1>{{ title }}</h1>
+        <p class="mensaje-principal">{{ message }}</p>
+        <p class="mensaje-secundario" *ngIf="secondaryMessage">{{ secondaryMessage }}</p>
+        <app-button [icon]="actionIcon" (clicked)="onAction()">{{ actionLabel }}</app-button>
+    </div>
+</div>

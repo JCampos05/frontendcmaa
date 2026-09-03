@@ -2,6 +2,8 @@
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TorneoService } from '../../../../services/torneo';
+import { AuthService } from '../../../../services/auth';
+import { TorneoContextService } from '../../../../services/torneo-context';
 import { Torneo } from '../../../../models/torneo';
 import { HoraAmPmPipe } from '../../../../pipes/hora-ampm.pipe';
 import { PageHeaderComponent } from '../../../../componentes/organisms/page-header/page-header';
@@ -9,6 +11,7 @@ import { StateMessageComponent } from '../../../../componentes/molecules/state-m
 import { EmptyStateComponent } from '../../../../componentes/molecules/empty-state/empty-state';
 import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 import { IconComponent } from '../../../../componentes/atoms/icon/icon';
+import { SelectComponent, SelectOption } from '../../../../componentes/atoms/select/select';
 
 interface DetalleNota {
   titulo: string;
@@ -21,18 +24,22 @@ interface DetalleNota {
   standalone: true,
   imports: [
     CommonModule, HoraAmPmPipe, PageHeaderComponent, StateMessageComponent,
-    EmptyStateComponent, ButtonComponent, IconComponent
+    EmptyStateComponent, ButtonComponent, IconComponent, SelectComponent
   ],
   templateUrl: './torneo-actual.html',
   styleUrls: ['./torneo-actual.css']
 })
 export class TorneoActualComponent implements OnInit {
+  torneos: Torneo[] = [];
   torneoActual: Torneo | null = null;
+  torneoOptions: SelectOption<Torneo>[] = [];
   cargando = false;
   error: string | null = null;
 
   constructor(
     private torneoService: TorneoService,
+    private authService: AuthService,
+    private torneoContext: TorneoContextService,
     private router: Router
   ) {}
 
@@ -44,24 +51,55 @@ export class TorneoActualComponent implements OnInit {
     this.cargando = true;
     this.error = null;
 
-    this.torneoService.getActivos().subscribe({
+    // Para adminTorneo lo relevante es la ASIGNACIÓN (ya acotada server-side),
+    // no si el torneo además está marcado activo — filtrar por activo=true
+    // dejaba a un adminTorneo con un torneo asignado pero no activado varado
+    // en "sin torneo asignado". adminGral sí sigue viendo solo activos, ya
+    // que para ese rol esta pantalla muestra el torneo activo a gestionar,
+    // no una asignación personal.
+    const esAdminTorneo = this.authService.currentUserValue?.rol === 'adminTorneo';
+    this.torneoService.getAll(esAdminTorneo ? undefined : true).subscribe({
       next: (torneos) => {
+        if ((!torneos || torneos.length === 0) && this.authService.currentUserValue?.rol === 'adminTorneo') {
+          this.router.navigate(['/main-view/sin-torneo-asignado']);
+          return;
+        }
+
         if (torneos && torneos.length > 0) {
           const torneosOrdenados = torneos.sort((a, b) => {
             return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
           });
+          this.torneos = torneosOrdenados;
+          this.torneoOptions = torneosOrdenados.map(t => ({ value: t, label: `${t.nombre} - ${this.formatearFecha(t.fecha)}` }));
 
-          const hoy = new Date();
-          const tresDiasDespues = new Date();
-          tresDiasDespues.setDate(hoy.getDate() + 3);
+          // Si ya hay un torneo elegido en el contexto compartido (p.ej. el
+          // admin lo seleccionó aquí o en Inscripciones/Mesas/etc.) y sigue
+          // estando entre los suyos, respetar esa elección en vez de volver
+          // a auto-elegir el más próximo.
+          const seleccionActual = this.torneoContext.torneoSeleccionadoValue;
+          const seleccionVigente = seleccionActual
+            ? torneosOrdenados.find(t => t.idTorneo === seleccionActual.idTorneo)
+            : undefined;
 
-          const torneoEnRango = torneosOrdenados.find(t => {
-            const fechaTorneo = new Date(t.fecha);
-            return fechaTorneo >= hoy && fechaTorneo <= tresDiasDespues;
-          });
+          if (seleccionVigente) {
+            this.torneoActual = seleccionVigente;
+          } else {
+            const hoy = new Date();
+            const tresDiasDespues = new Date();
+            tresDiasDespues.setDate(hoy.getDate() + 3);
 
-          this.torneoActual = torneoEnRango || torneosOrdenados[0];
+            const torneoEnRango = torneosOrdenados.find(t => {
+              const fechaTorneo = new Date(t.fecha);
+              return fechaTorneo >= hoy && fechaTorneo <= tresDiasDespues;
+            });
+
+            this.torneoActual = torneoEnRango || torneosOrdenados[0];
+          }
+
+          this.torneoContext.seleccionar(this.torneoActual);
         } else {
+          this.torneos = [];
+          this.torneoOptions = [];
           this.torneoActual = null;
         }
         this.cargando = false;
@@ -72,6 +110,11 @@ export class TorneoActualComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  onTorneoSeleccionadoChange(torneo: Torneo): void {
+    this.torneoActual = torneo;
+    this.torneoContext.seleccionar(torneo);
   }
 
   formatearFecha(fecha: Date | string): string {
