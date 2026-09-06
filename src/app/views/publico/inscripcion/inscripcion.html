@@ -1,52 +1,49 @@
 <div class="inscripcion-container">
-    <!-- Botón de regreso -->
-    <button class="btn-regresar" (click)="intentarSalir()" [disabled]="loading">
-        <i class="fas fa-arrow-left"></i>
-        Regresar
-    </button>
+    <div class="inscripcion-top-card">
+        <div class="inscripcion-top-header">
+            <button class="btn btn-ghost btn-regresar" (click)="intentarSalir()" [disabled]="loading">
+                <i class="ph-bold ph-arrow-left"></i>
+                Regresar
+            </button>
 
-    <div class="inscripcion-header">
-        <h1>Inscripción al Torneo</h1>
-        <p>Complete el formulario para registrarse en el torneo</p>
-    </div>
-
-    <!-- Barra de progreso -->
-    <div class="progreso-container">
-        <div class="progreso-barra">
-            <div class="progreso-fill" [style.width.%]="progreso"></div>
+            <div class="inscripcion-header">
+                <h1>Inscripción al Torneo</h1>
+                <p>Complete el formulario para registrarse en el torneo</p>
+            </div>
         </div>
-        <div class="progreso-pasos">
-            <div class="paso" [class.activo]="pasoActual >= 1" [class.completado]="pasoActual > 1">
-                <div class="paso-numero">
-                    <i class="fas" [class.fa-check]="pasoActual > 1" [class.fa-user]="pasoActual <= 1"></i>
-                </div>
-                <span class="paso-texto">Datos Personales</span>
+
+        <!-- Barra de progreso -->
+        <div class="progreso-container">
+            <div class="progreso-barra">
+                <div class="progreso-fill" [style.width.%]="progreso"></div>
             </div>
-            <div class="paso" [class.activo]="pasoActual >= 2" [class.completado]="pasoActual > 2">
-                <div class="paso-numero">
-                    <i class="fas" [class.fa-check]="pasoActual > 2" [class.fa-phone]="pasoActual <= 2"></i>
+            <div class="progreso-pasos">
+                <div class="paso" [class.activo]="pasoActual >= 1" [class.completado]="pasoActual > 1">
+                    <div class="paso-numero">
+                        <i class="ph-bold" [class.ph-check]="pasoActual > 1" [class.ph-trophy]="pasoActual <= 1"></i>
+                    </div>
+                    <span class="paso-texto">Torneo y Categoría</span>
                 </div>
-                <span class="paso-texto">Contacto</span>
-            </div>
-            <div class="paso" [class.activo]="pasoActual >= 3" [class.completado]="pasoActual > 3">
-                <div class="paso-numero">
-                    <i class="fas" [class.fa-check]="pasoActual > 3" [class.fa-calendar-alt]="pasoActual <= 3"></i>
+                <div class="paso" [class.activo]="pasoActual >= 2" [class.completado]="pasoActual > 2">
+                    <div class="paso-numero">
+                        <i class="ph-bold" [class.ph-check]="pasoActual > 2" [class.ph-user]="pasoActual <= 2"></i>
+                    </div>
+                    <span class="paso-texto">Datos Personales</span>
                 </div>
-                <span class="paso-texto">Fecha Nacimiento</span>
-            </div>
-            <div class="paso" [class.activo]="pasoActual >= 4" [class.completado]="pasoActual > 4">
-                <div class="paso-numero">
-                    <i class="fas" [class.fa-check]="pasoActual > 4" [class.fa-chess]="pasoActual <= 4"></i>
+                <div class="paso" [class.activo]="pasoActual >= 3" [class.completado]="pasoActual > 3">
+                    <div class="paso-numero">
+                        <i class="ph-bold" [class.ph-check]="pasoActual > 3" [class.ph-clipboard-text]="pasoActual <= 3"></i>
+                    </div>
+                    <span class="paso-texto">Confirmación</span>
                 </div>
-                <span class="paso-texto">Torneo</span>
             </div>
         </div>
     </div>
 
     <!-- Mensajes de error -->
-    <div class="mensaje-error" *ngIf="errores.length > 0">
-        <i class="fas fa-exclamation-triangle"></i>
-        <div class="mensaje-error-contenido">
+    <div class="error-message" *ngIf="errores.length > 0">
+        <i class="ph-bold ph-warning"></i>
+        <div class="error-message-contenido">
             <strong>Por favor, corrija los siguientes errores:</strong>
             <ul>
                 <li *ngFor="let error of errores">{{ error }}</li>
@@ -57,116 +54,20 @@
     <!-- Formulario -->
     <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()" class="inscripcion-form">
 
-        <!-- Paso 1: Datos Personales -->
+        <!-- Paso 1: Torneo y Categoría -->
         <div class="paso-contenido" *ngIf="pasoActual === 1">
             <h2>
-                <i class="fas fa-user"></i>
-                Datos Personales
+                <i class="ph-bold ph-trophy"></i>
+                Torneo y Categoría
             </h2>
 
             <div class="form-group">
-                <label for="nombre">
-                    Nombre <span class="requerido">*</span>
-                </label>
-                <input type="text" id="nombre" formControlName="nombre" class="form-control"
-                    [class.invalido]="inscripcionForm.get('nombre')?.invalid && (inscripcionForm.get('nombre')?.touched || submitted)"
-                    placeholder="Ingrese su nombre">
-            </div>
-
-            <div class="form-group">
-                <label for="apellido1">
-                    Primer Apellido <span class="requerido">*</span>
-                </label>
-                <input type="text" id="apellido1" formControlName="apellido1" class="form-control"
-                    [class.invalido]="inscripcionForm.get('apellido1')?.invalid && (inscripcionForm.get('apellido1')?.touched || submitted)"
-                    placeholder="Ingrese su primer apellido">
-            </div>
-
-            <div class="form-group">
-                <label for="apellido2">
-                    Segundo Apellido
-                </label>
-                <input type="text" id="apellido2" formControlName="apellido2" class="form-control"
-                    [class.invalido]="inscripcionForm.get('apellido2')?.invalid && (inscripcionForm.get('apellido2')?.touched || submitted)"
-                    placeholder="Ingrese su segundo apellido (opcional)">
-            </div>
-        </div>
-
-        <!-- Paso 2: Contacto -->
-        <div class="paso-contenido" *ngIf="pasoActual === 2">
-            <h2>
-                <i class="fas fa-phone"></i>
-                Datos de Contacto
-            </h2>
-
-            <div class="form-group">
-                <label for="telefono">
-                    Teléfono <span class="requerido">*</span>
-                </label>
-                <input type="tel" id="telefono" formControlName="telefono" class="form-control"
-                    [class.invalido]="inscripcionForm.get('telefono')?.invalid && (inscripcionForm.get('telefono')?.touched || submitted)"
-                    placeholder="10 dígitos" maxlength="10">
-                <small class="form-text">Ingrese 10 dígitos sin espacios ni guiones</small>
-            </div>
-        </div>
-
-        <!-- Paso 3: Fecha de Nacimiento -->
-        <div class="paso-contenido" *ngIf="pasoActual === 3">
-            <h2>
-                <i class="fas fa-calendar-alt"></i>
-                Fecha de Nacimiento
-            </h2>
-
-            <div class="form-group">
-                <label>
-                    Fecha de Nacimiento <span class="requerido">*</span>
-                </label>
-                <div class="fecha-nacimiento-grid">
-                    <div class="fecha-campo">
-                        <label for="dia_nacimiento" class="fecha-label">Día</label>
-                        <select id="dia_nacimiento" formControlName="dia_nacimiento" class="form-control"
-                            [class.invalido]="inscripcionForm.get('dia_nacimiento')?.invalid && (inscripcionForm.get('dia_nacimiento')?.touched || submitted)">
-                            <option value="">Día</option>
-                            <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
-                        </select>
-                    </div>
-
-                    <div class="fecha-campo">
-                        <label for="mes_nacimiento" class="fecha-label">Mes</label>
-                        <select id="mes_nacimiento" formControlName="mes_nacimiento" class="form-control"
-                            [class.invalido]="inscripcionForm.get('mes_nacimiento')?.invalid && (inscripcionForm.get('mes_nacimiento')?.touched || submitted)">
-                            <option value="">Mes</option>
-                            <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
-                        </select>
-                    </div>
-
-                    <div class="fecha-campo">
-                        <label for="anio_nacimiento" class="fecha-label">Año</label>
-                        <select id="anio_nacimiento" formControlName="anio_nacimiento" class="form-control"
-                            [class.invalido]="inscripcionForm.get('anio_nacimiento')?.invalid && (inscripcionForm.get('anio_nacimiento')?.touched || submitted)">
-                            <option value="">Año</option>
-                            <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
-                        </select>
-                    </div>
-                </div>
-                <small class="form-text">La edad se calculará automáticamente según la fecha del torneo</small>
-            </div>
-        </div>
-
-        <!-- Paso 4: Torneo y Categoría -->
-        <div class="paso-contenido" *ngIf="pasoActual === 4">
-            <h2>
-                <i class="fas fa-chess"></i>
-                Selección de Torneo
-            </h2>
-
-            <div class="form-group">
-                <label for="torneo_id">
+                <label for="torneo_id" class="form-label">
                     Torneo <span class="requerido">*</span>
                 </label>
                 <select id="torneo_id" formControlName="torneo_id" class="form-control"
-                    [class.invalido]="inscripcionForm.get('torneo_id')?.invalid && (inscripcionForm.get('torneo_id')?.touched || submitted)"
-                    (change)="onTorneoChange($event)">
+                    [class.is-invalid]="inscripcionForm.get('torneo_id')?.invalid && (inscripcionForm.get('torneo_id')?.touched || submitted)"
+                    (change)="onTorneoSelectChange($event)">
                     <option value="">Seleccione un torneo</option>
                     <option *ngFor="let torneo of torneos" [value]="torneo.idTorneo">
                         {{ torneo.nombre || torneo.lugar }} - {{ torneo.fecha | date:'dd/MM/yyyy' }}
@@ -175,97 +76,240 @@
             </div>
 
             <div class="form-group" *ngIf="categorias.length > 0">
-                <label for="categoria_id">
+                <label class="form-label">
                     Categoría <span class="requerido">*</span>
                 </label>
-                <select id="categoria_id" formControlName="categoria_id" class="form-control"
-                    [class.invalido]="inscripcionForm.get('categoria_id')?.invalid && (inscripcionForm.get('categoria_id')?.touched || submitted)"
-                    (change)="onCategoriaChange($event)">
-                    <option value="">Seleccione una categoría</option>
-                    <option *ngFor="let cat of categorias"
-                        [value]="cat.categoria?.idCategoria || cat.idCategoria"
-                        [disabled]="!isCategoriaAbierta(cat)">
-                        {{ cat.categoria?.nombre || cat.nombre }} - ${{ cat.categoria?.costo || cat.costo | number:'1.2-2' }}
-                        {{ !isCategoriaAbierta(cat) ? ' (Inscripciones cerradas)' : '' }}
-                    </option>
-                </select>
+                <div class="categorias-grid-publico">
+                    <label class="categoria-card-publico"
+                        *ngFor="let cat of categorias"
+                        [class.seleccionada]="categoriaSeleccionada?.idCategoria === cat.idCategoria"
+                        [class.deshabilitada]="!puedeElegirCategoria(cat)">
+                        <input type="radio" formControlName="categoria_id" [value]="cat.idCategoria"
+                            [attr.disabled]="!puedeElegirCategoria(cat) ? true : null"
+                            (change)="onCategoriaChange({target: {value: cat.idCategoria}})">
+                        <div class="categoria-card-info">
+                            <span class="categoria-nombre">{{ cat.nombre }}</span>
+                            <span class="categoria-costo">${{ cat.costo | number:'1.2-2' }} MXN</span>
+                            <span class="categoria-cupo" *ngIf="cat.cupoMaximo && !cat.cerrada">
+                                <i class="ph-bold ph-users"></i>
+                                {{ cat.llena ? 'Cupo lleno' : (cat.cupoDisponible + ' lugares disponibles') }}
+                            </span>
+                            <span class="categoria-motivo" *ngIf="!puedeElegirCategoria(cat)">
+                                <i class="ph-bold ph-prohibit"></i>
+                                {{ motivoCategoriaDeshabilitada(cat) }}
+                            </span>
+                        </div>
+                    </label>
+                </div>
             </div>
 
             <!-- Mostrar el costo de inscripción -->
             <div class="costo-inscripcion" *ngIf="costoInscripcion > 0">
                 <div class="costo-contenido">
-                    <i class="fas fa-dollar-sign"></i>
+                    <i class="ph-bold ph-currency-dollar"></i>
                     <div>
                         <strong>Costo de Inscripción:</strong>
                         <span class="costo-monto">${{ costoInscripcion | number:'1.2-2' }} MXN</span>
                     </div>
                 </div>
-                <small class="costo-nota">
-                    <i class="fas fa-info-circle"></i>
+                <small class="form-hint">
+                    <i class="ph-bold ph-info"></i>
                     El pago se realiza de manera presencial en las oficinas del comité
                 </small>
             </div>
+        </div>
+
+        <!-- Paso 2: Datos Personales -->
+        <div class="paso-contenido" *ngIf="pasoActual === 2">
+            <h2>
+                <i class="ph-bold ph-user"></i>
+                Datos Personales
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre" class="form-label">Nombre <span class="requerido">*</span></label>
+                    <input type="text" id="nombre" formControlName="nombre" class="form-control"
+                        [class.is-invalid]="inscripcionForm.get('nombre')?.invalid && (inscripcionForm.get('nombre')?.touched || submitted)"
+                        placeholder="Ingrese su nombre">
+                </div>
+
+                <div class="form-group">
+                    <label for="apellido1" class="form-label">Primer Apellido <span class="requerido">*</span></label>
+                    <input type="text" id="apellido1" formControlName="apellido1" class="form-control"
+                        [class.is-invalid]="inscripcionForm.get('apellido1')?.invalid && (inscripcionForm.get('apellido1')?.touched || submitted)"
+                        placeholder="Ingrese su primer apellido">
+                </div>
+
+                <div class="form-group">
+                    <label for="apellido2" class="form-label">Segundo Apellido</label>
+                    <input type="text" id="apellido2" formControlName="apellido2" class="form-control"
+                        [class.is-invalid]="inscripcionForm.get('apellido2')?.invalid && (inscripcionForm.get('apellido2')?.touched || submitted)"
+                        placeholder="Ingrese su segundo apellido (opcional)">
+                </div>
+            </div>
+
+            <div class="form-group form-group--fecha">
+                <label class="form-label">Fecha de Nacimiento <span class="requerido">*</span></label>
+                <div class="fecha-nacimiento-grid">
+                    <div class="fecha-campo">
+                        <label for="dia_nacimiento" class="fecha-label">Día</label>
+                        <select id="dia_nacimiento" formControlName="dia_nacimiento" class="form-control">
+                            <option value="">Día</option>
+                            <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
+                        </select>
+                    </div>
+                    <div class="fecha-campo">
+                        <label for="mes_nacimiento" class="fecha-label">Mes</label>
+                        <select id="mes_nacimiento" formControlName="mes_nacimiento" class="form-control">
+                            <option value="">Mes</option>
+                            <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
+                        </select>
+                    </div>
+                    <div class="fecha-campo">
+                        <label for="anio_nacimiento" class="fecha-label">Año</label>
+                        <select id="anio_nacimiento" formControlName="anio_nacimiento" class="form-control">
+                            <option value="">Año</option>
+                            <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+                        </select>
+                    </div>
+                </div>
+                <small class="form-hint">La edad se calculará automáticamente según la fecha del torneo</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="telefono" class="form-label">Teléfono <span class="requerido">*</span></label>
+                    <input type="tel" id="telefono" formControlName="telefono" class="form-control"
+                        [class.is-invalid]="inscripcionForm.get('telefono')?.invalid && (inscripcionForm.get('telefono')?.touched || submitted)"
+                        placeholder="10 dígitos" maxlength="10">
+                    <small class="form-hint">Ingrese 10 dígitos sin espacios ni guiones</small>
+                </div>
+
+                <div class="form-group pregunta-participacion">
+                    <label class="form-label">¿Ya has participado en torneos del comité antes?</label>
+                    <div class="opciones-si-no">
+                        <label class="opcion-radio">
+                            <input type="radio" formControlName="ya_jugo_antes" [value]="true">
+                            Sí, ya he participado
+                        </label>
+                        <label class="opcion-radio">
+                            <input type="radio" formControlName="ya_jugo_antes" [value]="false">
+                            No, es mi primera vez
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 3: Confirmación final -->
+        <div class="paso-contenido" *ngIf="pasoActual === 3">
+            <h2>
+                <i class="ph-bold ph-clipboard-text"></i>
+                Confirma tus Datos
+            </h2>
+            <p class="confirmacion-intro">Revisa que todo esté correcto antes de finalizar tu inscripción.</p>
+
+            <div class="resumen-inscripcion">
+                <div class="resumen-fila">
+                    <span class="resumen-label"><i class="ph-bold ph-trophy"></i> Torneo</span>
+                    <span class="resumen-valor">{{ torneoActual?.nombre || torneoActual?.lugar }}</span>
+                </div>
+                <div class="resumen-fila">
+                    <span class="resumen-label"><i class="ph-bold ph-tag"></i> Categoría</span>
+                    <span class="resumen-valor">{{ categoriaSeleccionada?.nombre }} — ${{ costoInscripcion | number:'1.2-2' }} MXN</span>
+                </div>
+                <div class="resumen-fila">
+                    <span class="resumen-label"><i class="ph-bold ph-user"></i> Nombre completo</span>
+                    <span class="resumen-valor">
+                        {{ inscripcionForm.value.nombre }} {{ inscripcionForm.value.apellido1 }} {{ inscripcionForm.value.apellido2 }}
+                    </span>
+                </div>
+                <div class="resumen-fila">
+                    <span class="resumen-label"><i class="ph-bold ph-phone"></i> Teléfono</span>
+                    <span class="resumen-valor">{{ formatearTelefono(inscripcionForm.value.telefono) }}</span>
+                </div>
+                <div class="resumen-fila">
+                    <span class="resumen-label"><i class="ph-bold ph-calendar"></i> Fecha de nacimiento</span>
+                    <span class="resumen-valor">
+                        {{ inscripcionForm.value.dia_nacimiento }}/{{ inscripcionForm.value.mes_nacimiento }}/{{ inscripcionForm.value.anio_nacimiento }}
+                    </span>
+                </div>
+                <div class="resumen-fila" *ngIf="idJugadorSeleccionado">
+                    <span class="resumen-label"><i class="ph-bold ph-user-check"></i> Registro</span>
+                    <span class="resumen-valor">Se usará tu registro existente</span>
+                </div>
+            </div>
 
             <div class="form-group">
-                <label for="notas">
-                    Notas Adicionales
-                </label>
-                <textarea id="notas" formControlName="notas" class="form-control" rows="4"
+                <label for="notas" class="form-label">Notas Adicionales</label>
+                <textarea id="notas" formControlName="notas" class="form-control" rows="3"
                     placeholder="Información adicional (opcional)" maxlength="1000"></textarea>
-                <small class="form-text">Máximo 1000 caracteres</small>
+                <small class="form-hint">Máximo 1000 caracteres</small>
             </div>
         </div>
 
         <!-- Botones de navegación -->
         <div class="form-actions">
             <button type="button" class="btn btn-secondary" (click)="pasoAnterior()" *ngIf="pasoActual > 1"
-                [disabled]="loading">
-                <i class="fas fa-arrow-left"></i>
+                [disabled]="loading || buscandoJugador">
+                <i class="ph-bold ph-arrow-left"></i>
                 Anterior
             </button>
 
             <button type="button" class="btn btn-primary" (click)="siguientePaso()" *ngIf="pasoActual < totalPasos"
-                [disabled]="loading">
-                Siguiente
-                <i class="fas fa-arrow-right"></i>
+                [disabled]="loading || buscandoJugador">
+                <i class="ph-bold ph-spinner ph-spin" *ngIf="buscandoJugador"></i>
+                {{ buscandoJugador ? 'Verificando...' : 'Siguiente' }}
+                <i class="ph-bold ph-arrow-right" *ngIf="!buscandoJugador"></i>
             </button>
 
-            <button type="submit" class="btn btn-success" *ngIf="pasoActual === totalPasos"
-                [disabled]="loading || inscripcionForm.invalid">
-                <i class="fas fa-check" *ngIf="!loading"></i>
-                <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
-                {{ loading ? 'Procesando...' : 'Finalizar Inscripción' }}
+            <button type="submit" class="btn btn-success" *ngIf="pasoActual === totalPasos" [disabled]="loading">
+                <i class="ph-bold ph-check" *ngIf="!loading"></i>
+                <i class="ph-bold ph-spinner ph-spin" *ngIf="loading"></i>
+                {{ loading ? 'Procesando...' : 'Confirmar Inscripción' }}
             </button>
         </div>
     </form>
 
+    <!-- Modal: ¿ya estás registrado? -->
+    <app-jugador-similar
+        [mostrar]="mostrarModalSimilares"
+        [candidatos]="candidatosSimilares"
+        (seleccionar)="onSeleccionarSimilar($event)"
+        (ningunoDeEstos)="onNingunoDeEstos()">
+    </app-jugador-similar>
+
     <!-- Mensaje de éxito -->
     <div class="modal-overlay" *ngIf="mensajeExito" (click)="cerrarMensajeExito()">
-        <div class="modal-contenido" (click)="$event.stopPropagation()">
-            <div class="modal-header exito">
-                <i class="fas fa-check-circle"></i>
-                <h2>Inscripción Completada</h2>
+        <div class="modal-container modal--md" (click)="$event.stopPropagation()">
+            <div class="modal-header modal-header--gradient">
+                <div class="modal-title">
+                    <i class="ph-bold ph-check-circle modal-title-icon"></i>
+                    <div class="modal-title-text">
+                        <h2>Inscripción Completada</h2>
+                    </div>
+                </div>
             </div>
             <div class="modal-body">
                 <p>Su proceso de inscripción ha finalizado exitosamente.</p>
 
-                <!-- Mostrar el costo de la inscripción -->
                 <div class="modal-costo" *ngIf="costoInscripcion > 0">
                     <div class="modal-costo-header">
-                        <i class="fas fa-dollar-sign"></i>
+                        <i class="ph-bold ph-currency-dollar"></i>
                         <span>Monto a Pagar</span>
                     </div>
                     <div class="modal-costo-monto">
                         ${{ costoInscripcion | number:'1.2-2' }} MXN
                     </div>
                     <div class="modal-costo-categoria" *ngIf="categoriaSeleccionada">
-                        <i class="fas fa-tag"></i>
-                        {{ categoriaSeleccionada.categoria?.nombre || categoriaSeleccionada.nombre }}
+                        <i class="ph-bold ph-tag"></i>
+                        {{ categoriaSeleccionada.nombre }}
                     </div>
                 </div>
 
                 <div class="info-pago">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="ph-bold ph-info"></i>
                     <div>
                         <p><strong>Importante:</strong></p>
                         <p>Su inscripción quedará en estado <strong>PENDIENTE</strong> hasta que se confirme el pago.</p>
@@ -276,33 +320,33 @@
 
                 <div class="info-bancaria">
                     <div class="info-bancaria-header">
-                        <i class="fas fa-university"></i>
+                        <i class="ph-bold ph-bank"></i>
                         <strong>Datos para Transferencia Bancaria</strong>
                     </div>
                     <div class="info-bancaria-contenido">
                         <div class="dato-bancario">
-                            <i class="fas fa-user"></i>
+                            <i class="ph-bold ph-user"></i>
                             <div>
                                 <span class="dato-label">Titular de la cuenta:</span>
-                                <span class="dato-value">{{ sistemaPago?.nombreCuenta || 'No disponible' }}</span>
+                                <span class="dato-value">{{ sistemaPago?.nombreCuenta || sistemaPago?.nombre_cuenta || 'No disponible' }}</span>
                             </div>
                         </div>
                         <div class="dato-bancario">
-                            <i class="fas fa-building"></i>
+                            <i class="ph-bold ph-buildings"></i>
                             <div>
                                 <span class="dato-label">Banco:</span>
                                 <span class="dato-value">{{ sistemaPago?.banco || 'No disponible' }}</span>
                             </div>
                         </div>
                         <div class="dato-bancario">
-                            <i class="fas fa-credit-card"></i>
+                            <i class="ph-bold ph-credit-card"></i>
                             <div>
                                 <span class="dato-label">Cuenta:</span>
-                                <span class="dato-value clabe">{{ sistemaPago?.numeroCuenta || 'No disponible' }}</span>
+                                <span class="dato-value clabe">{{ sistemaPago?.numeroCuenta || sistemaPago?.numero_cuenta || 'No disponible' }}</span>
                             </div>
                         </div>
                         <div class="dato-bancario">
-                            <i class="fas fa-credit-card"></i>
+                            <i class="ph-bold ph-credit-card"></i>
                             <div>
                                 <span class="dato-label">CLABE:</span>
                                 <span class="dato-value clabe">{{ formatearClabe(sistemaPago?.clabe) || 'No disponible' }}</span>
@@ -310,33 +354,32 @@
                         </div>
                     </div>
                     <div class="info-bancaria-nota">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="ph-bold ph-warning"></i>
                         <strong>Solo se aceptan transferencias bancarias</strong>
                     </div>
                 </div>
 
                 <div class="info-comprobante">
-                    <i class="fas fa-receipt"></i>
+                    <i class="ph-bold ph-receipt"></i>
                     <div>
                         <p><strong>Envío de Comprobante:</strong></p>
                         <p>Una vez realizada la transferencia, envíe su comprobante de pago por WhatsApp al número:</p>
-                        <div class="numero-whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                            <a [href]="'https://wa.me/52' + sistemaPago.telefono.replace(/\D/g, '')" target="_blank">
+                        <div class="numero-whatsapp" *ngIf="sistemaPago?.telefono">
+                            <i class="ph-bold ph-whatsapp-logo"></i>
+                            <a [href]="'https://wa.me/52' + sistemaPago.telefono.replace('/\\D/g', '')" target="_blank">
                                 +52 {{ formatearTelefono(sistemaPago.telefono) }}
                             </a>
                         </div>
                         <div class="numero-whatsapp" *ngIf="!sistemaPago?.telefono">
-                            <i class="fab fa-whatsapp"></i>
+                            <i class="ph-bold ph-whatsapp-logo"></i>
                             <span>No disponible</span>
                         </div>
-                        <!--p class="comprobante-nota">Incluya su nombre completo y el torneo al que se inscribió.</!--p-->
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" (click)="cerrarMensajeExito()">
-                    <i class="fas fa-times"></i>
+                    <i class="ph-bold ph-x"></i>
                     Cerrar
                 </button>
             </div>
@@ -345,22 +388,26 @@
 
     <!-- Modal de confirmación de salida -->
     <div class="modal-overlay" *ngIf="mostrarConfirmacionSalida" (click)="cancelarSalida()">
-        <div class="modal-contenido modal-advertencia" (click)="$event.stopPropagation()">
-            <div class="modal-header advertencia">
-                <i class="fas fa-exclamation-circle"></i>
-                <h2>¿Desea salir?</h2>
+        <div class="modal-container" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="ph-bold ph-warning-circle modal-title-icon"></i>
+                    <div class="modal-title-text">
+                        <h2>¿Desea salir?</h2>
+                    </div>
+                </div>
             </div>
             <div class="modal-body">
                 <p>Si sale ahora, se perderán todos los datos que ha ingresado en el formulario.</p>
                 <p><strong>¿Está seguro de que desea continuar?</strong></p>
             </div>
-            <div class="modal-footer modal-footer-doble">
+            <div class="modal-footer">
                 <button class="btn btn-secondary" (click)="cancelarSalida()">
-                    <i class="fas fa-times"></i>
+                    <i class="ph-bold ph-x"></i>
                     Cancelar
                 </button>
                 <button class="btn btn-danger" (click)="confirmarSalida()">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i class="ph-bold ph-sign-out"></i>
                     Sí, salir
                 </button>
             </div>

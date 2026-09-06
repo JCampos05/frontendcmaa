@@ -203,7 +203,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   verDetalleTorneo(): void {
-    const match = this.rutaActual.match(/\/(detalle-torneo|editar-torneo)\/(\d+)/);
+    const match = this.rutaActual.match(/\/(detalle-torneo|editar-torneo)\/([^/]+)/);
     if (match) {
       this.router.navigate(['/main-view/detalle-torneo', match[2]]);
     } else {
@@ -213,7 +213,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   editarTorneoActual(): void {
-    const match = this.rutaActual.match(/\/(detalle-torneo|editar-torneo)\/(\d+)/);
+    const match = this.rutaActual.match(/\/(detalle-torneo|editar-torneo)\/([^/]+)/);
     if (match) {
       this.router.navigate(['/main-view/editar-torneo', match[2]]);
     } else {
@@ -249,7 +249,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   verDetalleLiga(): void {
-    const match = this.rutaActual.match(/\/(detalle-liga|editar-liga)\/(\d+)/);
+    const match = this.rutaActual.match(/\/(detalle-liga|editar-liga)\/([^/]+)/);
     if (match) {
       this.router.navigate(['/main-view/detalle-liga', match[2]]);
     } else {
@@ -259,7 +259,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   editarLigaActual(): void {
-    const match = this.rutaActual.match(/\/(detalle-liga|editar-liga)\/(\d+)/);
+    const match = this.rutaActual.match(/\/(detalle-liga|editar-liga)\/([^/]+)/);
     if (match) {
       this.router.navigate(['/main-view/editar-liga', match[2]]);
     } else {

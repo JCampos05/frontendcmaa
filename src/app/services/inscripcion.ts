@@ -65,23 +65,6 @@ export class InscripcionService {
     };
   }
 
-  crearInscripcionPublica(inscripcion: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/public`, inscripcion).pipe(
-      map(response => response),
-      catchError(this.handleError)
-    );
-  }
-
-  validarTelefono(telefono: string, idTorneo: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/validar-telefono`, {
-      telefono,
-      torneo_id: idTorneo
-    }).pipe(
-      map(response => response),
-      catchError(this.handleError)
-    );
-  }
-
   getAll(): Observable<any[]> {
     return this.http.get<any>(this.apiUrl).pipe(
       map(response => {

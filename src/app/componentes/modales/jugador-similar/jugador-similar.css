@@ -1,0 +1,57 @@
+.candidatos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-height: 45vh;
+    overflow-y: auto;
+}
+
+.candidato-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    width: 100%;
+    text-align: left;
+    background: var(--color-light-gray);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: var(--font-family);
+}
+
+.candidato-card:hover {
+    border-color: var(--color-brown);
+    background: var(--color-beige);
+}
+
+.candidato-nombre {
+    font-weight: 700;
+    color: var(--color-dark-navy);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.candidato-nombre .ph-bold {
+    color: var(--color-brown);
+}
+
+.candidato-detalle {
+    font-size: var(--text-sm);
+    color: var(--color-slate);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.candidato-accion {
+    margin-top: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-brown);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}

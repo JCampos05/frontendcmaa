@@ -30,6 +30,7 @@ export class DetalleLigaComponent implements OnInit {
   grupos: GrupoLiga[] = [];
   loading = true;
   ligaId?: number;
+  ligaSlug?: string;
 
   seccionesExpandidas = {
     informacionGeneral: true,
@@ -49,8 +50,8 @@ export class DetalleLigaComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.ligaId = +params['id'];
+      if (params['slug']) {
+        this.ligaSlug = params['slug'];
         this.cargarLiga();
       } else {
         this.router.navigate(['/main-view/ligas']);
@@ -75,16 +76,17 @@ export class DetalleLigaComponent implements OnInit {
   }
 
   cargarLiga(): void {
-    if (!this.ligaId) return;
+    if (!this.ligaSlug) return;
 
     this.loading = true;
-    this.infoLigaService.getById(this.ligaId).subscribe({
+    this.infoLigaService.getBySlug(this.ligaSlug).subscribe({
       next: (liga: InfoLiga) => {
+        this.ligaId = liga.idLiga;
         this.liga = {
           ...liga,
           activo: this.verificarEstadoLiga(liga) ? 1 : 0
         };
-        
+
         this.cargarGrupos();
       },
       error: (error) => {
@@ -225,8 +227,8 @@ export class DetalleLigaComponent implements OnInit {
   }
 
   editarLiga(): void {
-    if (this.ligaId) {
-      this.router.navigate(['/main-view/editar-liga', this.ligaId]);
+    if (this.liga?.slug) {
+      this.router.navigate(['/main-view/editar-liga', this.liga.slug]);
     }
   }
 }

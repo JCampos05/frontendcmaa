@@ -3,15 +3,23 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TorneoService } from '../../../../services/torneo';
 import { TorneoCategoria } from '../../../../models/torneo-categoria';
-import { Torneo } from '../../../../models/torneo';
+import { Torneo, EstadoTorneo } from '../../../../models/torneo';
 import { ToastNoti } from '../../../../componentes/modales/toast-noti/toast-noti';
 import { SistemaPago } from '../../../../models/sistema-pago';
 import { PageHeaderComponent } from '../../../../componentes/organisms/page-header/page-header';
 import { StateMessageComponent } from '../../../../componentes/molecules/state-message/state-message';
 import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 import { IconButtonComponent } from '../../../../componentes/atoms/icon-button/icon-button';
-import { BadgeComponent } from '../../../../componentes/atoms/badge/badge';
+import { BadgeComponent, BadgeStatus } from '../../../../componentes/atoms/badge/badge';
 import { IconComponent } from '../../../../componentes/atoms/icon/icon';
+
+const ESTADO_BADGE: Record<EstadoTorneo, { status: BadgeStatus; text: string; icon: string }> = {
+  borrador:   { status: 'pending',     text: 'Borrador',   icon: 'pencil-simple-line' },
+  publicado:  { status: 'scheduled',   text: 'Publicado',  icon: 'check-circle' },
+  en_curso:   { status: 'in-progress', text: 'En Curso',   icon: 'play-circle' },
+  finalizado: { status: 'finished',    text: 'Finalizado', icon: 'flag-checkered' },
+  cancelado:  { status: 'cancelled',   text: 'Cancelado',  icon: 'x-circle' },
+};
 
 @Component({
   selector: 'app-torneo-detalle',
@@ -31,6 +39,7 @@ export class TorneoDetalleComponent implements OnInit {
   sistemaPago?: SistemaPago;
   loading = true;
   torneoId?: number;
+  torneoSlug?: string;
 
   seccionesExpandidas = {
     informacionGeneral: true,
@@ -51,8 +60,8 @@ export class TorneoDetalleComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.torneoId = +params['id'];
+      if (params['slug']) {
+        this.torneoSlug = params['slug'];
         this.cargarTorneo();
       } else {
         this.router.navigate(['/main-view/torneos']);
@@ -80,11 +89,12 @@ export class TorneoDetalleComponent implements OnInit {
   // Modificar el método cargarTorneo() para aplicar la verificación:
 
   cargarTorneo(): void {
-    if (!this.torneoId) return;
+    if (!this.torneoSlug) return;
 
     this.loading = true;
-    this.torneoService.getById(this.torneoId).subscribe({
+    this.torneoService.getBySlug(this.torneoSlug).subscribe({
       next: (torneo: Torneo) => {
+        this.torneoId = torneo.idTorneo;
         this.torneo = {
           ...torneo,
           activo: this.verificarEstadoTorneo(torneo) // Aplicar verificación automática
@@ -278,9 +288,13 @@ export class TorneoDetalleComponent implements OnInit {
   }
 
   editarTorneo(): void {
-    if (this.torneoId) {
-      this.router.navigate(['/main-view/editar-torneo', this.torneoId]);
+    if (this.torneo?.slug) {
+      this.router.navigate(['/main-view/editar-torneo', this.torneo.slug]);
     }
+  }
+
+  getEstadoBadge(torneo: Torneo) {
+    return ESTADO_BADGE[torneo.estado ?? 'borrador'];
   }
 
   formatearClabe(clabe: string): string {

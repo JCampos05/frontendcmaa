@@ -1,10 +1,11 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { InscripcionService } from '../../../services/inscripcion';
 import { TorneoService } from '../../../services/torneo';
-import { Torneo } from '../../../models/torneo'
+import { InscripcionPublicaService, CategoriaPublica, JugadorSimilar } from '../../../services/inscripcion-publica';
+import { Torneo } from '../../../models/torneo';
+import { JugadorSimilarComponent } from '../../../componentes/modales/jugador-similar/jugador-similar';
 
 @Component({
   selector: 'app-inscripcion',
@@ -12,7 +13,8 @@ import { Torneo } from '../../../models/torneo'
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    DatePipe
+    DatePipe,
+    JugadorSimilarComponent
   ],
   templateUrl: './inscripcion.html',
   styleUrls: ['./inscripcion.css']
@@ -20,42 +22,41 @@ import { Torneo } from '../../../models/torneo'
 export class InscripcionComponent implements OnInit {
   inscripcionForm: FormGroup;
   pasoActual: number = 1;
-  totalPasos: number = 4;
+  totalPasos: number = 3;
   torneos: any[] = [];
-  categorias: any[] = [];
+  categorias: CategoriaPublica[] = [];
   loading: boolean = false;
   submitted: boolean = false;
   mensajeExito: boolean = false;
   mostrarConfirmacionSalida: boolean = false;
   errores: string[] = [];
 
-  categoriaSeleccionada: any = null;
+  categoriaSeleccionada: CategoriaPublica | null = null;
   costoInscripcion: number = 0;
   torneoIdInicial: number | null = null;
+  torneoSlugInicial: string | null = null;
   sistemaPago: any = null;
-  torneoActual: Torneo | null = null;
+  torneoActual: any = null;
+
+  // Detección de jugador existente / duplicado (puntos 4, 5, 5.1)
+  buscandoJugador: boolean = false;
+  mostrarModalSimilares: boolean = false;
+  candidatosSimilares: JugadorSimilar[] = [];
+  idJugadorSeleccionado: number | null = null;
 
   dias: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
   meses = [
-    { valor: 1, nombre: 'Enero' },
-    { valor: 2, nombre: 'Febrero' },
-    { valor: 3, nombre: 'Marzo' },
-    { valor: 4, nombre: 'Abril' },
-    { valor: 5, nombre: 'Mayo' },
-    { valor: 6, nombre: 'Junio' },
-    { valor: 7, nombre: 'Julio' },
-    { valor: 8, nombre: 'Agosto' },
-    { valor: 9, nombre: 'Septiembre' },
-    { valor: 10, nombre: 'Octubre' },
-    { valor: 11, nombre: 'Noviembre' },
-    { valor: 12, nombre: 'Diciembre' }
+    { valor: 1, nombre: 'Enero' }, { valor: 2, nombre: 'Febrero' }, { valor: 3, nombre: 'Marzo' },
+    { valor: 4, nombre: 'Abril' }, { valor: 5, nombre: 'Mayo' }, { valor: 6, nombre: 'Junio' },
+    { valor: 7, nombre: 'Julio' }, { valor: 8, nombre: 'Agosto' }, { valor: 9, nombre: 'Septiembre' },
+    { valor: 10, nombre: 'Octubre' }, { valor: 11, nombre: 'Noviembre' }, { valor: 12, nombre: 'Diciembre' }
   ];
   anios: number[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private inscripcionService: InscripcionService,
     private torneoService: TorneoService,
+    private inscripcionPublicaService: InscripcionPublicaService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -65,45 +66,24 @@ export class InscripcionComponent implements OnInit {
     }
 
     this.inscripcionForm = this.fb.group({
-      nombre: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(100),
-        this.soloLetrasValidator
-      ]],
-      apellido1: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(100),
-        this.soloLetrasValidator
-      ]],
-      apellido2: ['', [
-        Validators.minLength(2),
-        Validators.maxLength(100),
-        this.soloLetrasValidator
-      ]],
-      telefono: ['', [
-        Validators.required,
-        Validators.pattern(/^\d{10}$/),
-        this.telefonoValidator
-      ]],
+      torneo_id: ['', Validators.required],
+      categoria_id: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100), this.soloLetrasValidator]],
+      apellido1: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100), this.soloLetrasValidator]],
+      apellido2: ['', [Validators.minLength(2), Validators.maxLength(100), this.soloLetrasValidator]],
+      telefono: ['', [Validators.required, Validators.pattern(/^\d{10}$/), this.telefonoValidator]],
       dia_nacimiento: ['', Validators.required],
       mes_nacimiento: ['', Validators.required],
       anio_nacimiento: ['', Validators.required],
-      torneo_id: ['', Validators.required],
-      categoria_id: ['', Validators.required],
+      ya_jugo_antes: [null],
       notas: ['', Validators.maxLength(1000)]
     });
   }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.torneoIdInicial = +params['id'];
-        this.cargarTorneosActivos();
-      } else {
-        this.cargarTorneosActivos();
-      }
+      this.torneoSlugInicial = params['slug'] || null;
+      this.cargarTorneosActivos();
     });
   }
 
@@ -120,134 +100,109 @@ export class InscripcionComponent implements OnInit {
     return regex.test(telefono) ? null : { telefonoInvalido: true };
   }
 
+  // El backend devuelve cierre_inscripciones en snake_case en las listas
+  // públicas (getActivos no lo normaliza a camelCase) — aceptar ambos.
+  private cierreDeTorneo(torneo: any): string | null {
+    return torneo?.cierre_inscripciones ?? torneo?.cierreInscripciones ?? null;
+  }
+
   cargarTorneosActivos(): void {
     this.torneoService.getActivos().subscribe({
       next: (torneos) => {
-        const ahora = new Date();
-
         this.torneos = (torneos || []).filter(torneo => {
-          const cierreInscripciones = torneo.cierreInscripciones;
-
-          if (!cierreInscripciones) {
-            return true;
-          }
-
-          return !this.verificarInscripcionesCerradas(cierreInscripciones);
+          const cierre = this.cierreDeTorneo(torneo);
+          return !cierre || !this.fechaYaPaso(cierre);
         });
-
-        //console.log('Torneos con inscripciones abiertas:', this.torneos);
 
         if (this.torneos.length === 0) {
           this.errores = ['No hay torneos disponibles con inscripciones abiertas en este momento'];
-        } else if (this.torneoIdInicial) {
-          const torneoEncontrado = this.torneos.find(t => t.idTorneo === this.torneoIdInicial);
+        } else if (this.torneoSlugInicial) {
+          const torneoEncontrado = this.torneos.find(t => t.slug === this.torneoSlugInicial);
 
-          if (torneoEncontrado) {
-            this.inscripcionForm.patchValue({ torneo_id: this.torneoIdInicial });
-            this.onTorneoChange({ target: { value: this.torneoIdInicial.toString() } });
+          if (torneoEncontrado && torneoEncontrado.idTorneo) {
+            this.torneoIdInicial = torneoEncontrado.idTorneo;
+            this.inscripcionForm.patchValue({ torneo_id: torneoEncontrado.idTorneo });
+            this.onTorneoChange(torneoEncontrado.idTorneo);
           } else {
             this.errores = ['El torneo seleccionado ya no tiene inscripciones abiertas'];
           }
         }
       },
-      error: (error) => {
-        //console.error('Error al cargar torneos:', error);
+      error: () => {
         this.errores = ['Error al cargar los torneos disponibles'];
       }
     });
   }
 
-  onTorneoChange(event: any): void {
-    const torneoId = event.target.value;
-
-    if (torneoId && torneoId !== '' && torneoId !== null) {
-      const torneoIdNumero = Number(torneoId);
-
-      if (isNaN(torneoIdNumero) || torneoIdNumero <= 0) {
-        this.errores = ['Error al seleccionar el torneo. Por favor, intente nuevamente.'];
-        this.categorias = [];
-        this.sistemaPago = null;
-        return;
-      }
-
-      // Obtener información del sistema de pago del torneo seleccionado
-      const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoIdNumero);
-      this.torneoActual = torneoSeleccionado || null;
-      if (torneoSeleccionado && torneoSeleccionado.sistema_pago) {
-        this.sistemaPago = torneoSeleccionado.sistema_pago;
-      } else {
-        this.sistemaPago = null;
-      }
-
-      this.loading = true;
-      this.errores = [];
-
-      this.torneoService.getCategoriasByTorneo(torneoIdNumero).subscribe({
-        next: (response) => {
-          this.loading = false;
-          this.categorias = response.categorias || [];
-
-          if (this.categorias.length === 0) {
-            this.errores = ['Este torneo no tiene categorías disponibles'];
-          }
-        },
-        error: (error) => {
-          this.loading = false;
-          //console.error('Error al cargar categorías:', error);
-          this.categorias = [];
-
-          if (error.status === 404) {
-            this.errores = ['No se encontraron categorías para este torneo'];
-          } else if (error.status === 400) {
-            this.errores = ['Error al cargar las categorías. Verifique que el torneo sea válido.'];
-          } else {
-            this.errores = ['Error al cargar las categorías del torneo'];
-          }
-        }
-      });
-    } else {
-      this.categorias = [];
-      this.sistemaPago = null;
-      this.torneoActual = null;
-    }
+  onTorneoChange(idTorneoRaw: number | string): void {
+    const idTorneo = Number(idTorneoRaw);
 
     this.inscripcionForm.patchValue({ categoria_id: '' });
     this.categoriaSeleccionada = null;
     this.costoInscripcion = 0;
+
+    if (!idTorneo || isNaN(idTorneo) || idTorneo <= 0) {
+      this.categorias = [];
+      this.sistemaPago = null;
+      this.torneoActual = null;
+      return;
+    }
+
+    const torneoSeleccionado = this.torneos.find(t => t.idTorneo === idTorneo);
+    this.torneoActual = torneoSeleccionado || null;
+    this.sistemaPago = torneoSeleccionado?.sistema_pago || torneoSeleccionado?.sistemaPago || null;
+
+    this.loading = true;
+    this.errores = [];
+
+    this.inscripcionPublicaService.obtenerCategorias(idTorneo).subscribe({
+      next: (categorias) => {
+        this.loading = false;
+        this.categorias = categorias || [];
+        if (this.categorias.length === 0) {
+          this.errores = ['Este torneo no tiene categorías disponibles'];
+        }
+      },
+      error: () => {
+        this.loading = false;
+        this.categorias = [];
+        this.errores = ['Error al cargar las categorías del torneo'];
+      }
+    });
+  }
+
+  onTorneoSelectChange(event: any): void {
+    this.onTorneoChange(event.target.value);
   }
 
   onCategoriaChange(event: any): void {
-    const categoriaId = event.target.value;
-    //console.log('Categoría seleccionada - ID:', categoriaId);
-
-    if (categoriaId && categoriaId !== '' && this.categorias.length > 0) {
-      const categoriaIdNumero = Number(categoriaId);
-      this.categoriaSeleccionada = this.categorias.find(cat => cat.idCategoria === categoriaIdNumero);
-
-      if (this.categoriaSeleccionada) {
-        this.costoInscripcion = this.categoriaSeleccionada.costo || 0;
-        //console.log('Costo de inscripción:', this.costoInscripcion);
-      } else {
-        this.costoInscripcion = 0;
-      }
-    } else {
-      this.categoriaSeleccionada = null;
-      this.costoInscripcion = 0;
-    }
+    const categoriaId = Number(event.target.value);
+    this.categoriaSeleccionada = this.categorias.find(c => c.idCategoria === categoriaId) || null;
+    this.costoInscripcion = this.categoriaSeleccionada?.costo || 0;
   }
+
+  puedeElegirCategoria(cat: CategoriaPublica): boolean {
+    return !cat.cerrada && !cat.llena;
+  }
+
+  motivoCategoriaDeshabilitada(cat: CategoriaPublica): string {
+    if (cat.cerrada) return 'Inscripciones cerradas';
+    if (cat.llena) return 'Cupo lleno';
+    return '';
+  }
+
+  // ── Validación por paso ────────────────────────────────────
 
   validarPasoActual(): boolean {
     this.errores = [];
 
     switch (this.pasoActual) {
       case 1:
-        return this.validarCampos(['nombre', 'apellido1', 'apellido2']);
-      case 2:
-        return this.validarCampos(['telefono']);
-      case 3:
-        return this.validarFechaNacimiento();
-      case 4:
         return this.validarCampos(['torneo_id', 'categoria_id']);
+      case 2:
+        return this.validarCampos(['nombre', 'apellido1', 'apellido2', 'telefono']) && this.validarFechaNacimiento();
+      case 3:
+        return true;
       default:
         return false;
     }
@@ -264,13 +219,10 @@ export class InscripcionComponent implements OnInit {
     }
 
     const fecha = new Date(anio, mes - 1, dia);
-    if (fecha.getDate() !== parseInt(dia) ||
-      fecha.getMonth() !== parseInt(mes) - 1 ||
-      fecha.getFullYear() !== parseInt(anio)) {
+    if (fecha.getDate() !== parseInt(dia) || fecha.getMonth() !== parseInt(mes) - 1 || fecha.getFullYear() !== parseInt(anio)) {
       this.errores.push('La fecha de nacimiento no es válida');
       return false;
     }
-
     if (fecha > new Date()) {
       this.errores.push('La fecha de nacimiento no puede ser futura');
       return false;
@@ -278,77 +230,121 @@ export class InscripcionComponent implements OnInit {
 
     const hoy = new Date();
     let edad = hoy.getFullYear() - fecha.getFullYear();
-    const mesActual = hoy.getMonth();
-    const diaActual = hoy.getDate();
-
-    if (mesActual < fecha.getMonth() || (mesActual === fecha.getMonth() && diaActual < fecha.getDate())) {
+    if (hoy.getMonth() < fecha.getMonth() || (hoy.getMonth() === fecha.getMonth() && hoy.getDate() < fecha.getDate())) {
       edad--;
     }
-
     if (edad < 5) {
       this.errores.push('La edad mínima para participar es 5 años');
       return false;
     }
-
     if (edad > 120) {
       this.errores.push('La fecha de nacimiento no es válida');
       return false;
     }
-
     return true;
   }
 
   validarCampos(campos: string[]): boolean {
     let valido = true;
-
     campos.forEach(campo => {
       const control = this.inscripcionForm.get(campo);
-
       if (control && control.invalid && (control.dirty || control.touched || this.submitted)) {
         valido = false;
-
         if (control.errors) {
-          if (control.errors['required']) {
-            this.errores.push(`El campo ${this.getNombreCampo(campo)} es obligatorio`);
-          }
-          if (control.errors['minlength']) {
-            this.errores.push(`${this.getNombreCampo(campo)} debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`);
-          }
-          if (control.errors['maxlength']) {
-            this.errores.push(`${this.getNombreCampo(campo)} no puede exceder ${control.errors['maxlength'].requiredLength} caracteres`);
-          }
-          if (control.errors['soloLetras']) {
-            this.errores.push(`${this.getNombreCampo(campo)} solo puede contener letras`);
-          }
-          if (control.errors['pattern'] || control.errors['telefonoInvalido']) {
-            this.errores.push('El teléfono debe tener exactamente 10 dígitos');
-          }
+          if (control.errors['required']) this.errores.push(`El campo ${this.getNombreCampo(campo)} es obligatorio`);
+          if (control.errors['minlength']) this.errores.push(`${this.getNombreCampo(campo)} debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`);
+          if (control.errors['maxlength']) this.errores.push(`${this.getNombreCampo(campo)} no puede exceder ${control.errors['maxlength'].requiredLength} caracteres`);
+          if (control.errors['soloLetras']) this.errores.push(`${this.getNombreCampo(campo)} solo puede contener letras`);
+          if (control.errors['pattern'] || control.errors['telefonoInvalido']) this.errores.push('El teléfono debe tener exactamente 10 dígitos');
         }
       }
     });
-
     return valido;
   }
 
   getNombreCampo(campo: string): string {
     const nombres: { [key: string]: string } = {
-      'nombre': 'Nombre',
-      'apellido1': 'Primer apellido',
-      'apellido2': 'Segundo apellido',
-      'telefono': 'Teléfono',
-      'torneo_id': 'Torneo',
-      'categoria_id': 'Categoría'
+      nombre: 'Nombre', apellido1: 'Primer apellido', apellido2: 'Segundo apellido',
+      telefono: 'Teléfono', torneo_id: 'Torneo', categoria_id: 'Categoría'
     };
     return nombres[campo] || campo;
   }
 
+  // ── Navegación entre pasos ──────────────────────────────────
+
   siguientePaso(): void {
     this.submitted = true;
+    if (!this.validarPasoActual()) {
+      // En móvil (o cualquier pantalla donde el formulario se desplace hacia
+      // abajo) el banner de errores queda arriba, fuera de vista, si no se
+      // regresa el scroll al inicio.
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
 
-    if (this.validarPasoActual()) {
+    if (this.pasoActual === 2) {
+      // Punto 4/5: siempre se busca, sin importar la respuesta a "¿ya jugaste antes?"
+      this.buscarPosiblesDuplicados();
+      return;
+    }
+
+    this.pasoActual++;
+    this.submitted = false;
+  }
+
+  private buscarPosiblesDuplicados(): void {
+    const nombre = this.inscripcionForm.value.nombre?.trim();
+    const apellido1 = this.inscripcionForm.value.apellido1?.trim();
+    if (!nombre || !apellido1) {
       this.pasoActual++;
       this.submitted = false;
+      return;
     }
+
+    this.buscandoJugador = true;
+    this.inscripcionPublicaService.buscarJugador(`${nombre} ${apellido1}`).subscribe({
+      next: (candidatos) => {
+        this.buscandoJugador = false;
+        if (candidatos && candidatos.length > 0) {
+          this.candidatosSimilares = candidatos;
+          this.mostrarModalSimilares = true;
+        } else {
+          this.pasoActual++;
+          this.submitted = false;
+        }
+      },
+      error: () => {
+        // Si la búsqueda falla, no bloquear el flujo — se sigue validando
+        // duplicados exactos en el backend al momento de inscribir.
+        this.buscandoJugador = false;
+        this.pasoActual++;
+        this.submitted = false;
+      }
+    });
+  }
+
+  onSeleccionarSimilar(jugador: JugadorSimilar): void {
+    this.idJugadorSeleccionado = jugador.idJugador;
+    this.mostrarModalSimilares = false;
+
+    if (jugador.fecha_nacimiento) {
+      const f = new Date(jugador.fecha_nacimiento);
+      this.inscripcionForm.patchValue({
+        dia_nacimiento: f.getUTCDate(),
+        mes_nacimiento: f.getUTCMonth() + 1,
+        anio_nacimiento: f.getUTCFullYear()
+      });
+    }
+
+    this.pasoActual++;
+    this.submitted = false;
+  }
+
+  onNingunoDeEstos(): void {
+    this.idJugadorSeleccionado = null;
+    this.mostrarModalSimilares = false;
+    this.pasoActual++;
+    this.submitted = false;
   }
 
   pasoAnterior(): void {
@@ -358,35 +354,19 @@ export class InscripcionComponent implements OnInit {
     }
   }
 
+  // ── Envío final ──────────────────────────────────────────────
+
   onSubmit(): void {
     this.submitted = true;
     this.errores = [];
 
-    if (!this.validarPasoActual()) {
-      return;
-    }
-
-    if (this.inscripcionForm.invalid) {
-      Object.keys(this.inscripcionForm.controls).forEach(key => {
-        const control = this.inscripcionForm.get(key);
-        if (control && control.invalid) {
-          control.markAsTouched();
-        }
-      });
-      return;
-    }
-
     const torneoId = Number(this.inscripcionForm.value.torneo_id);
-    const torneoSeleccionado = this.torneos.find(t => t.idTorneo === torneoId);
+    const categoriaId = Number(this.inscripcionForm.value.categoria_id);
 
-    if (torneoSeleccionado) {
-      const cierreInscripciones = torneoSeleccionado.cierreInscripciones;
-
-      if (this.verificarInscripcionesCerradas(cierreInscripciones)) {
-        this.errores = ['Las inscripciones para este torneo ya han cerrado'];
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
+    if (!torneoId || !categoriaId) {
+      this.errores = ['Faltan datos del torneo o la categoría'];
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
 
     const dia = String(this.inscripcionForm.value.dia_nacimiento).padStart(2, '0');
@@ -394,80 +374,42 @@ export class InscripcionComponent implements OnInit {
     const anio = this.inscripcionForm.value.anio_nacimiento;
     const fecha_nacimiento = `${anio}-${mes}-${dia}`;
 
-    const categoriaId = Number(this.inscripcionForm.value.categoria_id);
-
-    if (isNaN(categoriaId) || categoriaId <= 0) {
-      this.errores = ['Debe seleccionar una categoría válida'];
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    const categoriaEnForm = this.categorias.find(
-      c => (c.categoria?.idCategoria || c.idCategoria) === categoriaId
-    );
-    if (categoriaEnForm && !this.isCategoriaAbierta(categoriaEnForm)) {
-      this.errores = ['Las inscripciones para esta categoría ya han cerrado'];
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    if (isNaN(torneoId) || torneoId <= 0) {
-      this.errores = ['Debe seleccionar un torneo válido'];
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
     this.loading = true;
 
-    const inscripcionData = {
+    const payload = {
+      idJugador: this.idJugadorSeleccionado ?? undefined,
       nombre: this.inscripcionForm.value.nombre.trim(),
       apellido1: this.inscripcionForm.value.apellido1.trim(),
-      apellido2: this.inscripcionForm.value.apellido2?.trim() || null,
+      apellido2: this.inscripcionForm.value.apellido2?.trim() || undefined,
       telefono: this.inscripcionForm.value.telefono.replace(/\s/g, ''),
-      fecha_nacimiento: fecha_nacimiento,
-      idCategoria: categoriaId,
+      fecha_nacimiento,
       idTorneo: torneoId,
-      notas: this.inscripcionForm.value.notas?.trim() || null
+      idCategoria: categoriaId,
+      notas: this.inscripcionForm.value.notas?.trim() || undefined
     };
 
-    //console.log('Enviando inscripción:', inscripcionData);
-
-    this.inscripcionService.crearInscripcionPublica(inscripcionData).subscribe({
-      next: (response) => {
+    this.inscripcionPublicaService.crear(payload).subscribe({
+      next: () => {
         this.loading = false;
-        //console.log('Inscripción exitosa:', response);
-        if (response.success) {
-          this.mensajeExito = true;
-          this.inscripcionForm.reset();
-          this.pasoActual = 1;
-          this.submitted = false;
-          this.categorias = [];
-        }
+        this.mensajeExito = true;
+        this.inscripcionForm.reset();
+        this.pasoActual = 1;
+        this.submitted = false;
+        this.categorias = [];
+        this.idJugadorSeleccionado = null;
       },
       error: (error) => {
         this.loading = false;
-        //console.error('Error completo:', error);
 
-        if (error.error && error.error.errores && Array.isArray(error.error.errores)) {
+        if (error.error?.errores && Array.isArray(error.error.errores)) {
           this.errores = error.error.errores;
-        } else if (error.status === 409) {
-          if (error.error && error.error.mensaje) {
-            this.errores = [error.error.mensaje];
-          } else {
-            this.errores = ['Ya existe un registro con estos datos. Por favor, verifica la información.'];
-          }
-        } else if (error.error && error.error.mensaje) {
+        } else if (error.error?.mensaje) {
           this.errores = [error.error.mensaje];
         } else if (error.status === 0) {
           this.errores = ['No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.'];
-        } else if (error.status === 500) {
-          this.errores = ['Ocurrió un error en el servidor. Por favor, intenta nuevamente en unos momentos.'];
-        } else if (error.status === 400) {
-          this.errores = ['Los datos enviados no son válidos. Por favor, revisa la información del formulario.'];
         } else {
           this.errores = ['Error al procesar la inscripción. Por favor, verifica tus datos e intenta nuevamente.'];
         }
-
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
@@ -478,8 +420,7 @@ export class InscripcionComponent implements OnInit {
     this.costoInscripcion = 0;
     this.categoriaSeleccionada = null;
     this.sistemaPago = null;
-    this.router.navigate(['/'])
-    //.catch(error => console.error('Error al navegar:', error));
+    this.router.navigate(['/']);
   }
 
   formularioTieneDatos(): boolean {
@@ -517,92 +458,27 @@ export class InscripcionComponent implements OnInit {
 
   formatearClabe(clabe: string): string {
     if (!clabe) return '';
-    // Formato: XXX XXX XXXX XXXX XXXX
     return clabe.replace(/(\d{3})(\d{3})(\d{4})(\d{4})(\d{4})/, '$1 $2 $3 $4 $5');
   }
 
   formatearTelefono(telefono: string): string {
     if (!telefono) return '';
-    // Remover caracteres no numéricos
     const numeros = telefono.replace(/\D/g, '');
-    // Formato: XXX XXX XXXX
     if (numeros.length === 10) {
       return numeros.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
     }
     return telefono;
   }
 
-
-
-  // Reemplaza la función inscripcionesCerradas() existente con esta versión:
-  inscripcionesCerradas(torneo: Torneo): boolean {
-    const cierreInscripciones = torneo.cierreInscripciones;
-    //console.log('Cierre inscripciones desde BD:', cierreInscripciones);
-
-    if (!cierreInscripciones) {
-      return false;
-    }
-
+  private fechaYaPaso(fechaCierre: string | Date): boolean {
     try {
-      // Crear fecha de cierre interpretándola como hora local de Los Mochis
-      const fechaCierreStr = typeof cierreInscripciones === 'string'
-        ? cierreInscripciones
-        : cierreInscripciones.toISOString();
-
-      // Extraer los componentes de la fecha (año, mes, día, hora, minuto)
+      const fechaCierreStr = typeof fechaCierre === 'string' ? fechaCierre : fechaCierre.toISOString();
       const [datePart, timePart] = fechaCierreStr.split('T');
       const [year, month, day] = datePart.split('-').map(Number);
-      const [hour, minute] = timePart.split(':').map(Number);
-
-      // Crear fecha en zona horaria local (Los Mochis)
-      const fechaCierre = new Date(year, month - 1, day, hour, minute);
-
-      // Obtener hora actual en zona horaria local
-      const ahora = new Date();
-
-      //console.log('Fecha cierre (local):', fechaCierre);
-      //console.log('Fecha actual (local):', ahora);
-      //console.log('¿Inscripciones cerradas?:', ahora >= fechaCierre);
-
-      return ahora >= fechaCierre;
-    } catch (e) {
-      //console.error('Error al verificar cierre de inscripciones:', e);
-      return false;
-    }
-  }
-
-  // Verificar si una categoría tiene inscripciones abiertas (considera cierre propio o del torneo padre)
-  isCategoriaAbierta(cat: any): boolean {
-    // Cierre propio de la categoría tiene prioridad
-    const cierreCat = cat.cierre_inscripciones || cat.cierreInscripciones;
-    if (cierreCat) {
-      return !this.verificarInscripcionesCerradas(cierreCat);
-    }
-    // Fallback: cierre del torneo padre
-    const cierreTorneo = this.torneoActual?.cierreInscripciones;
-    return !this.verificarInscripcionesCerradas(cierreTorneo);
-  }
-
-  // FUNCIÓN AUXILIAR para verificar cierre de inscripciones (reutilizable)
-  private verificarInscripcionesCerradas(cierreInscripciones: any): boolean {
-    if (!cierreInscripciones) {
-      return false;
-    }
-
-    try {
-      const fechaCierreStr = typeof cierreInscripciones === 'string'
-        ? cierreInscripciones
-        : cierreInscripciones.toISOString();
-
-      const [datePart, timePart] = fechaCierreStr.split('T');
-      const [year, month, day] = datePart.split('-').map(Number);
-      const [hour, minute] = timePart.split(':').map(Number);
-
-      const fechaCierre = new Date(year, month - 1, day, hour, minute);
-      const ahora = new Date();
-
-      return ahora >= fechaCierre;
-    } catch (e) {
+      const [hour, minute] = (timePart || '00:00').split(':').map(Number);
+      const fecha = new Date(year, month - 1, day, hour, minute);
+      return new Date() >= fecha;
+    } catch {
       return false;
     }
   }

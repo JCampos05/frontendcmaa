@@ -7,6 +7,46 @@
     min-height: 100dvh;
 }
 
+.banner-borrador {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: #fff8e6;
+    border: 1px solid #f0c419;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.banner-borrador > app-icon {
+    font-size: 1.75rem;
+    color: #b7791f;
+    flex-shrink: 0;
+}
+
+.banner-borrador-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.banner-borrador-texto strong {
+    color: var(--color-dark-navy);
+}
+
+.banner-borrador-texto span {
+    color: var(--color-slate);
+    font-size: 0.9rem;
+}
+
+.banner-borrador-motivos {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+    color: #b7791f;
+    font-size: 0.85rem;
+}
+
 .section {
     background-color: var(--color-white);
     border-radius: 12px;

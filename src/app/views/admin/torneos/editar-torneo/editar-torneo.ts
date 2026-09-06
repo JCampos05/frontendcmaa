@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { forkJoin } from 'rxjs';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 import { TorneoService } from '../../../../services/torneo';
+import { AuthService } from '../../../../services/auth';
 import { TorneoCategoriaService } from '../../../../services/torneo-categoria';
 import { CategoriaService } from '../../../../services/categoria';
 import { RitmoJuegoService } from '../../../../services/ritmo-juego';
@@ -28,21 +29,31 @@ import { IconButtonComponent } from '../../../../componentes/atoms/icon-button/i
 import { IconComponent } from '../../../../componentes/atoms/icon/icon';
 import { StateMessageComponent } from '../../../../componentes/molecules/state-message/state-message';
 import { DatetimeInputComponent } from '../../../../componentes/atoms/datetime-input/datetime-input';
+import { ConfirmarPasswordComponent } from '../../../../componentes/modales/confirmar-password/confirmar-password';
+import { ToastNoti } from '../../../../componentes/modales/toast-noti/toast-noti';
 
 @Component({
   selector: 'app-editar-torneo',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent, StateMessageComponent, DatetimeInputComponent
+    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent, StateMessageComponent, DatetimeInputComponent,
+    ConfirmarPasswordComponent, ToastNoti
   ],
   templateUrl: './editar-torneo.html',
   styleUrls: ['./editar-torneo.css']
 })
 export class EditarTorneoComponent implements OnInit {
+  @ViewChild(ToastNoti) toast!: ToastNoti;
+
   torneoForm: FormGroup;
   idTorneo: number = 0;
+  slugTorneo: string = '';
   torneoOriginal: any = null;
+
+  mostrarModalPublicar = false;
+  publicando = false;
+  errorPublicar = '';
 
   // Catálogos
   categorias: Categoria[] = [];
@@ -73,6 +84,7 @@ export class EditarTorneoComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private torneoService: TorneoService,
+    private authService: AuthService,
     private torneoCategoriaService: TorneoCategoriaService,
     private categoriaService: CategoriaService,
     private ritmoJuegoService: RitmoJuegoService,
@@ -98,8 +110,8 @@ export class EditarTorneoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.idTorneo = Number(this.route.snapshot.paramMap.get('id'));
-    if (!this.idTorneo) {
+    this.slugTorneo = this.route.snapshot.paramMap.get('slug') || '';
+    if (!this.slugTorneo) {
       this.router.navigate(['/main-view/torneos']);
       return;
     }
@@ -116,7 +128,7 @@ export class EditarTorneoComponent implements OnInit {
         sistemasCompetencia: this.sistemaCompetenciaService.getAll(true),
         sistemasDesempate: this.sistemaDesempateService.getAll(true),
         sistemasPago: this.sistemaPagoService.getAll(true),
-        torneo: this.torneoService.getById(this.idTorneo)
+        torneo: this.torneoService.getBySlug(this.slugTorneo)
       }).toPromise();
 
       if (!resultado) {
@@ -134,6 +146,7 @@ export class EditarTorneoComponent implements OnInit {
       if (!torneo) {
         throw new Error('Torneo no encontrado');
       }
+      this.idTorneo = torneo.idTorneo;
 
       this.torneoOriginal = JSON.parse(JSON.stringify(torneo));
       this.cargarFormulario(torneo);
@@ -529,14 +542,24 @@ export class EditarTorneoComponent implements OnInit {
   }
 
   async guardarTorneo(): Promise<void> {
-    if (this.torneoForm.invalid || this.categoriasSeleccionadas.length === 0) {
-      this.error = 'Por favor complete todos los campos requeridos y seleccione al menos una categoría';
-      return;
-    }
+    // Un torneo en borrador acepta datos incompletos — solo se exige lo
+    // mínimo que el backend requiere. La validación completa (todas las
+    // categorías configuradas, desempates, etc.) solo aplica al publicar.
+    if (this.esBorrador) {
+      if (!this.datosMinimosCompletos) {
+        this.error = 'Completa al menos lugar, dirección, fecha y horarios para guardar el borrador';
+        return;
+      }
+    } else {
+      if (this.torneoForm.invalid || this.categoriasSeleccionadas.length === 0) {
+        this.error = 'Por favor complete todos los campos requeridos y seleccione al menos una categoría';
+        return;
+      }
 
-    if (this.desempatesGlobales.length < 2) {
-      this.error = 'Debe seleccionar al menos 2 sistemas de desempate';
-      return;
+      if (this.desempatesGlobales.length < 2) {
+        this.error = 'Debe seleccionar al menos 2 sistemas de desempate';
+        return;
+      }
     }
 
     // Si hay cambios, mostrar modal de confirmación
@@ -559,16 +582,18 @@ export class EditarTorneoComponent implements OnInit {
         nombre: formValue.nombre,
         lugar: formValue.lugar,
         direccion: formValue.direccion,
-        // undefined (no null): el backend valida url_maps con z.string().url().optional(),
-        // que acepta ausencia del campo pero no null.
+        // undefined (no null/vacío): el backend valida url_maps y cierre_inscripciones
+        // con validadores de formato que aceptan ausencia del campo pero no cadena vacía.
         url_maps: formValue.url_maps || undefined,
         fecha: formValue.fecha,
-        hora_inicio: formValue.hora_inicio,
-        hora_fin: formValue.hora_fin,
-        cierre_inscripciones: formValue.cierreInscripciones,
+        hora_inicio: formValue.hora_inicio || undefined,
+        hora_fin: formValue.hora_fin || undefined,
+        cierre_inscripciones: formValue.cierreInscripciones || undefined,
         idSistemaPago: formValue.idSistemaPago || null,
         notas: formValue.notas || null,
-        rondas: Math.max(...formValue.configuracionCategorias.map((c: any) => c.rondas)),
+        rondas: formValue.configuracionCategorias.length > 0
+          ? Math.max(...formValue.configuracionCategorias.map((c: any) => c.rondas))
+          : (this.torneoOriginal?.rondas || 5),
         categorias: this.categoriasSeleccionadas.map(id => this.getNombreCategoria(id)),
         activo: true
       };
@@ -636,6 +661,89 @@ export class EditarTorneoComponent implements OnInit {
       return { cierreDebeSerAntes: true };
     }
     return null;
+  }
+
+  /**
+   * Lo mínimo que la BD exige para persistir el torneo: lugar, dirección y
+   * fecha son NOT NULL en la tabla Torneo (no se puede omitir sin
+   * migración). hora_inicio/hora_fin sí son nullable, y todo lo demás
+   * (nombre, categorías, ritmo/sistema, desempates) puede quedar
+   * incompleto en un borrador.
+   */
+  get datosMinimosCompletos(): boolean {
+    const f = this.torneoForm;
+    return !!(
+      f.get('lugar')?.value?.trim() &&
+      f.get('direccion')?.value?.trim() &&
+      f.get('fecha')?.value
+    );
+  }
+
+  get estadoActual(): string {
+    return this.torneoOriginal?.estado || 'borrador';
+  }
+
+  get esBorrador(): boolean {
+    return this.estadoActual === 'borrador';
+  }
+
+  get motivosFaltantes(): string[] {
+    const motivos: string[] = [];
+    if (!this.torneoOriginal) return motivos;
+
+    if (!this.torneoOriginal.nombre) motivos.push('Falta el nombre del torneo');
+    if (!this.torneoOriginal.lugar) motivos.push('Falta el lugar');
+    if (!this.torneoOriginal.direccion) motivos.push('Falta la dirección');
+    if (!this.torneoOriginal.fecha) motivos.push('Falta la fecha del torneo');
+    if (!this.torneoOriginal.hora_inicio) motivos.push('Falta la hora de inicio');
+    if (!this.torneoOriginal.hora_fin) motivos.push('Falta la hora de fin');
+    if (this.categoriasSeleccionadas.length === 0) motivos.push('Agrega al menos una categoría');
+
+    return motivos;
+  }
+
+  get puedePublicarse(): boolean {
+    return this.esBorrador && this.motivosFaltantes.length === 0;
+  }
+
+  confirmarPublicacion(): void {
+    if (!this.puedePublicarse) return;
+    this.errorPublicar = '';
+    this.mostrarModalPublicar = true;
+  }
+
+  cancelarPublicacion(): void {
+    this.mostrarModalPublicar = false;
+    this.errorPublicar = '';
+  }
+
+  publicarTorneo(password: string): void {
+    if (!this.idTorneo) return;
+
+    this.publicando = true;
+    this.errorPublicar = '';
+
+    this.authService.verificarPassword(password).subscribe({
+      next: () => {
+        this.torneoService.cambiarEstado(this.idTorneo, 'publicado').subscribe({
+          next: () => {
+            this.publicando = false;
+            this.mostrarModalPublicar = false;
+            this.torneoOriginal.estado = 'publicado';
+            this.toast.success('Torneo publicado', 'El torneo ya es visible públicamente');
+          },
+          error: (error) => {
+            this.publicando = false;
+            this.mostrarModalPublicar = false;
+            this.toast.error('Error', error.error?.message || 'No se pudo publicar el torneo');
+          }
+        });
+      },
+      error: () => {
+        this.publicando = false;
+        this.errorPublicar = 'Contraseña incorrecta';
+      }
+    });
   }
 
   get errorCierreInscripciones(): string | null {

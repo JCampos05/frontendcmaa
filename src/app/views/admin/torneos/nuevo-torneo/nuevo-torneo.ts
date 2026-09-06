@@ -1,10 +1,12 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 
 import { TorneoService } from '../../../../services/torneo';
+import { AuthService } from '../../../../services/auth';
+import { Torneo } from '../../../../models/torneo';
 import { TorneoCategoriaService } from '../../../../services/torneo-categoria';
 import { CategoriaService } from '../../../../services/categoria';
 import { RitmoJuegoService } from '../../../../services/ritmo-juego';
@@ -23,19 +25,29 @@ import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 import { IconButtonComponent } from '../../../../componentes/atoms/icon-button/icon-button';
 import { IconComponent } from '../../../../componentes/atoms/icon/icon';
 import { DatetimeInputComponent } from '../../../../componentes/atoms/datetime-input/datetime-input';
+import { ConfirmarPasswordComponent } from '../../../../componentes/modales/confirmar-password/confirmar-password';
+import { ToastNoti } from '../../../../componentes/modales/toast-noti/toast-noti';
 
 @Component({
   selector: 'app-nuevo-torneo',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent, DatetimeInputComponent
+    PageHeaderComponent, ButtonComponent, IconButtonComponent, IconComponent, DatetimeInputComponent,
+    ConfirmarPasswordComponent, ToastNoti
   ],
   templateUrl: './nuevo-torneo.html',
   styleUrls: ['./nuevo-torneo.css']
 })
 export class NuevoTorneoComponent implements OnInit {
+  @ViewChild(ToastNoti) toast!: ToastNoti;
+
   torneoForm: FormGroup;
+
+  mostrarModalPublicar = false;
+  publicando = false;
+  errorPublicar = '';
+  torneoCreadoPendiente: Torneo | null = null;
 
   // Catálogos
   categorias: Categoria[] = [];
@@ -61,6 +73,7 @@ export class NuevoTorneoComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private torneoService: TorneoService,
+    private authService: AuthService,
     private torneoCategoriaService: TorneoCategoriaService,
     private categoriaService: CategoriaService,
     private ritmoJuegoService: RitmoJuegoService,
@@ -299,84 +312,171 @@ export class NuevoTorneoComponent implements OnInit {
     this.seccionesAbiertas[seccion] = !this.seccionesAbiertas[seccion];
   }
 
-  async guardarTorneo(): Promise<void> {
-    if (this.torneoForm.invalid || this.categoriasSeleccionadas.length === 0) {
-      this.error = 'Por favor complete todos los campos requeridos y seleccione al menos una categoría';
-      return;
+  /**
+   * Lo mínimo que la BD exige para crear el torneo: lugar, dirección y fecha
+   * son NOT NULL en la tabla Torneo (no se puede omitir sin migración).
+   * hora_inicio/hora_fin sí son nullable, y todo lo demás (nombre,
+   * categorías, ritmo/sistema, desempates) puede quedar incompleto en un
+   * borrador — solo se exige completo al publicar.
+   */
+  get datosMinimosCompletos(): boolean {
+    const f = this.torneoForm;
+    return !!(
+      f.get('lugar')?.value?.trim() &&
+      f.get('direccion')?.value?.trim() &&
+      f.get('fecha')?.value
+    );
+  }
+
+  /** Valida el formulario y crea el torneo + sus categorías. Devuelve null (con `error` seteado) si la validación falla. */
+  private async crearTorneoYCategorias(modo: 'borrador' | 'publicar'): Promise<Torneo | null> {
+    if (modo === 'publicar') {
+      if (this.torneoForm.invalid || this.categoriasSeleccionadas.length === 0) {
+        this.error = 'Por favor complete todos los campos requeridos y seleccione al menos una categoría';
+        return null;
+      }
+      if (this.desempatesGlobales.length < 2) {
+        this.error = 'Debe seleccionar al menos 2 sistemas de desempate';
+        return null;
+      }
+    } else if (!this.datosMinimosCompletos) {
+      this.error = 'Completa al menos lugar, dirección, fecha y horarios para guardar el borrador';
+      return null;
     }
 
-    // Validar desempates globales
-    if (this.desempatesGlobales.length < 2) {
-      this.error = 'Debe seleccionar al menos 2 sistemas de desempate';
-      return;
-    }
-
-    this.loading = true;
     this.error = null;
+    const formValue = this.torneoForm.value;
 
-    try {
-      const formValue = this.torneoForm.value;
+    // Crear el torneo principal con los campos correctos
+    const torneoData = {
+      nombre: formValue.nombre,
+      lugar: formValue.lugar,
+      direccion: formValue.direccion,
+      // undefined (no null/vacío): el backend valida url_maps y cierre_inscripciones
+      // con validadores de formato que aceptan ausencia del campo pero no cadena vacía.
+      url_maps: formValue.url_maps || undefined,
+      fecha: formValue.fecha,
+      hora_inicio: formValue.hora_inicio || undefined,
+      hora_fin: formValue.hora_fin || undefined,
+      cierre_inscripciones: formValue.cierreInscripciones || undefined,
+      idSistemaPago: formValue.idSistemaPago || null,
+      notas: formValue.notas || null,
+      rondas: formValue.configuracionCategorias.length > 0
+        ? Math.max(...formValue.configuracionCategorias.map((c: any) => c.rondas))
+        : 5,
+      categorias: this.categoriasSeleccionadas.map(id => this.getNombreCategoria(id)),
+      activo: true
+    };
 
-      // Crear el torneo principal con los campos correctos
-      const torneoData = {
-        nombre: formValue.nombre,
-        lugar: formValue.lugar,
-        direccion: formValue.direccion,
-        // undefined (no null): el backend valida url_maps con z.string().url().optional(),
-        // que acepta ausencia del campo pero no null.
-        url_maps: formValue.url_maps || undefined,
-        fecha: formValue.fecha,
-        hora_inicio: formValue.hora_inicio,
-        hora_fin: formValue.hora_fin,
-        cierre_inscripciones: formValue.cierreInscripciones,
-        idSistemaPago: formValue.idSistemaPago || null,
-        notas: formValue.notas || null,
-        rondas: Math.max(...formValue.configuracionCategorias.map((c: any) => c.rondas)),
-        categorias: this.categoriasSeleccionadas.map(id => this.getNombreCategoria(id)),
+    const torneoCreado = await this.torneoService.create(torneoData).toPromise();
+
+    if (!torneoCreado?.idTorneo) {
+      throw new Error('No se pudo crear el torneo');
+    }
+
+    // Crear las configuraciones de categorías
+    for (const config of formValue.configuracionCategorias) {
+      const premiosObj: any = {};
+      config.premios.forEach((p: any, idx: number) => {
+        const descripcion = p.descripcion || `Lugar ${idx + 1}`;
+        const monto = p.monto || '0';
+        premiosObj[idx + 1] = `${monto} - ${descripcion}`;
+      });
+
+      const categoriaData = {
+        idTorneo: torneoCreado.idTorneo,
+        idCategoria: config.idCategoria,
+        rondas: config.rondas,
+        ritmo_juego: config.ritmoJuego || null,
+        sistema_competencia: config.sistemaCompetencia || null,
+        calendario: config.calendario.map((ronda: any) => ({
+          numero: ronda.numero,
+          fecha: ronda.fecha || null
+        })),
+        premios: premiosObj,
+        desempates: config.desempates.map((id: number) =>
+          this.sistemasDesempate.find(s => s.idDesempate === id)?.nombre || ''
+        ),
         activo: true
       };
 
-      const torneoCreado = await this.torneoService.create(torneoData).toPromise();
+      await this.torneoCategoriaService.upsert(categoriaData).toPromise();
+    }
 
-      if (!torneoCreado?.idTorneo) {
-        throw new Error('No se pudo crear el torneo');
-      }
+    return torneoCreado;
+  }
 
-      // Crear las configuraciones de categorías
-      for (const config of formValue.configuracionCategorias) {
-        const premiosObj: any = {};
-        config.premios.forEach((p: any, idx: number) => {
-          const descripcion = p.descripcion || `Lugar ${idx + 1}`;
-          const monto = p.monto || '0';
-          premiosObj[idx + 1] = `${monto} - ${descripcion}`;
-        });
-
-        const categoriaData = {
-          idTorneo: torneoCreado.idTorneo,
-          idCategoria: config.idCategoria,
-          rondas: config.rondas,
-          ritmo_juego: config.ritmoJuego || null,
-          sistema_competencia: config.sistemaCompetencia || null,
-          calendario: config.calendario.map((ronda: any) => ({
-            numero: ronda.numero,
-            fecha: ronda.fecha || null
-          })),
-          premios: premiosObj,
-          desempates: config.desempates.map((id: number) =>
-            this.sistemasDesempate.find(s => s.idDesempate === id)?.nombre || ''
-          ),
-          activo: true
-        };
-
-        await this.torneoCategoriaService.upsert(categoriaData).toPromise();
-      }
-
-      this.router.navigate(['/main-view/torneos']);
+  /** Crea el torneo y se queda en estado borrador — lleva a la vista de revisión/publicación. */
+  async guardarComoBorrador(): Promise<void> {
+    this.loading = true;
+    try {
+      const torneoCreado = await this.crearTorneoYCategorias('borrador');
+      if (!torneoCreado) return;
+      this.router.navigate(['/main-view/editar-torneo', torneoCreado.slug]);
     } catch (err: any) {
       this.error = err.error?.message || 'Error al crear el torneo';
       console.error('Error completo:', err);
     } finally {
       this.loading = false;
+    }
+  }
+
+  /** Crea el torneo y, tras confirmar contraseña, lo publica de inmediato. */
+  async guardarYPublicar(): Promise<void> {
+    this.loading = true;
+    try {
+      const torneoCreado = await this.crearTorneoYCategorias('publicar');
+      if (!torneoCreado) return;
+      this.torneoCreadoPendiente = torneoCreado;
+      this.mostrarModalPublicar = true;
+    } catch (err: any) {
+      this.error = err.error?.message || 'Error al crear el torneo';
+      console.error('Error completo:', err);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  confirmarPublicacionInicial(password: string): void {
+    if (!this.torneoCreadoPendiente?.idTorneo) return;
+    const torneo = this.torneoCreadoPendiente;
+
+    this.publicando = true;
+    this.errorPublicar = '';
+
+    this.authService.verificarPassword(password).subscribe({
+      next: () => {
+        this.torneoService.cambiarEstado(torneo.idTorneo!, 'publicado').subscribe({
+          next: () => {
+            this.publicando = false;
+            this.mostrarModalPublicar = false;
+            this.torneoCreadoPendiente = null;
+            this.toast.success('Torneo publicado', 'El torneo se creó y publicó correctamente');
+            this.router.navigate(['/main-view/torneos']);
+          },
+          error: (error) => {
+            this.publicando = false;
+            this.mostrarModalPublicar = false;
+            this.torneoCreadoPendiente = null;
+            this.toast.error('Guardado como borrador', error.error?.message || 'El torneo se creó pero no se pudo publicar');
+            this.router.navigate(['/main-view/editar-torneo', torneo.slug]);
+          }
+        });
+      },
+      error: () => {
+        this.publicando = false;
+        this.errorPublicar = 'Contraseña incorrecta';
+      }
+    });
+  }
+
+  cancelarPublicacionInicial(): void {
+    this.mostrarModalPublicar = false;
+    const torneo = this.torneoCreadoPendiente;
+    this.torneoCreadoPendiente = null;
+    if (torneo?.slug) {
+      this.toast.success('Guardado como borrador', 'El torneo quedó guardado como borrador');
+      this.router.navigate(['/main-view/editar-torneo', torneo.slug]);
     }
   }
 

@@ -88,12 +88,9 @@ export class LandingComponent implements OnInit {
     element?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  irAInscripcion(torneoId?: number): void {
-    if (torneoId) {
-      //console.log('Navegando a inscripción con ID:', torneoId);
-      this.router.navigate(['/inscripcion', torneoId]);
-    } else {
-      //console.error('No se proporcionó ID de torneo');
+  irAInscripcion(slug?: string): void {
+    if (slug) {
+      this.router.navigate(['/inscripcion', slug]);
     }
   }
 

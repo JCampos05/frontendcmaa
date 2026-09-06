@@ -77,6 +77,18 @@ export class InfoLigaService {
   }
 
   /**
+   * GET /api/liga/info/slug/:slug - Obtener liga por slug (protegido)
+   */
+  getBySlug(slug: string): Observable<InfoLiga> {
+    return this.http.get<any>(`${this.apiUrl}/slug/${slug}`).pipe(
+      map(response => {
+        const data = response.data || response;
+        return this.transformarLiga(data);
+      })
+    );
+  }
+
+  /**
    * GET /api/liga/info/:id/stats - Obtener estadísticas de una liga (protegido)
    */
   getStats(id: number): Observable<any> {

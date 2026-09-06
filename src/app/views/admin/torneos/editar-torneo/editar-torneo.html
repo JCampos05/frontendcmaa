@@ -8,6 +8,20 @@
             <app-icon-button actions icon="arrow-left" variant="secondary" ariaLabel="Volver a torneos" (clicked)="cancelar()"></app-icon-button>
         </app-page-header>
 
+        <div class="banner-borrador" *ngIf="esBorrador">
+            <app-icon name="pencil-simple-line"></app-icon>
+            <div class="banner-borrador-texto">
+                <strong>Este torneo está en borrador</strong>
+                <span>No es visible públicamente ni puede recibir inscripciones hasta que se publique.</span>
+                <ul *ngIf="motivosFaltantes.length > 0" class="banner-borrador-motivos">
+                    <li *ngFor="let motivo of motivosFaltantes">{{ motivo }}</li>
+                </ul>
+            </div>
+            <app-button variant="success" icon="rocket-launch" [disabled]="!puedePublicarse" (clicked)="confirmarPublicacion()">
+                Publicar Torneo
+            </app-button>
+        </div>
+
         <form [formGroup]="torneoForm" (ngSubmit)="guardarTorneo()">
             <!-- Información General -->
             <div class="section">
@@ -360,7 +374,7 @@
             <div class="form-actions">
                 <app-button variant="ghost" icon="x" (clicked)="cancelar()">Cancelar</app-button>
                 <app-button variant="primary" icon="check" type="submit" [loading]="loading"
-                    [disabled]="loading || torneoForm.invalid || categoriasSeleccionadas.length === 0">
+                    [disabled]="loading || (esBorrador ? !datosMinimosCompletos : (torneoForm.invalid || categoriasSeleccionadas.length === 0))">
                     {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
                 </app-button>
             </div>
@@ -391,3 +405,16 @@
         </div>
     </div>
 </div>
+
+<app-toast-noti></app-toast-noti>
+
+<app-confirmar-password
+    [mostrar]="mostrarModalPublicar"
+    titulo="Publicar Torneo"
+    mensaje="Vas a publicar este torneo. Será visible públicamente y podrá recibir inscripciones. Confirma tu contraseña para continuar."
+    textoConfirmar="Publicar Torneo"
+    [cargando]="publicando"
+    [error]="errorPublicar"
+    (confirmar)="publicarTorneo($event)"
+    (cancelar)="cancelarPublicacion()">
+</app-confirmar-password>

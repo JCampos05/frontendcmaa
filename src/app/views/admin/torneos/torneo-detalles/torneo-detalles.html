@@ -8,7 +8,7 @@
     <div *ngIf="!loading && torneo">
         <app-page-header icon="trophy" [title]="torneo.nombre || torneo.lugar" subtitle="Detalles completos del torneo">
             <app-icon-button actions icon="arrow-left" variant="secondary" ariaLabel="Volver a torneos" (clicked)="volver()"></app-icon-button>
-            <app-button actions *ngIf="torneo.activo" icon="pencil-simple" (clicked)="editarTorneo()">
+            <app-button actions icon="pencil-simple" (clicked)="editarTorneo()">
                 Editar Torneo
             </app-button>
         </app-page-header>
@@ -79,9 +79,9 @@
                             </span>
                             <span class="info-value">
                                 <app-badge
-                                    [status]="torneo.activo ? 'active' : 'finished'"
-                                    [text]="torneo.activo ? 'Activo' : 'Finalizado'"
-                                    [icon]="torneo.activo ? 'check-circle' : 'flag-checkered'">
+                                    [status]="getEstadoBadge(torneo).status"
+                                    [text]="getEstadoBadge(torneo).text"
+                                    [icon]="getEstadoBadge(torneo).icon">
                                 </app-badge>
                             </span>
                         </div>
@@ -298,7 +298,7 @@
                 <app-button variant="secondary" icon="arrow-left" (clicked)="volver()">
                     Volver a Torneos
                 </app-button>
-                <app-button *ngIf="torneo.activo" icon="pencil-simple" (clicked)="editarTorneo()">
+                <app-button icon="pencil-simple" (clicked)="editarTorneo()">
                     Editar Torneo
                 </app-button>
             </div>

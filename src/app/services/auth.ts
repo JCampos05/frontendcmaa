@@ -93,6 +93,16 @@ export class AuthService {
   }
 
   /**
+   * POST /api/auth/verificar-password
+   * Reautenticación puntual (no crea ni invalida sesión) — usada como paso
+   * de confirmación antes de acciones sensibles como publicar un torneo.
+   */
+  verificarPassword(password: string): Observable<{ ok: boolean }> {
+    return this.http.post<any>(`${this.apiUrl}/verificar-password`, { password })
+      .pipe(map(response => response.data || response));
+  }
+
+  /**
    * GET /api/auth/profile
    * Ruta protegida - requiere token
    */

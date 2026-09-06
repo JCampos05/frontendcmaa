@@ -136,7 +136,7 @@
         </div>
       </div>
 
-      <button (click)="irAInscripcion(torneoDestacado.idTorneo)" class="btn-inscribirse"
+      <button (click)="irAInscripcion(torneoDestacado.slug)" class="btn-inscribirse"
         [disabled]="inscripcionesCerradas(torneoDestacado)"
         [class.btn-disabled]="inscripcionesCerradas(torneoDestacado)">
         <i *ngIf="!inscripcionesCerradas(torneoDestacado)" class="ph-bold ph-arrow-right ph-icon"></i>
@@ -190,7 +190,7 @@
             {{ getSistemaCompetencia(torneo) }}
           </p>
         </div>
-        <button (click)="irAInscripcion(torneo.idTorneo)" class="btn-card-inscripcion"
+        <button (click)="irAInscripcion(torneo.slug)" class="btn-card-inscripcion"
           [disabled]="inscripcionesCerradas(torneo)" [class.btn-disabled]="inscripcionesCerradas(torneo)">
           <i *ngIf="inscripcionesCerradas(torneo)" class="ph-bold ph-lock ph-icon"></i>
           {{ inscripcionesCerradas(torneo) ? 'Cerrado' : 'Inscribirse' }}

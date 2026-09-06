@@ -10,6 +10,7 @@ export type EstadoTorneo = 'borrador' | 'publicado' | 'en_curso' | 'finalizado' 
 export interface Torneo {
     idTorneo?: number;
     nombre?: string;
+    slug?: string;
     lugar: string;
     direccion: string;
     fecha: Date | string;

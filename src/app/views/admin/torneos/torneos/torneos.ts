@@ -2,23 +2,33 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TorneoService } from '../../../../services/torneo';
-import { Torneo } from '../../../../models/torneo';
+import { AuthService } from '../../../../services/auth';
+import { Torneo, EstadoTorneo } from '../../../../models/torneo';
 import { ModalConfirmacionComponent } from '../../../../componentes/modales/modal-confirmacion/modal-confirmacion';
+import { ConfirmarPasswordComponent } from '../../../../componentes/modales/confirmar-password/confirmar-password';
 import { ToastNoti } from '../../../../componentes/modales/toast-noti/toast-noti';
 import { HoraAmPmPipe } from '../../../../pipes/hora-ampm.pipe';
 import { AdminListPageComponent } from '../../../../componentes/templates/admin-list-page/admin-list-page';
 import { ButtonComponent } from '../../../../componentes/atoms/button/button';
 import { IconButtonComponent } from '../../../../componentes/atoms/icon-button/icon-button';
-import { BadgeComponent } from '../../../../componentes/atoms/badge/badge';
+import { BadgeComponent, BadgeStatus } from '../../../../componentes/atoms/badge/badge';
 import { IconComponent } from '../../../../componentes/atoms/icon/icon';
 import { FilterChipOption } from '../../../../componentes/molecules/filter-chips/filter-chips';
 import { verificarActivoPorFecha } from '../../../../utils/entidad-estado.util';
+
+const ESTADO_BADGE: Record<EstadoTorneo, { status: BadgeStatus; text: string; icon: string }> = {
+  borrador:   { status: 'pending',     text: 'Borrador',   icon: 'pencil-simple-line' },
+  publicado:  { status: 'scheduled',   text: 'Publicado',  icon: 'check-circle' },
+  en_curso:   { status: 'in-progress', text: 'En Curso',   icon: 'play-circle' },
+  finalizado: { status: 'finished',    text: 'Finalizado', icon: 'flag-checkered' },
+  cancelado:  { status: 'cancelled',   text: 'Cancelado',  icon: 'x-circle' },
+};
 
 @Component({
   selector: 'app-torneos',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, ModalConfirmacionComponent, ToastNoti, HoraAmPmPipe,
+    CommonModule, RouterModule, ModalConfirmacionComponent, ConfirmarPasswordComponent, ToastNoti, HoraAmPmPipe,
     AdminListPageComponent, ButtonComponent, IconButtonComponent, BadgeComponent, IconComponent
   ],
   templateUrl: './torneos.html',
@@ -44,8 +54,14 @@ export class TorneosComponent implements OnInit {
   torneoAEliminar: Torneo | null = null;
   torneoAEditar: Torneo | null = null;
 
+  mostrarModalPublicar = false;
+  torneoAPublicar: Torneo | null = null;
+  publicando = false;
+  errorPublicar = '';
+
   constructor(
     private torneoService: TorneoService,
+    private authService: AuthService,
     private router: Router
   ) { }
 
@@ -59,7 +75,10 @@ export class TorneosComponent implements OnInit {
       next: (torneos) => {
         this.torneos = torneos.map(t => ({
           ...t,
-          torneoCategorias: this.parsearJSON(t.torneoCategorias),
+          // El backend devuelve la relación como 'torneo_categorias' (nombre del
+          // modelo Prisma) — no 'torneoCategorias'. Sin este mapeo el conteo de
+          // categorías siempre salía vacío.
+          torneoCategorias: this.parsearJSON((t as any).torneo_categorias ?? t.torneoCategorias),
           activo: verificarActivoPorFecha(t.fecha, t.activo)
         }));
         this.filtrarTorneos();
@@ -116,10 +135,85 @@ export class TorneosComponent implements OnInit {
     this.filtrarTorneos();
   }
 
-  verDetalle(torneoId?: number): void {
-    if (torneoId) {
-      this.router.navigate(['/main-view/detalle-torneo', torneoId]);
+  verDetalle(torneo: Torneo): void {
+    if (!torneo.slug) return;
+    if (torneo.estado === 'borrador') {
+      this.router.navigate(['/main-view/editar-torneo', torneo.slug]);
+    } else {
+      this.router.navigate(['/main-view/detalle-torneo', torneo.slug]);
     }
+  }
+
+  getEstadoBadge(torneo: Torneo) {
+    return ESTADO_BADGE[torneo.estado ?? 'borrador'];
+  }
+
+  /** Mismo criterio que la vista de Editar Torneo: lo mínimo para que un torneo sea publicable. */
+  motivosFaltantesTorneo(torneo: Torneo): string[] {
+    const motivos: string[] = [];
+    if (!torneo.nombre) motivos.push('Falta el nombre del torneo');
+    if (!torneo.lugar) motivos.push('Falta el lugar');
+    if (!torneo.direccion) motivos.push('Falta la dirección');
+    if (!torneo.fecha) motivos.push('Falta la fecha del torneo');
+    if (!torneo.hora_inicio) motivos.push('Falta la hora de inicio');
+    if (!torneo.hora_fin) motivos.push('Falta la hora de fin');
+    if (!torneo.torneoCategorias || torneo.torneoCategorias.length === 0) motivos.push('Agrega al menos una categoría');
+    return motivos;
+  }
+
+  torneoListoParaPublicar(torneo: Torneo): boolean {
+    return this.motivosFaltantesTorneo(torneo).length === 0;
+  }
+
+  confirmarPublicacion(torneo: Torneo): void {
+    if (!this.torneoListoParaPublicar(torneo)) {
+      this.toast.error(
+        'Faltan datos para publicar',
+        this.motivosFaltantesTorneo(torneo).join(' · ')
+      );
+      return;
+    }
+    this.torneoAPublicar = torneo;
+    this.errorPublicar = '';
+    this.mostrarModalPublicar = true;
+  }
+
+  cancelarPublicacion(): void {
+    this.mostrarModalPublicar = false;
+    this.torneoAPublicar = null;
+    this.errorPublicar = '';
+  }
+
+  publicarTorneo(password: string): void {
+    if (!this.torneoAPublicar?.idTorneo) return;
+    const idTorneo = this.torneoAPublicar.idTorneo;
+
+    this.publicando = true;
+    this.errorPublicar = '';
+
+    this.authService.verificarPassword(password).subscribe({
+      next: () => {
+        this.torneoService.cambiarEstado(idTorneo, 'publicado').subscribe({
+          next: () => {
+            this.publicando = false;
+            this.mostrarModalPublicar = false;
+            this.torneoAPublicar = null;
+            this.toast.success('Torneo publicado', 'El torneo ya es visible públicamente');
+            this.cargarTorneos();
+          },
+          error: (error) => {
+            this.publicando = false;
+            this.mostrarModalPublicar = false;
+            this.torneoAPublicar = null;
+            this.toast.error('Error', error.error?.message || 'No se pudo publicar el torneo');
+          }
+        });
+      },
+      error: () => {
+        this.publicando = false;
+        this.errorPublicar = 'Contraseña incorrecta';
+      }
+    });
   }
 
   editarTorneo(torneoId?: number): void {
@@ -133,9 +227,9 @@ export class TorneosComponent implements OnInit {
   }
 
   confirmarEdicion(): void {
-    if (this.torneoAEditar?.idTorneo) {
+    if (this.torneoAEditar?.slug) {
       this.mostrarModalEditar = false;
-      this.router.navigate(['/main-view/editar-torneo', this.torneoAEditar.idTorneo]);
+      this.router.navigate(['/main-view/editar-torneo', this.torneoAEditar.slug]);
       this.torneoAEditar = null;
     }
   }
@@ -165,7 +259,7 @@ export class TorneosComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al eliminar torneo:', error);
-          this.toast.error('Error', 'Error al eliminar el torneo');
+          this.toast.error('Error', error.error?.message || 'Error al eliminar el torneo');
           this.cancelarEliminacion();
         }
       });

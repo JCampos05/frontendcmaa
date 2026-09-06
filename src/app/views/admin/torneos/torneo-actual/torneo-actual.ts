@@ -66,9 +66,7 @@ export class TorneoActualComponent implements OnInit {
         }
 
         if (torneos && torneos.length > 0) {
-          const torneosOrdenados = torneos.sort((a, b) => {
-            return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
-          });
+          const torneosOrdenados = this.torneoContext.prepararCandidatos(torneos);
           this.torneos = torneosOrdenados;
           this.torneoOptions = torneosOrdenados.map(t => ({ value: t, label: `${t.nombre} - ${this.formatearFecha(t.fecha)}` }));
 
@@ -81,20 +79,7 @@ export class TorneoActualComponent implements OnInit {
             ? torneosOrdenados.find(t => t.idTorneo === seleccionActual.idTorneo)
             : undefined;
 
-          if (seleccionVigente) {
-            this.torneoActual = seleccionVigente;
-          } else {
-            const hoy = new Date();
-            const tresDiasDespues = new Date();
-            tresDiasDespues.setDate(hoy.getDate() + 3);
-
-            const torneoEnRango = torneosOrdenados.find(t => {
-              const fechaTorneo = new Date(t.fecha);
-              return fechaTorneo >= hoy && fechaTorneo <= tresDiasDespues;
-            });
-
-            this.torneoActual = torneoEnRango || torneosOrdenados[0];
-          }
+          this.torneoActual = seleccionVigente || this.torneoContext.elegirPorDefecto(torneosOrdenados) || null;
 
           this.torneoContext.seleccionar(this.torneoActual);
         } else {

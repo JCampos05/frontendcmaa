@@ -1,3 +1,5 @@
+import { Jugador } from './jugador';
+
 export interface Mesa {
   idMesa: number;
   numeroMesa: number;
@@ -14,8 +16,8 @@ export interface Mesa {
   
   // Relaciones
   ronda?: any;
-  jugador_blanco?: any;
-  jugador_negro?: any;
+  jugador_blanco?: Jugador;
+  jugador_negro?: Jugador;
   partida?: any;
 }
 

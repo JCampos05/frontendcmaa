@@ -34,6 +34,7 @@ import { StateMessageComponent } from '../../../../componentes/molecules/state-m
 export class EditarLigaComponent implements OnInit {
   ligaForm: FormGroup;
   idLiga: number = 0;
+  slugLiga: string = '';
   ligaOriginal: any = null;
 
   ritmosJuego: RitmoJuego[] = [];
@@ -79,8 +80,8 @@ export class EditarLigaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.idLiga = Number(this.route.snapshot.paramMap.get('id'));
-    if (!this.idLiga) {
+    this.slugLiga = this.route.snapshot.paramMap.get('slug') || '';
+    if (!this.slugLiga) {
       this.router.navigate(['/main-view/ligas']);
       return;
     }
@@ -90,10 +91,17 @@ export class EditarLigaComponent implements OnInit {
   async cargarDatos(): Promise<void> {
     this.loadingData = true;
     try {
+      // La liga se resuelve primero por slug — grupos depende del idLiga real,
+      // que solo se conoce tras esa respuesta.
+      const liga: any = await this.infoLigaService.getBySlug(this.slugLiga).toPromise();
+      if (!liga) {
+        throw new Error('Liga no encontrada');
+      }
+      this.idLiga = liga.idLiga;
+
       const resultado = await forkJoin({
         ritmosJuego: this.ritmoJuegoService.getAll(true),
         sistemasDesempate: this.sistemaDesempateService.getAll(true),
-        liga: this.infoLigaService.getById(this.idLiga),
         grupos: this.grupoLigaService.getByLiga(this.idLiga)
       }).toPromise();
 
@@ -104,16 +112,11 @@ export class EditarLigaComponent implements OnInit {
       this.ritmosJuego = resultado.ritmosJuego || [];
       this.sistemasDesempate = resultado.sistemasDesempate || [];
 
-      const liga: any = resultado.liga;
       const grupos: any[] = resultado.grupos || [];
 
       // TEMPORAL: Para debug
       console.log('Liga recibida:', liga);
       console.log('Grupos recibidos:', grupos);
-
-      if (!liga) {
-        throw new Error('Liga no encontrada');
-      }
 
       this.ligaOriginal = JSON.parse(JSON.stringify({ ...liga, grupos }));
       this.cargarFormulario(liga, grupos);

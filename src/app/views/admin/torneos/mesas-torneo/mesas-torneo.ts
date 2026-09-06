@@ -170,9 +170,7 @@ export class MesasTorneoComponent implements OnInit {
       next: (torneos) => {
         this.totalTorneosAsignados = torneos?.length || 0;
         if (torneos && torneos.length > 0) {
-          const torneosOrdenados = torneos.sort((a, b) => {
-            return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
-          });
+          const torneosOrdenados = this.torneoContext.prepararCandidatos(torneos);
 
           // Respetar el torneo elegido en el contexto compartido (p.ej. desde
           // "Torneo Actual" u otra vista hermana) si sigue entre los propios.
@@ -181,20 +179,7 @@ export class MesasTorneoComponent implements OnInit {
             ? torneosOrdenados.find(t => t.idTorneo === seleccionActual.idTorneo)
             : undefined;
 
-          if (seleccionVigente) {
-            this.torneoActual = seleccionVigente;
-          } else {
-            const hoy = new Date();
-            const tresDiasDespues = new Date();
-            tresDiasDespues.setDate(hoy.getDate() + 3);
-
-            const torneoEnRango = torneosOrdenados.find(t => {
-              const fechaTorneo = new Date(t.fecha);
-              return fechaTorneo >= hoy && fechaTorneo <= tresDiasDespues;
-            });
-
-            this.torneoActual = torneoEnRango || torneosOrdenados[0];
-          }
+          this.torneoActual = seleccionVigente || this.torneoContext.elegirPorDefecto(torneosOrdenados) || null;
 
           this.torneoContext.seleccionar(this.torneoActual);
 

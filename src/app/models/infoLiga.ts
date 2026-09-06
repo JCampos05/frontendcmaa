@@ -5,6 +5,7 @@ import { RondaLiga } from './rondaLiga';
 export interface InfoLiga {
     idLiga?: number;
     nombre: string;
+    slug?: string;
     descripcion?: string;
     fecha_inicio: Date | string;
     fecha_fin?: Date | string;

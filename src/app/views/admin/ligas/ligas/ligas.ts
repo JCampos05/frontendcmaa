@@ -101,9 +101,9 @@ export class LigasComponent implements OnInit {
     this.filtrarLigas();
   }
 
-  verDetalle(ligaId?: number): void {
-    if (ligaId) {
-      this.router.navigate(['/main-view/detalle-liga', ligaId]);
+  verDetalle(slug?: string): void {
+    if (slug) {
+      this.router.navigate(['/main-view/detalle-liga', slug]);
     }
   }
 
@@ -118,9 +118,9 @@ export class LigasComponent implements OnInit {
   }
 
   confirmarEdicion(): void {
-    if (this.ligaAEditar?.idLiga) {
+    if (this.ligaAEditar?.slug) {
       this.mostrarModalEditar = false;
-      this.router.navigate(['/main-view/editar-liga', this.ligaAEditar.idLiga]);
+      this.router.navigate(['/main-view/editar-liga', this.ligaAEditar.slug]);
       this.ligaAEditar = null;
     }
   }

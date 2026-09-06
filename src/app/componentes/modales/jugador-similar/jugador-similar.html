@@ -1,0 +1,44 @@
+<div class="modal-overlay" *ngIf="mostrar">
+    <div class="modal-container modal--md" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header--gradient">
+            <div class="modal-title">
+                <i class="ph-bold ph-user-check modal-title-icon"></i>
+                <div class="modal-title-text">
+                    <h2>¿Ya estás registrado?</h2>
+                    <p>Encontramos jugadores con un nombre parecido</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>Si ya jugaste antes con nosotros, selecciona tu registro para no crear uno duplicado.</p>
+
+            <div class="candidatos-lista">
+                <button
+                    type="button"
+                    class="candidato-card"
+                    *ngFor="let candidato of candidatos"
+                    (click)="onSeleccionar(candidato)">
+                    <div class="candidato-nombre">
+                        <i class="ph-bold ph-user"></i>
+                        {{ nombreCompleto(candidato) }}
+                    </div>
+                    <div class="candidato-detalle" *ngIf="ultimaInscripcion(candidato)">
+                        <i class="ph-bold ph-trophy"></i>
+                        {{ ultimaInscripcion(candidato) }}
+                    </div>
+                    <div class="candidato-detalle" *ngIf="!ultimaInscripcion(candidato)">
+                        <i class="ph-bold ph-info"></i>
+                        Sin torneos registrados aún
+                    </div>
+                    <span class="candidato-accion">Soy yo</span>
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="onNingunoDeEstos()">
+                <i class="ph-bold ph-user-plus"></i>
+                Ninguno de estos, soy nuevo
+            </button>
+        </div>
+    </div>
+</div>

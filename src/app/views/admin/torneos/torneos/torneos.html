@@ -22,9 +22,9 @@
 
     <ng-template let-torneo>
         <app-badge
-            [status]="torneo.activo ? 'active' : 'finished'"
-            [text]="torneo.activo ? 'Activo' : 'Finalizado'"
-            [icon]="torneo.activo ? 'check-circle' : 'flag-checkered'">
+            [status]="getEstadoBadge(torneo).status"
+            [text]="getEstadoBadge(torneo).text"
+            [icon]="getEstadoBadge(torneo).icon">
         </app-badge>
 
         <div class="item-fecha">
@@ -77,17 +77,25 @@
         </div>
 
         <div class="item-acciones">
-            <app-button variant="ghost" size="sm" icon="eye" (clicked)="verDetalle(torneo.idTorneo)">
+            <app-button variant="ghost" size="sm" icon="eye" (clicked)="verDetalle(torneo)">
                 Ver Detalle
             </app-button>
             <app-icon-button
-                *ngIf="torneo.activo"
+                *ngIf="torneo.estado === 'borrador'"
+                icon="rocket-launch"
+                variant="success"
+                [disabled]="!torneoListoParaPublicar(torneo)"
+                [ariaLabel]="torneoListoParaPublicar(torneo) ? 'Publicar torneo' : 'Faltan datos para publicar: ' + motivosFaltantesTorneo(torneo).join(', ')"
+                (clicked)="confirmarPublicacion(torneo)">
+            </app-icon-button>
+            <app-icon-button
                 icon="pencil-simple"
                 variant="warning"
                 ariaLabel="Editar torneo"
                 (clicked)="editarTorneo(torneo.idTorneo)">
             </app-icon-button>
             <app-icon-button
+                *ngIf="torneo.estado === 'borrador'"
                 icon="trash"
                 variant="danger"
                 ariaLabel="Eliminar torneo"
@@ -126,3 +134,14 @@
     (confirmar)="eliminarTorneo()"
     (cancelar)="cancelarEliminacion()">
 </app-modal-confirmacion>
+
+<app-confirmar-password
+    [mostrar]="mostrarModalPublicar"
+    titulo="Publicar Torneo"
+    [mensaje]="'Vas a publicar \'' + (torneoAPublicar?.nombre || torneoAPublicar?.lugar) + '\'. Será visible públicamente y podrá recibir inscripciones. Confirma tu contraseña para continuar.'"
+    textoConfirmar="Publicar Torneo"
+    [cargando]="publicando"
+    [error]="errorPublicar"
+    (confirmar)="publicarTorneo($event)"
+    (cancelar)="cancelarPublicacion()">
+</app-confirmar-password>

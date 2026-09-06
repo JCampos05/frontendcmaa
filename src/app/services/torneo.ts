@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../environment/enviroment';
-import { Torneo } from '../models/torneo';
+import { Torneo, EstadoTorneo } from '../models/torneo';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class TorneoService {
    */
   getActivos(): Observable<Torneo[]> {
     return this.http.get<any>(`${this.apiUrl}/activos`).pipe(
-      map(response => response.data || response || []),
+      map(response => (response.data || response || []).map((t: any) => this.normalizarEsActual(t))),
       catchError(this.handleError)
     );
   }
@@ -28,9 +28,17 @@ export class TorneoService {
    */
   getUpcoming(): Observable<Torneo[]> {
     return this.http.get<any>(`${this.apiUrl}/proximos`).pipe(
-      map(response => response.data || response || []),
+      map(response => (response.data || response || []).map((t: any) => this.normalizarEsActual(t))),
       catchError(this.handleError)
     );
+  }
+
+  /** El backend devuelve `es_actual` (snake_case) — el modelo usa `esActual`. */
+  private normalizarEsActual(torneo: any): any {
+    if (torneo && torneo.es_actual !== undefined && torneo.esActual === undefined) {
+      torneo.esActual = torneo.es_actual;
+    }
+    return torneo;
   }
 
   /**
@@ -92,57 +100,68 @@ export class TorneoService {
    */
   getById(id: number): Observable<Torneo> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map(response => {
-        const torneo = response.data || response;
-
-        // Convertir snake_case a camelCase para campos específicos
-        if (torneo.cierre_inscripciones && !torneo.cierreInscripciones) {
-          torneo.cierreInscripciones = torneo.cierre_inscripciones;
-        }
-
-        // Normalizar el alias de categorías
-        if (torneo.torneo_categorias && !torneo.torneoCategoria) {
-          torneo.torneoCategoria = torneo.torneo_categorias;
-        }
-
-        // Parsear campos JSON si vienen como strings
-        if (torneo.torneoCategoria && Array.isArray(torneo.torneoCategoria)) {
-          torneo.torneoCategoria = torneo.torneoCategoria.map((tc: any) => {
-            // Parsear calendario
-            if (tc.calendario && typeof tc.calendario === 'string') {
-              try {
-                tc.calendario = JSON.parse(tc.calendario);
-              } catch (e) {
-                console.error('Error parseando calendario:', e);
-                tc.calendario = [];
-              }
-            }
-            // Parsear premios
-            if (tc.premios && typeof tc.premios === 'string') {
-              try {
-                tc.premios = JSON.parse(tc.premios);
-              } catch (e) {
-                console.error('Error parseando premios:', e);
-                tc.premios = {};
-              }
-            }
-            // Parsear desempates
-            if (tc.desempates && typeof tc.desempates === 'string') {
-              try {
-                tc.desempates = JSON.parse(tc.desempates);
-              } catch (e) {
-                console.error('Error parseando desempates:', e);
-                tc.desempates = [];
-              }
-            }
-            return tc;
-          });
-        }
-
-        return torneo;
-      }),
+      map(response => this.transformarDetalle(response.data || response)),
       catchError(this.handleError)
     );
+  }
+
+  /**
+   * GET /api/torneos/slug/:slug - Obtener un torneo por su slug (protegido)
+   */
+  getBySlug(slug: string): Observable<Torneo> {
+    return this.http.get<any>(`${this.apiUrl}/slug/${slug}`).pipe(
+      map(response => this.transformarDetalle(response.data || response)),
+      catchError(this.handleError)
+    );
+  }
+
+  private transformarDetalle(torneo: any): Torneo {
+    // Convertir snake_case a camelCase para campos específicos
+    if (torneo.cierre_inscripciones && !torneo.cierreInscripciones) {
+      torneo.cierreInscripciones = torneo.cierre_inscripciones;
+    }
+    this.normalizarEsActual(torneo);
+
+    // Normalizar el alias de categorías
+    if (torneo.torneo_categorias && !torneo.torneoCategoria) {
+      torneo.torneoCategoria = torneo.torneo_categorias;
+    }
+
+    // Parsear campos JSON si vienen como strings
+    if (torneo.torneoCategoria && Array.isArray(torneo.torneoCategoria)) {
+      torneo.torneoCategoria = torneo.torneoCategoria.map((tc: any) => {
+        // Parsear calendario
+        if (tc.calendario && typeof tc.calendario === 'string') {
+          try {
+            tc.calendario = JSON.parse(tc.calendario);
+          } catch (e) {
+            console.error('Error parseando calendario:', e);
+            tc.calendario = [];
+          }
+        }
+        // Parsear premios
+        if (tc.premios && typeof tc.premios === 'string') {
+          try {
+            tc.premios = JSON.parse(tc.premios);
+          } catch (e) {
+            console.error('Error parseando premios:', e);
+            tc.premios = {};
+          }
+        }
+        // Parsear desempates
+        if (tc.desempates && typeof tc.desempates === 'string') {
+          try {
+            tc.desempates = JSON.parse(tc.desempates);
+          } catch (e) {
+            console.error('Error parseando desempates:', e);
+            tc.desempates = [];
+          }
+        }
+        return tc;
+      });
+    }
+
+    return torneo;
   }
 
   /**
@@ -154,7 +173,7 @@ export class TorneoService {
       params = params.set('activo', activo.toString());
     }
     return this.http.get<any>(this.apiUrl, { params }).pipe(
-      map(response => response.data || response || []),
+      map(response => (response.data || response || []).map((t: any) => this.normalizarEsActual(t))),
       catchError(this.handleError)
     );
   }
@@ -190,10 +209,20 @@ export class TorneoService {
   }
 
   /**
-   * PATCH /api/torneos/:id/toggle - Activar/desactivar torneo (protegido)
+   * PATCH /api/torneos/:id/activo - Activar/desactivar torneo (protegido)
    */
   toggleActive(id: number, activo: boolean): Observable<Torneo> {
-    return this.http.patch<any>(`${this.apiUrl}/${id}/toggle`, { activo }).pipe(
+    return this.http.patch<any>(`${this.apiUrl}/${id}/activo`, { activo }).pipe(
+      map(response => response.data || response),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * PATCH /api/torneos/:id/estado - Cambiar estado del torneo (protegido, solo adminGral)
+   */
+  cambiarEstado(id: number, estado: EstadoTorneo, notas?: string): Observable<Torneo> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/estado`, { estado, notas }).pipe(
       map(response => response.data || response),
       catchError(this.handleError)
     );
