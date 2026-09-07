@@ -106,8 +106,16 @@
     align-items: center;
 }
 
-@media (max-width: 768px) {
+@container admin-list-page (max-width: 768px) {
     .item-acciones {
         flex-wrap: wrap;
+    }
+}
+
+@supports not (container-type: inline-size) {
+    @media (max-width: 768px) {
+        .item-acciones {
+            flex-wrap: wrap;
+        }
     }
 }

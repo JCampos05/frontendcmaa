@@ -244,15 +244,15 @@
                                 <ng-container *ngFor="let premio of getPremios(i).controls; let j = index">
                                     <div class="premio-lugar" [formGroupName]="j">
                                         <div class="lugar-header">
-                                            <label>
-                                                <app-icon name="medal" [ngClass]="{
+                                            <app-icon name="medal" [ngClass]="{
                             'medal-gold': j === 0,
                             'medal-silver': j === 1,
                             'medal-bronze': j === 2,
                             'medal-other': j > 2
                           }"></app-icon>
-                                                {{ premio.get('descripcion')?.value || 'Lugar ' + (j + 1) }}
-                                            </label>
+                                            <input type="text" formControlName="descripcion"
+                                                placeholder="Ej: Sexto Lugar, Sub 1800"
+                                                class="form-control input-descripcion-premio" />
                                             <app-icon-button
                                                 *ngIf="getPremios(i).length > 1"
                                                 icon="trash"

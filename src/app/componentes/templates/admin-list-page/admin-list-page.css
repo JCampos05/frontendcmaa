@@ -2,6 +2,13 @@
     max-width: var(--content-max-width);
     margin: 0 auto;
     padding: var(--space-8);
+    /* El breakpoint de .record-card debe reaccionar al ancho REAL disponible
+       para el contenido (descontado el sidebar fijo de 260px), no al ancho
+       del viewport — con @media, una ventana de ~1030px deja solo ~770px
+       de contenido, por debajo del punto de quiebre, pero el media query
+       seguía viendo "escritorio" y forzaba la grilla de 4 columnas. */
+    container-type: inline-size;
+    container-name: admin-list-page;
 }
 
 @media (max-width: 768px) {
