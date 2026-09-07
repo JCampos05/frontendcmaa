@@ -114,8 +114,8 @@
                             Sistema de Pago
                         </label>
                         <select formControlName="idSistemaPago" class="form-control">
-                            <option [value]="null">Seleccione un sistema de pago...</option>
-                            <option *ngFor="let sistema of sistemasPago" [value]="sistema.idSistemaPago">
+                            <option [ngValue]="null">Seleccione un sistema de pago...</option>
+                            <option *ngFor="let sistema of sistemasPago" [ngValue]="sistema.idSistemaPago">
                                 {{ sistema.banco }} - {{ sistema.nombreCuenta }}
                             </option>
                         </select>
