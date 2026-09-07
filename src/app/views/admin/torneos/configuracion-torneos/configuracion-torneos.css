@@ -82,6 +82,17 @@
     animation: slideDown 0.3s ease;
 }
 
+/* Cuando el form-card se usa dentro de .modal-overlay (crear/editar) en vez
+   de inline arriba de la lista — mismo formulario, presentado como modal. */
+.form-card.modal-form-card {
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin-bottom: 0;
+    animation: slideUp 0.3s ease;
+}
+
 .form-card-header {
     display: flex;
     justify-content: space-between;

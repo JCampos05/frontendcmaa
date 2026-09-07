@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../environment/enviroment';
 import { Torneo, EstadoTorneo } from '../models/torneo';
+import { extraerMensajeError } from '../utils/http-error.util';
 
 @Injectable({
   providedIn: 'root'
@@ -258,27 +259,10 @@ export class TorneoService {
     );
   }
 
-  private handleError(error: any): Observable<never> {
-    let errorMessage = 'Ha ocurrido un error desconocido';
-
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      if (error.status === 0) {
-        errorMessage = 'No se pudo conectar con el servidor';
-      } else if (error.status === 400) {
-        errorMessage = error.error?.message || 'Datos inválidos';
-      } else if (error.status === 404) {
-        errorMessage = 'Recurso no encontrado';
-      } else if (error.status === 500) {
-        errorMessage = 'Error interno del servidor';
-      } else {
-        errorMessage = error.error?.message || `Error ${error.status}: ${error.statusText}`;
-      }
-    }
-
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    const errorMessage = extraerMensajeError(error, `Error ${error.status}: ${error.statusText}`);
     console.error('Error en TorneoService:', error);
-    return throwError(() => ({ error: { message: errorMessage }, status: error.status }));
+    return throwError(() => ({ error: { message: errorMessage, errores: error.error?.errores }, status: error.status }));
   }
 }
 

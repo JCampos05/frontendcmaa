@@ -33,68 +33,6 @@
                 <h2>Categorías de Torneos</h2>
             </div>
 
-            <div class="form-card" *ngIf="mostrandoFormCategoria">
-                <div class="form-card-header">
-                    <h3>{{ editandoCategoria ? 'Editar' : 'Nueva' }} Categoría</h3>
-                    <button class="btn-close" (click)="cancelarFormCategoria()">
-                        <i class="ph-bold ph-x ph-icon"></i>
-                    </button>
-                </div>
-                <form [formGroup]="categoriaForm" (ngSubmit)="guardarCategoria()">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre *</label>
-                            <input type="text" formControlName="nombre" placeholder="Ej: Sub 12, 1era Fuerza">
-                        </div>
-                        <div class="form-group">
-                            <label>Costo de Inscripción *</label>
-                            <div class="input-with-prefix">
-                                <span class="prefix">$</span>
-                                <input type="number" formControlName="costo" placeholder="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>
-                                <i class="ph-bold ph-arrow-down ph-icon"></i>
-                                Edad Mínima
-                            </label>
-                            <input type="number" formControlName="edadMinima" placeholder="Ej: 50 (opcional)" min="0"
-                                max="120">
-                            <small style="color: var(--color-slate); font-size: 0.85rem; margin-top: 0.25rem;">
-                                Dejar vacío si no hay restricción
-                            </small>
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <i class="ph-bold ph-arrow-up ph-icon"></i>
-                                Edad Máxima
-                            </label>
-                            <input type="number" formControlName="edadMaxima" placeholder="Ej: 13 (opcional)" min="0"
-                                max="120">
-                            <small style="color: var(--color-slate); font-size: 0.85rem; margin-top: 0.25rem;">
-                                Dejar vacío si no hay restricción
-                            </small>
-                        </div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Notas</label>
-                        <textarea formControlName="nota" rows="3"
-                            placeholder="Información adicional sobre la categoría"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" (click)="cancelarFormCategoria()">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn-save">
-                            <i class="ph-bold ph-check ph-icon"></i>
-                            {{ editandoCategoria ? 'Actualizar' : 'Guardar' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
             <div class="items-grid">
                 <div class="item-card" *ngFor="let categoria of categorias">
                     <div class="item-header">
@@ -158,35 +96,6 @@
                 <h2>Sistemas de Competencia</h2>
             </div>
 
-            <div class="form-card" *ngIf="mostrandoFormSistema">
-                <div class="form-card-header">
-                    <h3>{{ editandoSistema ? 'Editar' : 'Nuevo' }} Sistema</h3>
-                    <button class="btn-close" (click)="cancelarFormSistema()">
-                        <i class="ph-bold ph-x ph-icon"></i>
-                    </button>
-                </div>
-                <form [formGroup]="sistemaForm" (ngSubmit)="guardarSistema()">
-                    <div class="form-group full-width">
-                        <label>Nombre *</label>
-                        <input type="text" formControlName="nombre" placeholder="Ej: Sistema Suizo, Round Robin">
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Descripción</label>
-                        <textarea formControlName="descripcion" rows="3"
-                            placeholder="Descripción del sistema de competencia"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" (click)="cancelarFormSistema()">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn-save">
-                            <i class="ph-bold ph-check ph-icon"></i>
-                            {{ editandoSistema ? 'Actualizar' : 'Guardar' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
             <div class="items-grid">
                 <div class="item-card" *ngFor="let sistema of sistemas">
                     <div class="item-header">
@@ -218,45 +127,6 @@
         <div *ngIf="tabActiva === 'ritmos'" class="tab-content">
             <div class="section-header">
                 <h2>Ritmos de Juego</h2>
-            </div>
-
-            <div class="form-card" *ngIf="mostrandoFormRitmo">
-                <div class="form-card-header">
-                    <h3>{{ editandoRitmo ? 'Editar' : 'Nuevo' }} Ritmo</h3>
-                    <button class="btn-close" (click)="cancelarFormRitmo()">
-                        <i class="ph-bold ph-x ph-icon"></i>
-                    </button>
-                </div>
-                <form [formGroup]="ritmoForm" (ngSubmit)="guardarRitmo()">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre *</label>
-                            <input type="text" formControlName="nombre" placeholder="Ej: 20+5">
-                        </div>
-                        <div class="form-group">
-                            <label>Minutos *</label>
-                            <input type="number" formControlName="minutos" placeholder="20">
-                        </div>
-                        <div class="form-group">
-                            <label>Incremento (seg)</label>
-                            <input type="number" formControlName="incremento" placeholder="5">
-                        </div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Descripción</label>
-                        <input type="text" formControlName="descripcion"
-                            placeholder="Ej: Ritmo Rápido - 20 minutos + 5 segundos">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" (click)="cancelarFormRitmo()">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn-save">
-                            <i class="ph-bold ph-check ph-icon"></i>
-                            {{ editandoRitmo ? 'Actualizar' : 'Guardar' }}
-                        </button>
-                    </div>
-                </form>
             </div>
 
             <div class="items-grid">
@@ -302,35 +172,6 @@
                 <h2>Sistemas de Desempate</h2>
             </div>
 
-            <div class="form-card" *ngIf="mostrandoFormDesempate">
-                <div class="form-card-header">
-                    <h3>{{ editandoDesempate ? 'Editar' : 'Nuevo' }} Sistema de Desempate</h3>
-                    <button class="btn-close" (click)="cancelarFormDesempate()">
-                        <i class="ph-bold ph-x ph-icon"></i>
-                    </button>
-                </div>
-                <form [formGroup]="desempateForm" (ngSubmit)="guardarDesempate()">
-                    <div class="form-group full-width">
-                        <label>Nombre *</label>
-                        <input type="text" formControlName="nombre" placeholder="Ej: Buchholz, Sonneborn-Berger">
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Descripción</label>
-                        <textarea formControlName="descripcion" rows="3"
-                            placeholder="Descripción del sistema de desempate"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" (click)="cancelarFormDesempate()">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn-save">
-                            <i class="ph-bold ph-check ph-icon"></i>
-                            {{ editandoDesempate ? 'Actualizar' : 'Guardar' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
             <div class="items-grid">
                 <div class="item-card" *ngFor="let desempate of desempates">
                     <div class="item-header">
@@ -357,6 +198,177 @@
                 <p>No hay sistemas de desempate registrados</p>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Categoría: crear/editar -->
+<div class="modal-overlay" *ngIf="mostrandoFormCategoria" (click)="cancelarFormCategoria()">
+    <div class="form-card modal-form-card" (click)="$event.stopPropagation()">
+        <div class="form-card-header">
+            <h3>{{ editandoCategoria ? 'Editar' : 'Nueva' }} Categoría</h3>
+            <button class="btn-close" (click)="cancelarFormCategoria()">
+                <i class="ph-bold ph-x ph-icon"></i>
+            </button>
+        </div>
+        <form [formGroup]="categoriaForm" (ngSubmit)="guardarCategoria()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    <input type="text" formControlName="nombre" placeholder="Ej: Sub 12, 1era Fuerza">
+                </div>
+                <div class="form-group">
+                    <label>Costo de Inscripción *</label>
+                    <div class="input-with-prefix">
+                        <span class="prefix">$</span>
+                        <input type="number" formControlName="costo" placeholder="0">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <i class="ph-bold ph-arrow-down ph-icon"></i>
+                        Edad Mínima
+                    </label>
+                    <input type="number" formControlName="edadMinima" placeholder="Ej: 50 (opcional)" min="0"
+                        max="120">
+                    <small style="color: var(--color-slate); font-size: 0.85rem; margin-top: 0.25rem;">
+                        Dejar vacío si no hay restricción
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="ph-bold ph-arrow-up ph-icon"></i>
+                        Edad Máxima
+                    </label>
+                    <input type="number" formControlName="edadMaxima" placeholder="Ej: 13 (opcional)" min="0"
+                        max="120">
+                    <small style="color: var(--color-slate); font-size: 0.85rem; margin-top: 0.25rem;">
+                        Dejar vacío si no hay restricción
+                    </small>
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label>Notas</label>
+                <textarea formControlName="nota" rows="3"
+                    placeholder="Información adicional sobre la categoría"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="cancelarFormCategoria()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-save">
+                    <i class="ph-bold ph-check ph-icon"></i>
+                    {{ editandoCategoria ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sistema de competencia: crear/editar -->
+<div class="modal-overlay" *ngIf="mostrandoFormSistema" (click)="cancelarFormSistema()">
+    <div class="form-card modal-form-card" (click)="$event.stopPropagation()">
+        <div class="form-card-header">
+            <h3>{{ editandoSistema ? 'Editar' : 'Nuevo' }} Sistema</h3>
+            <button class="btn-close" (click)="cancelarFormSistema()">
+                <i class="ph-bold ph-x ph-icon"></i>
+            </button>
+        </div>
+        <form [formGroup]="sistemaForm" (ngSubmit)="guardarSistema()">
+            <div class="form-group full-width">
+                <label>Nombre *</label>
+                <input type="text" formControlName="nombre" placeholder="Ej: Sistema Suizo, Round Robin">
+            </div>
+            <div class="form-group full-width">
+                <label>Descripción</label>
+                <textarea formControlName="descripcion" rows="3"
+                    placeholder="Descripción del sistema de competencia"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="cancelarFormSistema()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-save">
+                    <i class="ph-bold ph-check ph-icon"></i>
+                    {{ editandoSistema ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Ritmo de juego: crear/editar -->
+<div class="modal-overlay" *ngIf="mostrandoFormRitmo" (click)="cancelarFormRitmo()">
+    <div class="form-card modal-form-card" (click)="$event.stopPropagation()">
+        <div class="form-card-header">
+            <h3>{{ editandoRitmo ? 'Editar' : 'Nuevo' }} Ritmo</h3>
+            <button class="btn-close" (click)="cancelarFormRitmo()">
+                <i class="ph-bold ph-x ph-icon"></i>
+            </button>
+        </div>
+        <form [formGroup]="ritmoForm" (ngSubmit)="guardarRitmo()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    <input type="text" formControlName="nombre" placeholder="Ej: 20+5">
+                </div>
+                <div class="form-group">
+                    <label>Minutos *</label>
+                    <input type="number" formControlName="minutos" placeholder="20">
+                </div>
+                <div class="form-group">
+                    <label>Incremento (seg)</label>
+                    <input type="number" formControlName="incremento" placeholder="5">
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label>Descripción</label>
+                <input type="text" formControlName="descripcion"
+                    placeholder="Ej: Ritmo Rápido - 20 minutos + 5 segundos">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="cancelarFormRitmo()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-save">
+                    <i class="ph-bold ph-check ph-icon"></i>
+                    {{ editandoRitmo ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sistema de desempate: crear/editar -->
+<div class="modal-overlay" *ngIf="mostrandoFormDesempate" (click)="cancelarFormDesempate()">
+    <div class="form-card modal-form-card" (click)="$event.stopPropagation()">
+        <div class="form-card-header">
+            <h3>{{ editandoDesempate ? 'Editar' : 'Nuevo' }} Sistema de Desempate</h3>
+            <button class="btn-close" (click)="cancelarFormDesempate()">
+                <i class="ph-bold ph-x ph-icon"></i>
+            </button>
+        </div>
+        <form [formGroup]="desempateForm" (ngSubmit)="guardarDesempate()">
+            <div class="form-group full-width">
+                <label>Nombre *</label>
+                <input type="text" formControlName="nombre" placeholder="Ej: Buchholz, Sonneborn-Berger">
+            </div>
+            <div class="form-group full-width">
+                <label>Descripción</label>
+                <textarea formControlName="descripcion" rows="3"
+                    placeholder="Descripción del sistema de desempate"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="cancelarFormDesempate()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-save">
+                    <i class="ph-bold ph-check ph-icon"></i>
+                    {{ editandoDesempate ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 

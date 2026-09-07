@@ -415,6 +415,7 @@ export class NuevoTorneoComponent implements OnInit {
       this.router.navigate(['/main-view/editar-torneo', torneoCreado.slug]);
     } catch (err: any) {
       this.error = err.error?.message || 'Error al crear el torneo';
+      this.toast.error('No se pudo guardar el borrador', this.error ?? undefined);
       console.error('Error completo:', err);
     } finally {
       this.loading = false;
@@ -431,6 +432,7 @@ export class NuevoTorneoComponent implements OnInit {
       this.mostrarModalPublicar = true;
     } catch (err: any) {
       this.error = err.error?.message || 'Error al crear el torneo';
+      this.toast.error('No se pudo crear el torneo', this.error ?? undefined);
       console.error('Error completo:', err);
     } finally {
       this.loading = false;

@@ -152,6 +152,7 @@ export class EditarTorneoComponent implements OnInit {
       this.cargarFormulario(torneo);
     } catch (err: any) {
       this.error = err.error?.message || 'Error al cargar el torneo';
+      this.toast.error('No se pudo cargar el torneo', this.error ?? undefined);
       console.error('Error:', err);
     } finally {
       this.loadingData = false;
@@ -632,7 +633,8 @@ export class EditarTorneoComponent implements OnInit {
       this.router.navigate(['/main-view/torneos']);
     } catch (err: any) {
       this.error = err.error?.message || 'Error al actualizar el torneo';
-      //console.error('Error completo:', err);
+      this.toast.error('No se pudo guardar el torneo', this.error ?? undefined);
+      console.error('Error completo:', err);
     } finally {
       this.loading = false;
       this.confirmacionGuardado = false;

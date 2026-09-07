@@ -41,12 +41,13 @@ export class TorneosComponent implements OnInit {
   torneosFiltrados: Torneo[] = [];
   loading = true;
   searchTerm = '';
-  filtroActivo: 'todos' | 'activos' | 'finalizados' = 'todos';
+  filtroActivo: 'todos' | 'activos' | 'finalizados' | 'borrador' = 'todos';
 
   readonly filterOptions: FilterChipOption[] = [
     { value: 'todos', label: 'Todos', icon: 'list' },
     { value: 'activos', label: 'Activos', icon: 'check-circle' },
-    { value: 'finalizados', label: 'Finalizados', icon: 'x-circle' }
+    { value: 'finalizados', label: 'Finalizados', icon: 'x-circle' },
+    { value: 'borrador', label: 'Borrador', icon: 'pencil-simple-line' }
   ];
 
   mostrarModalEliminar = false;
@@ -87,7 +88,7 @@ export class TorneosComponent implements OnInit {
       error: (error) => {
         console.error('Error al cargar torneos:', error);
         this.loading = false;
-        this.toast.error('Error', 'Error al cargar los torneos');
+        this.toast.error('No se pudieron cargar los torneos', error.error?.message);
       }
     });
   }
@@ -112,6 +113,8 @@ export class TorneosComponent implements OnInit {
       resultado = resultado.filter(t => t.activo);
     } else if (this.filtroActivo === 'finalizados') {
       resultado = resultado.filter(t => !t.activo);
+    } else if (this.filtroActivo === 'borrador') {
+      resultado = resultado.filter(t => t.estado === 'borrador');
     }
 
     if (this.searchTerm.trim()) {
@@ -122,7 +125,11 @@ export class TorneosComponent implements OnInit {
       );
     }
 
-    this.torneosFiltrados = resultado;
+    // Siempre ordenado por fecha del torneo, más reciente arriba —
+    // sin agrupar ni relegar los borradores, sin importar el filtro activo.
+    this.torneosFiltrados = [...resultado].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    );
   }
 
   onSearchChange(termino: string): void {
@@ -131,7 +138,7 @@ export class TorneosComponent implements OnInit {
   }
 
   cambiarFiltro(filtro: string): void {
-    this.filtroActivo = filtro as 'todos' | 'activos' | 'finalizados';
+    this.filtroActivo = filtro as 'todos' | 'activos' | 'finalizados' | 'borrador';
     this.filtrarTorneos();
   }
 
@@ -319,6 +326,7 @@ export class TorneosComponent implements OnInit {
     if (this.searchTerm.trim()) return 'No se encontraron torneos';
     if (this.filtroActivo === 'activos') return 'No hay torneos activos';
     if (this.filtroActivo === 'finalizados') return 'No hay torneos finalizados';
+    if (this.filtroActivo === 'borrador') return 'No hay torneos en borrador';
     return 'No hay torneos registrados';
   }
 
@@ -326,6 +334,7 @@ export class TorneosComponent implements OnInit {
     if (this.searchTerm.trim()) return 'Intenta con otros términos de búsqueda';
     if (this.filtroActivo === 'activos') return 'Crea un nuevo torneo para comenzar';
     if (this.filtroActivo === 'finalizados') return 'Los torneos finalizados aparecerán aquí';
+    if (this.filtroActivo === 'borrador') return 'Los torneos sin publicar aparecerán aquí';
     return 'Comienza creando tu primer torneo';
   }
 }
