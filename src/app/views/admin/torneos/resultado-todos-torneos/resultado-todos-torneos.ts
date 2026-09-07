@@ -126,13 +126,6 @@ export class ResultadosTodoTorneosComponent implements OnInit {
     this.torneoService.getCategoriasByTorneo(idTorneo).subscribe({
       next: (response) => {
         this.categorias = response.categorias || [];
-        console.log('Categorías cargadas:', this.categorias);
-
-        // Verificar si desempates viene en la respuesta
-        this.categorias.forEach(cat => {
-          console.log(`Categoría ${cat.idTorneoCat}:`, cat);
-          console.log(`  - desempates:`, cat.desempates);
-        });
         this.actualizarDerivados();
       },
       error: (err) => {
@@ -212,28 +205,18 @@ export class ResultadosTodoTorneosComponent implements OnInit {
     this.error = null;
     this.sinDatos = null;
 
-    console.log('=== cargarEstadisticas() ===');
-    console.log('rondaSeleccionada:', this.rondaSeleccionada);
-    console.log('tipo de rondaSeleccionada:', typeof this.rondaSeleccionada);
-    console.log(this.rondaSeleccionada);
-    //this.cargarListaFinal();
-
-    // CRÍTICO: Comparación estricta con número -1
+    // Comparación estricta con número -1
     if (this.rondaSeleccionada === -1) {
-      console.log('✓ Detectado Lista Final, llamando a cargarListaFinal()');
       this.cargarListaFinal();
       return;
     }
 
     if (this.rondaSeleccionada === 0) {
-      console.log('✓ Detectado Lista Inicial, llamando a cargarListaInicial()');
       this.cargarListaInicial();
       return;
     }
 
     // Rondas normales (1, 2, 3, 4, 5...)
-    console.log('✓ Ronda normal, llamando a getEstadisticasByTorneoCategoriaHastaRonda()');
-
     this.estadisticaService.getEstadisticasByTorneoCategoriaHastaRonda(
       this.torneoSeleccionado.idTorneo,
       this.categoriaSeleccionada,
@@ -794,16 +777,11 @@ export class ResultadosTodoTorneosComponent implements OnInit {
   // ============================================
 
   private cargarListaFinal(): void {
-    console.log('=== DENTRO DE cargarListaFinal() ===');
-    console.log('idTorneo:', this.torneoSeleccionado!.idTorneo);
-    console.log('idTorneoCategoria:', this.categoriaSeleccionada);
-
     this.estadisticaService.getRankingFinal(
       this.torneoSeleccionado!.idTorneo!,
       this.categoriaSeleccionada!
     ).subscribe({
       next: (response) => {
-        console.log('Respuesta getRankingFinal exitosa:', response);
         const estadisticasData = response || [];
 
         this.estadisticas = (Array.isArray(estadisticasData) ? estadisticasData : [])
@@ -811,20 +789,15 @@ export class ResultadosTodoTorneosComponent implements OnInit {
             let desempatesObj = {};
 
             if (est.desempates) {
-              console.log('Desempates RAW para jugador', est.jugador?.nombre, ':', est.desempates);
-              console.log('Tipo de desempates:', typeof est.desempates);
-
               if (typeof est.desempates === 'string') {
                 try {
                   desempatesObj = JSON.parse(est.desempates);
-                  console.log('Desempates parseados:', desempatesObj);
                 } catch (e) {
                   console.warn('Error al parsear desempates:', e);
                   desempatesObj = {};
                 }
               } else if (typeof est.desempates === 'object') {
                 desempatesObj = est.desempates;
-                console.log('Desempates ya es objeto:', desempatesObj);
               }
             }
 
@@ -847,9 +820,6 @@ export class ResultadosTodoTorneosComponent implements OnInit {
           }
           return b.puntos - a.puntos;
         });
-
-        console.log('Total estadísticas procesadas:', this.estadisticas.length);
-        console.log('Primera estadística completa:', this.estadisticas[0]);
 
         this.calcularPaginacion();
         this.calcularEstadisticasGenerales();
@@ -885,7 +855,6 @@ export class ResultadosTodoTorneosComponent implements OnInit {
       return [];
     }
 
-    console.log('Sistemas de desempate configurados:', categoria.desempates);
     return categoria.desempates;
   }
 

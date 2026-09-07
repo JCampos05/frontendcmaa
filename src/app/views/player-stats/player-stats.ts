@@ -92,9 +92,6 @@ export class PlayerStatsComponent implements OnInit {
 
     this.jugadorService.getPublicStats(jugador.idJugador).subscribe({
       next: (data) => {
-        console.log('Datos recibidos del backend:', data);
-        console.log('Ligas en los datos:', data.ligas);
-        
         this.jugadorSeleccionado = data;
         
         // Separar torneos en pasados y futuros
@@ -258,6 +255,13 @@ export class PlayerStatsComponent implements OnInit {
       month: 'long',
       year: 'numeric'
     });
+  }
+
+  formatearPosicion(posicion: number): string {
+    if (posicion === 1) return '1er';
+    if (posicion === 2) return '2do';
+    if (posicion === 3) return '3er';
+    return `${posicion}°`;
   }
 
   getNombreCompleto(jugador: any): string {

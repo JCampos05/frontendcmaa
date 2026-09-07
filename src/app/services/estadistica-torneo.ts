@@ -189,12 +189,9 @@ export class EstadisticaTorneoService {
 
   getRankingFinal(idTorneo: number, idTorneoCategoria: number): Observable<EstadisticaTorneo[]> {
     const url = `${this.apiUrl}/ranking-final/${idTorneo}/${idTorneoCategoria}`;
-    console.log('=== SERVICE getRankingFinal ===');
-    console.log('URL que se llamará:', url);
 
     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
       map(response => {
-        console.log('Respuesta cruda del servidor:', response);
         if (response.success && response.data) {
           return response.data;
         }

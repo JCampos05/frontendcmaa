@@ -193,9 +193,15 @@
             <div class="tab-content" *ngIf="tabActivo === 'ultimo'">
                 <div class="ultimo-torneo-section" *ngIf="jugadorSeleccionado.ultimoTorneo">
                     <div class="torneo-card-detailed">
-                        <div class="torneo-badge">
-                            <i class="fa-solid fa-medal"></i>
-                            Último Torneo Participado
+                        <div class="torneo-card-header">
+                            <div class="torneo-badge">
+                                <i class="fa-solid fa-medal"></i>
+                                {{ esTorneoPasado(jugadorSeleccionado.ultimoTorneo.torneo.fecha) ? 'Último Torneo Participado' : 'Tu Inscripción Más Reciente' }}
+                            </div>
+                            <span class="status-badge" [ngClass]="getPagoClass(jugadorSeleccionado.ultimoTorneo.pago_confirmado)">
+                                <i class="fa-solid" [ngClass]="getPagoIcon(jugadorSeleccionado.ultimoTorneo.pago_confirmado)"></i>
+                                {{ getPagoLabel(jugadorSeleccionado.ultimoTorneo.pago_confirmado) }}
+                            </span>
                         </div>
                         <h3 class="torneo-name">{{ jugadorSeleccionado.ultimoTorneo.torneo.nombre ||
                             jugadorSeleccionado.ultimoTorneo.torneo.lugar }}</h3>
@@ -270,9 +276,15 @@
                                     <i class="fa-solid fa-hourglass-half"></i>
                                 </div>
                                 <div class="timeline-card">
-                                    <div class="timeline-badge futuro">
-                                        <i class="fa-solid fa-clock"></i>
-                                        Por Jugar
+                                    <div class="timeline-card-header">
+                                        <div class="timeline-badge futuro">
+                                            <i class="fa-solid fa-clock"></i>
+                                            Por Jugar
+                                        </div>
+                                        <span class="status-badge" [ngClass]="getPagoClass(participacion.pago_confirmado)">
+                                            <i class="fa-solid" [ngClass]="getPagoIcon(participacion.pago_confirmado)"></i>
+                                            {{ getPagoLabel(participacion.pago_confirmado) }}
+                                        </span>
                                     </div>
                                     <div class="timeline-date">{{ formatearFecha(participacion.torneo.fecha) }}</div>
                                     <h4 class="timeline-title">{{ participacion.torneo.nombre || participacion.torneo.lugar }}</h4>
@@ -324,9 +336,21 @@
                                     <i class="fa-solid fa-chess-board"></i>
                                 </div>
                                 <div class="timeline-card">
-                                    <div class="timeline-badge pasado">
-                                        <i class="fa-solid fa-check"></i>
-                                        Finalizado
+                                    <div class="timeline-card-header">
+                                        <div class="timeline-badge pasado">
+                                            <i class="fa-solid fa-check"></i>
+                                            Finalizado
+                                        </div>
+                                        <span class="resultado-badge" *ngIf="participacion.resultado?.posicion_actual as posicion; else sinResultado">
+                                            <i class="fa-solid fa-medal"></i>
+                                            {{ formatearPosicion(posicion) }} lugar
+                                        </span>
+                                        <ng-template #sinResultado>
+                                            <span class="resultado-badge sin-resultado">
+                                                <i class="fa-solid fa-circle-question"></i>
+                                                Sin resultado registrado
+                                            </span>
+                                        </ng-template>
                                     </div>
                                     <div class="timeline-date">{{ formatearFecha(participacion.torneo.fecha) }}</div>
                                     <h4 class="timeline-title">{{ participacion.torneo.nombre || participacion.torneo.lugar }}</h4>
@@ -342,6 +366,24 @@
                                         <span class="timeline-detail">
                                             <i class="fa-solid fa-chess"></i>
                                             {{ participacion.torneo.rondas }} rondas
+                                        </span>
+                                    </div>
+                                    <div class="timeline-desempeno" *ngIf="participacion.resultado">
+                                        <span class="desempeno-item">
+                                            <i class="fa-solid fa-star"></i>
+                                            {{ participacion.resultado.puntos }} pts
+                                        </span>
+                                        <span class="desempeno-item victoria">
+                                            <i class="fa-solid fa-circle"></i>
+                                            {{ participacion.resultado.victorias || 0 }} V
+                                        </span>
+                                        <span class="desempeno-item empate">
+                                            <i class="fa-solid fa-circle"></i>
+                                            {{ participacion.resultado.empates || 0 }} E
+                                        </span>
+                                        <span class="desempeno-item derrota">
+                                            <i class="fa-solid fa-circle"></i>
+                                            {{ participacion.resultado.derrotas || 0 }} D
                                         </span>
                                     </div>
                                 </div>
@@ -375,9 +417,15 @@
 
                         <div class="ligas-grid">
                             <div class="liga-card activa" *ngFor="let participacion of ligasActivas">
-                                <div class="liga-status activa">
-                                    <i class="fa-solid fa-circle-play"></i>
-                                    En Curso
+                                <div class="liga-card-header">
+                                    <div class="liga-status activa">
+                                        <i class="fa-solid fa-circle-play"></i>
+                                        En Curso
+                                    </div>
+                                    <span class="status-badge" [ngClass]="getPagoClass(participacion.pago_confirmado)">
+                                        <i class="fa-solid" [ngClass]="getPagoIcon(participacion.pago_confirmado)"></i>
+                                        {{ getPagoLabel(participacion.pago_confirmado) }}
+                                    </span>
                                 </div>
                                 <h4 class="liga-nombre">{{ participacion.liga.nombre }}</h4>
                                 <p class="liga-descripcion" *ngIf="participacion.liga.descripcion">
@@ -469,9 +517,15 @@
 
                         <div class="ligas-grid">
                             <div class="liga-card futura" *ngFor="let participacion of ligasFuturas">
-                                <div class="liga-status futura">
-                                    <i class="fa-solid fa-hourglass-half"></i>
-                                    Por Comenzar
+                                <div class="liga-card-header">
+                                    <div class="liga-status futura">
+                                        <i class="fa-solid fa-hourglass-half"></i>
+                                        Por Comenzar
+                                    </div>
+                                    <span class="status-badge" [ngClass]="getPagoClass(participacion.pago_confirmado)">
+                                        <i class="fa-solid" [ngClass]="getPagoIcon(participacion.pago_confirmado)"></i>
+                                        {{ getPagoLabel(participacion.pago_confirmado) }}
+                                    </span>
                                 </div>
                                 <h4 class="liga-nombre">{{ participacion.liga.nombre }}</h4>
                                 <p class="liga-descripcion" *ngIf="participacion.liga.descripcion">
@@ -534,9 +588,15 @@
 
                         <div class="ligas-grid">
                             <div class="liga-card pasada" *ngFor="let participacion of ligasPasadas">
-                                <div class="liga-status pasada">
-                                    <i class="fa-solid fa-flag-checkered"></i>
-                                    Finalizada
+                                <div class="liga-card-header">
+                                    <div class="liga-status pasada">
+                                        <i class="fa-solid fa-flag-checkered"></i>
+                                        Finalizada
+                                    </div>
+                                    <span class="status-badge" [ngClass]="getPagoClass(participacion.pago_confirmado)">
+                                        <i class="fa-solid" [ngClass]="getPagoIcon(participacion.pago_confirmado)"></i>
+                                        {{ getPagoLabel(participacion.pago_confirmado) }}
+                                    </span>
                                 </div>
                                 <h4 class="liga-nombre">{{ participacion.liga.nombre }}</h4>
 

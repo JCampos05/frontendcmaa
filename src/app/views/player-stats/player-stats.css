@@ -680,6 +680,19 @@
     border: 2px solid var(--color-light-gray);
 }
 
+.torneo-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.torneo-card-header .torneo-badge {
+    margin-bottom: 0;
+}
+
 .torneo-badge {
     display: inline-flex;
     align-items: center;
@@ -960,6 +973,19 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
 }
 
+.timeline-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.timeline-card-header .timeline-badge {
+    margin-bottom: 0;
+}
+
 /* Badge en timeline card */
 .timeline-badge {
     display: inline-flex;
@@ -977,6 +1003,66 @@
 .timeline-badge.futuro {
     background: rgba(76, 175, 80, 0.15);
     color: #2E7D32;
+}
+
+/* Resultado final del torneo (posición) — reemplaza el badge de pago en
+   "Torneos Jugados": una vez finalizado, lo relevante es cómo le fue. */
+.resultado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: rgba(133, 77, 46, 0.12);
+    color: var(--color-brown, #854D2E);
+}
+
+.resultado-badge.sin-resultado {
+    background: var(--color-light-gray);
+    color: var(--color-slate, #3E464B);
+    font-weight: 500;
+}
+
+.timeline-desempeno {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--color-light-gray);
+}
+
+.desempeno-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #F5F5F5;
+    color: #555;
+}
+
+.desempeno-item i {
+    font-size: 0.5rem;
+}
+
+.desempeno-item.victoria {
+    background: rgba(76, 175, 80, 0.12);
+    color: #2E7D32;
+}
+
+.desempeno-item.empate {
+    background: rgba(255, 152, 0, 0.12);
+    color: #E65100;
+}
+
+.desempeno-item.derrota {
+    background: rgba(239, 68, 68, 0.12);
+    color: #B91C1C;
 }
 
 .timeline-badge.pasado {
@@ -1831,6 +1917,19 @@
 
 .liga-card:hover::before {
     width: 8px;
+}
+
+.liga-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.liga-card-header .liga-status {
+    margin-bottom: 0;
 }
 
 .liga-status {

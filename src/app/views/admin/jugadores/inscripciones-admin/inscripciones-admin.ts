@@ -328,8 +328,6 @@ export class InscripcionesAdminComponent implements OnInit {
         data.posicion = formValue.posicion ? Number(formValue.posicion) : undefined;
       }
 
-      console.log('Datos a enviar:', data);
-
       const response = await this.inscripcionAdminService.create(data).toPromise();
 
       if (response?.success) {

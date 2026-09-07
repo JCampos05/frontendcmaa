@@ -85,8 +85,6 @@ export class CargarRankingExcelComponent implements OnInit {
             this.jugadoresMap.set(nombreCompleto, insc);
           }
         });
-
-        console.log(`Jugadores cargados: ${this.jugadoresMap.size}`);
       }
     } catch (error) {
       console.error('Error al cargar jugadores completos:', error);
@@ -97,7 +95,6 @@ export class CargarRankingExcelComponent implements OnInit {
   private cargarSistemasDesempate(): void {
     if (this.torneoCategoria?.desempates && Array.isArray(this.torneoCategoria.desempates)) {
       this.sistemasDesempate = this.torneoCategoria.desempates;
-      console.log('Sistemas de desempate:', this.sistemasDesempate);
       return;
     }
 
@@ -110,7 +107,6 @@ export class CargarRankingExcelComponent implements OnInit {
       next: (torneoCategoria) => {
         if (torneoCategoria?.desempates && Array.isArray(torneoCategoria.desempates)) {
           this.sistemasDesempate = torneoCategoria.desempates;
-          console.log('Sistemas cargados del servicio:', this.sistemasDesempate);
         } else {
           console.warn('No se encontraron sistemas de desempate');
           this.sistemasDesempate = [];
@@ -175,9 +171,6 @@ export class CargarRankingExcelComponent implements OnInit {
   private extraerRanking(data: any[]): void {
     this.ranking = [];
 
-    console.log('Iniciando extracción');
-    console.log('Sistemas esperados:', this.sistemasDesempate);
-
     // PASO 1: Encontrar encabezados
     let filaEncabezados = -1;
     let colRank = -1, colName = -1, colRtg = -1, colPts = -1;
@@ -209,8 +202,6 @@ export class CargarRankingExcelComponent implements OnInit {
       this.toast.warning('Advertencia', 'Formato de Excel no válido');
       return;
     }
-
-    console.log('Columnas encontradas: Rank=' + colRank + ', Name=' + colName + ', Rtg=' + colRtg + ', Pts=' + colPts);
 
     // PASO 2: Procesar filas
     for (let i = filaEncabezados + 1; i < data.length; i++) {
@@ -259,8 +250,6 @@ export class CargarRankingExcelComponent implements OnInit {
         }
       }
 
-      console.log(`Desempates para ${nombreExcel}:`, desempates);
-
       this.ranking.push({
         idJugador: jugador.idJugador!,
         posicion,
@@ -275,9 +264,6 @@ export class CargarRankingExcelComponent implements OnInit {
     // Ordenar por posición
     this.ranking.sort((a, b) => a.posicion - b.posicion);
     this.ranking.forEach((j, idx) => j.posicion = idx + 1);
-
-    console.log('Ranking procesado:', this.ranking.length, 'jugadores');
-    console.log('Primer jugador:', this.ranking[0]);
 
     if (this.errores.length > 0) {
       console.warn('Advertencias:', this.errores);
@@ -341,8 +327,6 @@ export class CargarRankingExcelComponent implements OnInit {
     this.ranking.forEach((jugador, index) => {
       jugador.posicion = index + 1;
     });
-
-    console.log('Nuevo orden aplicado');
   }
 
   toggleEdicion(jugador: JugadorRanking): void {

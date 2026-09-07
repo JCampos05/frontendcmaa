@@ -434,10 +434,15 @@
                                         {{ mesa.jugador_blanco?.rating }}
                                     </span>
                                 </div>
-                                <div class="jugador-ilegales" *ngIf="mesa.ilegalesBlanco > 0">
-                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                <button type="button" class="jugador-ilegales" *ngIf="mesa.ilegalesBlanco > 0"
+                                    (click)="$any($event.currentTarget).focus()"
+                                    [attr.aria-label]="mesa.ilegalesBlanco + ' jugada' + (mesa.ilegalesBlanco === 1 ? '' : 's') + ' ilegal' + (mesa.ilegalesBlanco === 1 ? '' : 'es') + ' durante la partida'">
+                                    <i class="fa-solid fa-flag"></i>
                                     {{ mesa.ilegalesBlanco }}
-                                </div>
+                                    <span class="tooltip-ilegales">
+                                        {{ mesa.ilegalesBlanco }} jugada{{ mesa.ilegalesBlanco === 1 ? '' : 's' }} ilegal{{ mesa.ilegalesBlanco === 1 ? '' : 'es' }} durante la partida
+                                    </span>
+                                </button>
                             </div>
 
                             <div class="vs-separator">vs</div>
@@ -457,10 +462,15 @@
                                         {{ mesa.jugador_negro?.rating }}
                                     </span>
                                 </div>
-                                <div class="jugador-ilegales" *ngIf="mesa.ilegalesNegro > 0">
-                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                <button type="button" class="jugador-ilegales" *ngIf="mesa.ilegalesNegro > 0"
+                                    (click)="$any($event.currentTarget).focus()"
+                                    [attr.aria-label]="mesa.ilegalesNegro + ' jugada' + (mesa.ilegalesNegro === 1 ? '' : 's') + ' ilegal' + (mesa.ilegalesNegro === 1 ? '' : 'es') + ' durante la partida'">
+                                    <i class="fa-solid fa-flag"></i>
                                     {{ mesa.ilegalesNegro }}
-                                </div>
+                                    <span class="tooltip-ilegales">
+                                        {{ mesa.ilegalesNegro }} jugada{{ mesa.ilegalesNegro === 1 ? '' : 's' }} ilegal{{ mesa.ilegalesNegro === 1 ? '' : 'es' }} durante la partida
+                                    </span>
+                                </button>
                             </div>
                         </div>
 

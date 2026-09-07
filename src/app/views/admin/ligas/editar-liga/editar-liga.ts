@@ -114,10 +114,6 @@ export class EditarLigaComponent implements OnInit {
 
       const grupos: any[] = resultado.grupos || [];
 
-      // TEMPORAL: Para debug
-      console.log('Liga recibida:', liga);
-      console.log('Grupos recibidos:', grupos);
-
       this.ligaOriginal = JSON.parse(JSON.stringify({ ...liga, grupos }));
       this.cargarFormulario(liga, grupos);
     } catch (err: any) {
