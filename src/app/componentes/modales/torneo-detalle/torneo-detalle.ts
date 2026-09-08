@@ -122,17 +122,24 @@ export class TorneoDetalleModalComponent {
 
       claves.forEach(key => {
         const numero = parseInt(key);
-        const lugar = this.obtenerNombreLugar(numero);
         const valor = premiosObj[key];
 
-        // Limpiar el valor si viene en formato "monto - descripción"
-        let valorLimpio = valor;
-        if (typeof valor === 'string' && valor.includes(' - ')) {
-          const partes = valor.split(' - ');
-          valorLimpio = partes[0]; // Solo tomar la parte del monto
+        // El valor se guarda como "monto - descripción" (ver nuevo-torneo.ts /
+        // editar-torneo.ts). La descripción es editable por el admin (ej. "Sub
+        // 1800" en vez de "Sexto Lugar") — hay que usar la guardada, no
+        // recalcularla por posición, o se pierde el nombre personalizado.
+        let monto = valor;
+        let descripcion = this.obtenerNombreLugar(numero);
+        if (typeof valor === 'string') {
+          const separador = valor.indexOf(' - ');
+          if (separador !== -1) {
+            monto = valor.substring(0, separador);
+            const nombreGuardado = valor.substring(separador + 3).trim();
+            if (nombreGuardado) descripcion = nombreGuardado;
+          }
         }
 
-        premiosArray.push(`${lugar}: ${valorLimpio}`);
+        premiosArray.push(`${descripcion}: ${monto}`);
       });
 
       return premiosArray;

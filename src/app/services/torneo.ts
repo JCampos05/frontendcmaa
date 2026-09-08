@@ -19,7 +19,7 @@ export class TorneoService {
    */
   getActivos(): Observable<Torneo[]> {
     return this.http.get<any>(`${this.apiUrl}/activos`).pipe(
-      map(response => (response.data || response || []).map((t: any) => this.normalizarEsActual(t))),
+      map(response => (response.data || response || []).map((t: any) => this.normalizarTorneo(t))),
       catchError(this.handleError)
     );
   }
@@ -29,16 +29,35 @@ export class TorneoService {
    */
   getUpcoming(): Observable<Torneo[]> {
     return this.http.get<any>(`${this.apiUrl}/proximos`).pipe(
-      map(response => (response.data || response || []).map((t: any) => this.normalizarEsActual(t))),
+      map(response => (response.data || response || []).map((t: any) => this.normalizarTorneo(t))),
       catchError(this.handleError)
     );
   }
 
-  /** El backend devuelve `es_actual` (snake_case) — el modelo usa `esActual`. */
-  private normalizarEsActual(torneo: any): any {
-    if (torneo && torneo.es_actual !== undefined && torneo.esActual === undefined) {
+  /**
+   * El backend devuelve `es_actual`, `torneo_categorias`, `ritmo_juego` y
+   * `sistema_competencia` en snake_case — los componentes (incl. el modal
+   * de detalle de la landing) leen `esActual`/`torneoCategorias`/
+   * `ritmoJuego`/`sistemaCompetencia`. Sin este mapeo, torneos obtenidos
+   * de getActivos()/getUpcoming()/getAll() llegan con torneoCategorias
+   * vacío y el modal no muestra categorías, premios ni calendario.
+   */
+  private normalizarTorneo(torneo: any): any {
+    if (!torneo) return torneo;
+
+    if (torneo.es_actual !== undefined && torneo.esActual === undefined) {
       torneo.esActual = torneo.es_actual;
     }
+
+    const categorias = torneo.torneoCategorias ?? torneo.torneo_categorias;
+    if (Array.isArray(categorias)) {
+      torneo.torneoCategorias = categorias.map((tc: any) => ({
+        ...tc,
+        ritmoJuego: tc.ritmoJuego ?? tc.ritmo_juego ?? null,
+        sistemaCompetencia: tc.sistemaCompetencia ?? tc.sistema_competencia ?? null,
+      }));
+    }
+
     return torneo;
   }
 
@@ -121,7 +140,7 @@ export class TorneoService {
     if (torneo.cierre_inscripciones && !torneo.cierreInscripciones) {
       torneo.cierreInscripciones = torneo.cierre_inscripciones;
     }
-    this.normalizarEsActual(torneo);
+    this.normalizarTorneo(torneo);
 
     // Normalizar el alias de categorías
     if (torneo.torneo_categorias && !torneo.torneoCategoria) {
@@ -174,7 +193,7 @@ export class TorneoService {
       params = params.set('activo', activo.toString());
     }
     return this.http.get<any>(this.apiUrl, { params }).pipe(
-      map(response => (response.data || response || []).map((t: any) => this.normalizarEsActual(t))),
+      map(response => (response.data || response || []).map((t: any) => this.normalizarTorneo(t))),
       catchError(this.handleError)
     );
   }
