@@ -153,7 +153,9 @@ export class ListasTorneoComponent implements OnInit {
   cargarInscripciones(idTorneo: number): void {
     this.inscripcionService.getByTorneo(idTorneo).subscribe({
       next: (inscripciones) => {
-        this.inscripciones = inscripciones;
+        // Una inscripción cancelada no debe aparecer en listas, mesas ni
+        // resultados — solo en la tabla de Inscripciones del torneo.
+        this.inscripciones = inscripciones.filter(i => i.estado !== 'cancelado');
         this.procesarListas();
         this.cargando = false;
       },

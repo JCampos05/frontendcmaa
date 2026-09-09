@@ -222,8 +222,11 @@ export class JugadoresTorneoComponent implements OnInit {
 
     this.inscripcionService.getByTorneo(idTorneo).subscribe({
       next: (inscripciones) => {
-        this.inscripciones = inscripciones;
-        this.procesarEstadisticas(inscripciones);
+        // Una inscripción cancelada no debe aparecer en listas, mesas ni
+        // resultados — solo en la tabla de Inscripciones del torneo.
+        const activas = inscripciones.filter(i => i.estado !== 'cancelado');
+        this.inscripciones = activas;
+        this.procesarEstadisticas(activas);
         this.cargando = false;
       },
       error: (err) => {

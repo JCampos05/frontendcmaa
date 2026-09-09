@@ -214,11 +214,6 @@ export class InscripcionesAdminComponent implements OnInit {
     const categorias = new Map<number, EstadisticasCategoria>();
 
     inscripciones.forEach(insc => {
-      const montoPagadoNum = Number(insc.montoPagado) || 0;
-      const costoCategoria = Number(insc.categoria?.costo) || 0;
-
-      const pagoCompleto = montoPagadoNum >= costoCategoria && costoCategoria > 0;
-
       const idCat = insc.idCategoria || 0;
 
       if (!categorias.has(idCat)) {
@@ -237,8 +232,17 @@ export class InscripcionesAdminComponent implements OnInit {
       }
 
       const cat = categorias.get(idCat)!;
-      cat.totalInscritos++;
+      // La tabla detallada sí debe seguir mostrando las canceladas —
+      // solo se excluyen de los conteos/promedios de abajo.
       cat.inscripciones.push(insc);
+
+      if (insc.estado === 'cancelado') return;
+
+      const montoPagadoNum = Number(insc.montoPagado) || 0;
+      const costoCategoria = Number(insc.categoria?.costo) || 0;
+      const pagoCompleto = montoPagadoNum >= costoCategoria && costoCategoria > 0;
+
+      cat.totalInscritos++;
 
       if (pagoCompleto) {
         cat.pagosConfirmados++;
@@ -257,6 +261,7 @@ export class InscripcionesAdminComponent implements OnInit {
 
     categorias.forEach(cat => {
       const ratings = cat.inscripciones
+        .filter(i => i.estado !== 'cancelado')
         .map(i => i.jugador?.rating || 0)
         .filter(r => r > 0);
 
@@ -270,23 +275,26 @@ export class InscripcionesAdminComponent implements OnInit {
     this.estadisticasPorCategoria = Array.from(categorias.values());
     this.cargarCategorias();
 
-    const totalInscritos = inscripciones.length;
+    // Igual que arriba: una inscripción cancelada no cuenta como "inscrito"
+    // en ninguno de los totales generales, aunque siga visible en la tabla.
+    const inscripcionesActivas = inscripciones.filter(i => i.estado !== 'cancelado');
+    const totalInscritos = inscripcionesActivas.length;
 
-    const pagosConfirmados = inscripciones.filter(i => {
+    const pagosConfirmados = inscripcionesActivas.filter(i => {
       const montoPagado = Number(i.montoPagado) || 0;
       const costo = Number(i.categoria?.costo) || 0;
       return montoPagado >= costo && costo > 0;
     }).length;
 
-    const totalRecaudado = inscripciones.reduce((sum, i) => {
+    const totalRecaudado = inscripcionesActivas.reduce((sum, i) => {
       return sum + (Number(i.montoPagado) || 0);
     }, 0);
 
-    const edades = inscripciones
+    const edades = inscripcionesActivas
       .map(i => i.edad || 0)
       .filter(e => e > 0);
 
-    const ratings = inscripciones
+    const ratings = inscripcionesActivas
       .map(i => i.jugador?.rating || 0)
       .filter(r => r > 0);
 
