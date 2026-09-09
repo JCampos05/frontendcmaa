@@ -159,6 +159,11 @@
     color: var(--color-dark-navy);
 }
 
+.hint-costo-categoria {
+    font-size: 0.8rem;
+    color: var(--color-slate);
+}
+
 .form-control {
     width: 100%;
     padding: 0.75rem 1rem;

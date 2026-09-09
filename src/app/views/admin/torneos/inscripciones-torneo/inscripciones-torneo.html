@@ -414,7 +414,7 @@
     <app-modal-confirmacion [mostrar]="mostrarModalConfirmacion" [titulo]="'Confirmar Pago'"
         [mensaje]="getMensajeConfirmacion()" [mensajeSecundario]="getMensajeSecundarioConfirmacion()"
         [textoConfirmar]="'Confirmar Pago'" [textoCancelar]="'Cancelar'" [tipoBotonPrimario]="'secondary'"
-        [icono]="'fa-circle-dollar-to-slot'" [iconoBotonPrimario]="'fa-check-circle'" (confirmar)="onConfirmarPago()"
+        [icono]="'ph-currency-circle-dollar'" [iconoBotonPrimario]="'ph-check-circle'" (confirmar)="onConfirmarPago()"
         (cancelar)="onCancelarConfirmacion()">
     </app-modal-confirmacion>
 
@@ -422,7 +422,7 @@
     <app-modal-confirmacion [mostrar]="mostrarModalEliminacion" [titulo]="'Eliminar Inscripción'"
         [mensaje]="getMensajeEliminacion()" [mensajeSecundario]="getMensajeSecundarioEliminacion()"
         [textoConfirmar]="'Eliminar'" [textoCancelar]="'Cancelar'" [tipoBotonPrimario]="'danger'"
-        [icono]="'fa-triangle-exclamation'" [iconoBotonPrimario]="'fa-trash'" [tipoAdvertencia]="true"
+        [icono]="'ph-warning'" [iconoBotonPrimario]="'ph-trash'" [tipoAdvertencia]="true"
         (confirmar)="onConfirmarEliminacion()" (cancelar)="onCancelarEliminacion()">
     </app-modal-confirmacion>
 </div>

@@ -355,7 +355,10 @@
                     </div>
                     <div class="info-bancaria-nota">
                         <i class="ph-bold ph-warning"></i>
-                        <strong>Solo se aceptan transferencias bancarias</strong>
+                        <span>
+                            <strong>Solo se aceptan transferencias bancarias.</strong>
+                            Pon el nombre completo del participante en el concepto de la transferencia.
+                        </span>
                     </div>
                 </div>
 
@@ -366,7 +369,7 @@
                         <p>Una vez realizada la transferencia, envíe su comprobante de pago por WhatsApp al número:</p>
                         <div class="numero-whatsapp" *ngIf="sistemaPago?.telefono">
                             <i class="ph-bold ph-whatsapp-logo"></i>
-                            <a [href]="'https://wa.me/52' + sistemaPago.telefono.replace('/\\D/g', '')" target="_blank">
+                            <a [href]="'https://wa.me/52' + soloDigitos(sistemaPago.telefono)" target="_blank">
                                 +52 {{ formatearTelefono(sistemaPago.telefono) }}
                             </a>
                         </div>

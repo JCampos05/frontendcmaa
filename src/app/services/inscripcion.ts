@@ -133,7 +133,8 @@ export class InscripcionService {
   update(id: number, datos: any): Observable<any> {
     //console.log(' UPDATE - Datos enviados al backend:', datos);
 
-    return this.http.put<any>(`${this.apiUrl}/${id}`, datos).pipe(
+    // El backend solo registra PATCH /:id (no PUT) — ver inscripcion.routes.ts.
+    return this.http.patch<any>(`${this.apiUrl}/${id}`, datos).pipe(
       map(response => {
         //console.log(' UPDATE - Respuesta del backend:', response);
         const data = response.data || response;

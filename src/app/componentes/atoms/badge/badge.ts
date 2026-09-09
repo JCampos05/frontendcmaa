@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../icon/icon';
 
-export type BadgeStatus = 'confirmed' | 'active' | 'pending' | 'inactive' | 'cancelled' | 'partial' | 'in-progress' | 'finished' | 'scheduled' | 'retired';
+export type BadgeStatus = 'confirmed' | 'active' | 'pending' | 'inactive' | 'cancelled' | 'partial' | 'excess' | 'in-progress' | 'finished' | 'scheduled' | 'retired';
 
 @Component({
   selector: 'app-badge',

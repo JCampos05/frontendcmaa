@@ -143,7 +143,8 @@ export class JugadorService {
    * PUT /api/jugadores/:id - Actualizar jugador (protegido)
    */
   update(id: number, jugador: Partial<Jugador>): Observable<Jugador> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, jugador).pipe(
+    // El backend solo registra PATCH /:id (no PUT) — ver jugador.routes.ts.
+    return this.http.patch<any>(`${this.apiUrl}/${id}`, jugador).pipe(
       map(response => response.data || response)
     );
   }

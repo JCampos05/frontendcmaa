@@ -470,6 +470,10 @@ export class InscripcionComponent implements OnInit {
     return telefono;
   }
 
+  soloDigitos(telefono: string): string {
+    return telefono ? telefono.replace(/\D/g, '') : '';
+  }
+
   private fechaYaPaso(fechaCierre: string | Date): boolean {
     try {
       const fechaCierreStr = typeof fechaCierre === 'string' ? fechaCierre : fechaCierre.toISOString();

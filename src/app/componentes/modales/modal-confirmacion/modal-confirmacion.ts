@@ -16,8 +16,10 @@ export class ModalConfirmacionComponent {
   @Input() textoConfirmar = 'Confirmar';
   @Input() textoCancelar = 'Cancelar';
   @Input() tipoBotonPrimario: 'primary' | 'danger' | 'secondary' = 'primary';
-  @Input() icono = 'fa-circle-question';
-  @Input() iconoBotonPrimario = 'fa-check';
+  // Clase completa de Phosphor Icons (ej. 'ph-warning'), no FontAwesome —
+  // el template solo agrega la clase base 'ph-bold', ver modal-confirmacion.html.
+  @Input() icono = 'ph-question';
+  @Input() iconoBotonPrimario = 'ph-check';
   @Input() tipoAdvertencia = false;
 
   @Output() confirmar = new EventEmitter<void>();

@@ -52,7 +52,6 @@
                         <select [(ngModel)]="jugadorEditando.estado" class="form-control">
                             <option value="activo">Activo</option>
                             <option value="inactivo">Inactivo</option>
-                            <option value="retirado">Retirado</option>
                         </select>
                     </div>
                 </div>
@@ -72,6 +71,10 @@
                                 {{ cat.nombre }}
                             </option>
                         </select>
+                        <small *ngIf="getCostoCategoriaSeleccionada() !== null" class="hint-costo-categoria">
+                            Costo de esta categoría: ${{ getCostoCategoriaSeleccionada() }}
+                            — no cambia automáticamente el monto ya pagado.
+                        </small>
                     </div>
                     <div class="form-group">
                         <label>Monto Pagado</label>
@@ -88,7 +91,7 @@
                     <div class="form-group">
                         <label>Estado de Inscripción</label>
                         <select [(ngModel)]="jugadorEditando.estado_inscripcion" class="form-control">
-                            <option value="pendiente">Pendiente</option>
+                            <option value="pendiente_pago">Pendiente</option>
                             <option value="confirmado">Confirmado</option>
                             <option value="cancelado">Cancelado</option>
                         </select>
@@ -114,4 +117,19 @@
             </div>
         </div>
     </div>
+
+    <app-modal-confirmacion
+        [mostrar]="mostrarModalCambioCategoria"
+        titulo="¿Cambiar de categoría?"
+        [mensaje]="mensajeCambioCategoria"
+        [mensajeSecundario]="mensajeSecundarioCambioCategoria"
+        [tipoAdvertencia]="true"
+        textoConfirmar="Sí, cambiar categoría"
+        textoCancelar="Cancelar"
+        tipoBotonPrimario="secondary"
+        icono="ph-warning"
+        iconoBotonPrimario="ph-check"
+        (confirmar)="confirmarCambioCategoria()"
+        (cancelar)="cancelarCambioCategoria()">
+    </app-modal-confirmacion>
 </div>

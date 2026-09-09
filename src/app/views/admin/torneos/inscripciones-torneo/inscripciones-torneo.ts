@@ -79,6 +79,8 @@ export class InscripcionesAdminComponent implements OnInit {
   readonly estadoPagoOptions: SelectOption<string>[] = [
     { value: 'todos', label: 'Todos' },
     { value: 'confirmado', label: 'Confirmados' },
+    { value: 'parcial', label: 'Pago parcial' },
+    { value: 'excedente', label: 'Excedente' },
     { value: 'pendiente', label: 'Pendientes' }
   ];
 
@@ -301,11 +303,20 @@ export class InscripcionesAdminComponent implements OnInit {
     this.actualizarDerivados();
   }
 
+  /**
+   * Todas las categorías asignadas al torneo (no solo las que ya tienen
+   * inscripciones) — el modal de edición debe poder mover a un jugador a
+   * cualquier categoría del torneo, incluso una sin inscritos todavía.
+   */
   cargarCategorias(): void {
-    this.categorias = this.estadisticasPorCategoria.map(ec => ({
-      idCategoria: ec.idCategoria,
-      nombre: ec.nombreCategoria
-    }));
+    const torneoCategorias = this.torneoSeleccionado?.torneoCategorias || [];
+    this.categorias = torneoCategorias
+      .filter(tc => tc.categoria)
+      .map(tc => ({
+        idCategoria: tc.idCategoria,
+        nombre: tc.categoria!.nombre,
+        costo: tc.categoria!.costo
+      }));
   }
 
   seleccionarCategoria(idCategoria: number | null): void {
@@ -367,7 +378,12 @@ export class InscripcionesAdminComponent implements OnInit {
 
   getBadgeStatusPago(inscripcion: Inscripcion): BadgeStatus {
     const estado = this.getEstadoPago(inscripcion);
-    return estado === 'confirmado' ? 'confirmed' : estado === 'parcial' ? 'partial' : 'pending';
+    switch (estado) {
+      case 'confirmado': return 'confirmed';
+      case 'parcial': return 'partial';
+      case 'excedente': return 'excess';
+      default: return 'pending';
+    }
   }
 
   getBadgeStatusInscripcion(estado: string | undefined): BadgeStatus {
@@ -398,22 +414,9 @@ export class InscripcionesAdminComponent implements OnInit {
     }
 
     if (this.filtroEstadoPago !== 'todos') {
-      inscripciones = inscripciones.filter(i => {
-        const montoPagado = Number(i.montoPagado) || 0;
-        const costoCategoria = Number(i.categoria?.costo) || 0;
-
-        if (this.filtroEstadoPago === 'confirmado') {
-          return montoPagado >= costoCategoria && costoCategoria > 0;
-        }
-        if (this.filtroEstadoPago === 'parcial') {
-          return montoPagado > 0 && montoPagado < costoCategoria;
-        }
-        if (this.filtroEstadoPago === 'pendiente') {
-          return montoPagado < costoCategoria;
-        }
-
-        return true;
-      });
+      // Reutiliza getEstadoPago() en vez de repetir la comparación
+      // monto/costo aquí — ya incluye el caso "excedente".
+      inscripciones = inscripciones.filter(i => this.getEstadoPago(i) === this.filtroEstadoPago);
     }
 
     if (this.filtroEstadoInscripcion !== 'todos') {
@@ -518,7 +521,9 @@ export class InscripcionesAdminComponent implements OnInit {
     if (!this.inscripcionParaConfirmar) return '';
 
     const nombreCompleto = `${this.inscripcionParaConfirmar.jugador?.nombre} ${this.inscripcionParaConfirmar.jugador?.apellido1}`;
-    const monto = this.inscripcionParaConfirmar.categoria?.costo || 0;
+    // costo llega como Decimal de Prisma (string en el JSON), no number — sin
+    // el Number() explícito, .toFixed() truena con "monto.toFixed is not a function".
+    const monto = Number(this.inscripcionParaConfirmar.categoria?.costo) || 0;
 
     return `Se confirmará el pago de <strong>$${monto.toFixed(2)}</strong> para el jugador <strong>${nombreCompleto}</strong>`;
   }
@@ -559,10 +564,18 @@ export class InscripcionesAdminComponent implements OnInit {
     }
   }
 
-  getEstadoPago(inscripcion: Inscripcion): 'confirmado' | 'parcial' | 'pendiente' {
+  getEstadoPago(inscripcion: Inscripcion): 'confirmado' | 'parcial' | 'pendiente' | 'excedente' {
     const montoPagado = Number(inscripcion.montoPagado) || 0;
-    const costoCategoria = inscripcion.categoria?.costo || 0;
+    const costoCategoria = Number(inscripcion.categoria?.costo) || 0;
     const pagoConfirmado = Boolean(inscripcion.pagoConfirmado);
+
+    // Típicamente por un cambio a una categoría más barata después de ya
+    // haber pagado el costo de la anterior — se revisa antes que "confirmado"
+    // porque el admin necesita verlo aunque el pago también esté marcado
+    // como confirmado.
+    if (costoCategoria > 0 && montoPagado > costoCategoria) {
+      return 'excedente';
+    }
 
     if (pagoConfirmado && montoPagado >= costoCategoria) {
       return 'confirmado';
@@ -583,6 +596,8 @@ export class InscripcionesAdminComponent implements OnInit {
         return 'status-confirmed';
       case 'parcial':
         return 'status-partial';
+      case 'excedente':
+        return 'status-excess';
       case 'pendiente':
       default:
         return 'status-pending';
@@ -597,6 +612,10 @@ export class InscripcionesAdminComponent implements OnInit {
         return 'Confirmado';
       case 'parcial':
         return 'Pago Parcial';
+      case 'excedente': {
+        const excedente = (Number(inscripcion.montoPagado) || 0) - (Number(inscripcion.categoria?.costo) || 0);
+        return `Excedente ($${excedente.toFixed(2)})`;
+      }
       case 'pendiente':
       default:
         return 'Pendiente';
@@ -611,6 +630,8 @@ export class InscripcionesAdminComponent implements OnInit {
         return 'fa-circle-check';
       case 'parcial':
         return 'fa-circle-half-stroke';
+      case 'excedente':
+        return 'fa-circle-exclamation';
       case 'pendiente':
       default:
         return 'fa-clock';
@@ -743,6 +764,10 @@ export class InscripcionesAdminComponent implements OnInit {
   onModalEdicionActualizado(): void {
     this.cerrarModalEdicion();
     this.actualizarEstadisticas();
+    // El toast del modal de edición se destruye junto con el modal antes de
+    // poder mostrarse (su <app-toast-noti> vive dentro del *ngIf que lo
+    // oculta) — se notifica aquí, en la vista contenedora, que sí persiste.
+    this.toast.success('Cambios guardados', 'Los datos del jugador y de la inscripción se actualizaron correctamente');
   }
 
   eliminarInscripcion(inscripcion: Inscripcion): void {

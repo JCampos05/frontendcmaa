@@ -89,16 +89,30 @@
     flex-shrink: 0;
 }
 
-/* Variante con degradado (usada en modales de edición) */
+/* Variante con degradado (usada en modales de edición).
+   Ángulo horizontal (a la derecha) en vez de diagonal: un ángulo fijo en
+   grados (135deg) se ve bien en un header ancho y bajo, pero en móvil,
+   cuando el título envuelve a 2 líneas y el header crece de alto, la
+   misma diagonal queda casi vertical y el degradado se ve mayormente
+   oscuro (solo se alcanza a ver una esquina con el tono claro). Un
+   degradado horizontal no depende de la proporción del header. */
 .modal-header--gradient {
-    background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-dark-navy) 100%);
+    background: linear-gradient(to right, var(--color-brown) 0%, var(--color-dark-navy) 100%);
     border-bottom: none;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
+/* El h2/p de abajo tienen su propio color explícito (dark-navy/slate) —
+   heredar "white" desde el contenedor no los sobreescribe, porque una
+   regla que apunta directamente al elemento siempre gana sobre un valor
+   heredado del padre, sin importar especificidad. Por eso el título
+   quedaba oscuro sobre el degradado oscuro (ilegible) hasta agregar
+   estas reglas explícitas sobre h2/p. */
 .modal-header--gradient .modal-title,
 .modal-header--gradient .modal-title-text,
-.modal-header--gradient .modal-title-icon {
+.modal-header--gradient .modal-title-icon,
+.modal-header--gradient .modal-title-text h2,
+.modal-header--gradient .modal-title-text p {
     color: var(--color-white);
 }
 

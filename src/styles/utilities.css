@@ -389,6 +389,14 @@
     color: var(--color-warning-text);
 }
 
+/* Monto pagado mayor al costo de la categoría actual — típicamente por un
+   cambio a una categoría más barata después de haber pagado. Distinto del
+   amber de "partial" (falta pagar) porque el problema es el opuesto: sobra. */
+.status-badge--excess {
+    background: var(--color-info-light);
+    color: var(--color-info-text);
+}
+
 /* Ronda / Mesa en curso */
 .status-badge--in-progress {
     background: var(--color-info-light);
